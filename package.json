@@ -1,0 +1,22 @@
+{
+  "name": "tradertools",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^3.19.0",
+    "@blueprintjs/datetime": "^3.14.0",
+    "@blueprintjs/icons": "^3.11.0",
+    "@blueprintjs/select": "^3.11.0",
+    "@emotion/core": "^10.0.21",
+    "@mdx-js/react": "^1.5.1",
+    "next": "9.0.8",
+    "react": "16.10.2",
+    "react-dom": "16.10.2",
+    "theme-ui": "^0.2.43"
+  }
+}
