@@ -1,78 +1,54 @@
-import * as React from "react";
-import Head from "next/head";
-import Nav from "../components/nav";
+/** @jsx jsx */
+import { jsx, css } from "@emotion/core";
+import React from "react";
+import Themed from "../components/Themed";
+import { Flex, Box } from "rebass";
+import { Button, Card, Elevation, InputGroup } from "@blueprintjs/core";
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>Home</title>
-      <link rel="icon" href="/static/favicon.ico" />
-    </Head>
-
-    <Nav />
-
-    <div className="hero">
-      <h1 className="title">Welcome to Next.js!</h1>
-      <p className="description">
-        To get started, edit <code>pages/index.js</code> and save to reload.
-      </p>
-
-      <div className="row">
-        <form onSubmit={() => console.log("submit login")}>
-          <input type="text" id="username" placeholder="username" />
-          <input type="password" id="password" placeholder="password" />
-          <button type="submit">Login</button>
-        </form>
-      </div>
-    </div>
-
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
+const Login = () => (
+  <Themed>
+    <Flex justifyContent="center" alignItems="center" height="100vh">
+      <Box width={1 / 2} px={2}>
+        <Card elevation={Elevation.TWO}>
+          <h2 style={{ marginTop: 0 }}>Login</h2>
+          <form action="/api/login" method="POST">
+            <InputGroup
+              leftIcon="user"
+              id="username"
+              name="username"
+              placeholder="username"
+              large
+              css={css`
+                margin-bottom: 10px;
+              `}
+            />
+            <InputGroup
+              leftIcon="lock"
+              type="passwor"
+              id="password"
+              name="password"
+              placeholder="password"
+              large
+              css={css`
+                margin-bottom: 10px;
+              `}
+            />
+            <Flex
+              justifyContent="right"
+              css={css`
+                margin-top: 20px;
+                margin-left: auto;
+              `}
+            >
+              <Button type="submit" large>
+                Submit
+              </Button>
+            </Flex>
+          </form>
+        </Card>
+      </Box>
+    </Flex>
+  </Themed>
 );
 
-export default Home;
+export default Login;
