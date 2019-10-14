@@ -36,3 +36,4 @@ pids
 *.seed
 
 yarn*
+package-lock.json

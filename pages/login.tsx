@@ -8,10 +8,10 @@ import { Button, Card, Elevation, InputGroup } from "@blueprintjs/core";
 const Login = () => (
   <Themed>
     <Flex justifyContent="center" alignItems="center" height="100vh">
-      <Box width={1 / 2} px={2}>
+      <Box width={[1, 1 / 2, 1 / 2, 1 / 4, 1 / 6]} px={2}>
         <Card elevation={Elevation.TWO}>
           <h2 style={{ marginTop: 0 }}>Login</h2>
-          <form action="/api/login" method="POST">
+          <form action="/login" method="POST">
             <InputGroup
               leftIcon="user"
               id="username"
@@ -24,7 +24,7 @@ const Login = () => (
             />
             <InputGroup
               leftIcon="lock"
-              type="passwor"
+              type="password"
               id="password"
               name="password"
               placeholder="password"
@@ -34,11 +34,11 @@ const Login = () => (
               `}
             />
             <Flex
-              justifyContent="right"
-              css={css`
-                margin-top: 20px;
-                margin-left: auto;
-              `}
+              justifyContent="flex-end"
+              sx={{
+                marginTop: 20,
+                marginLeft: "auto"
+              }}
             >
               <Button type="submit" large>
                 Submit
