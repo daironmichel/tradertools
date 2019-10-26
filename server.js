@@ -3,7 +3,7 @@ const Hapi = require("@hapi/hapi");
 const H2o2 = require("@hapi/h2o2");
 const CookieAuth = require("@hapi/cookie");
 const { nextHandlerWrapper } = require("./next-wrapper");
-const { BackboneAPI } = require("./api/backbone-server-api");
+const BackboneAPI = require("./api/backbone-api");
 const dev = process.env.NODE_ENV !== "production";
 
 if (dev) require("dotenv").config();
@@ -30,23 +30,12 @@ app.prepare().then(async () => {
     appendNext: true,
     redirectTo: "/login",
     validateFunc: async (request, session) => {
-      const query = `
-      {
-        viewer { 
-          credentials {
-            databaseId
-            fullName            
-          }
-        }
-      }
-      `;
-
       let credentials = {};
       try {
-        const response = await backboneApi.graphQL(query, {}, { Authorization: `Token ${session.accessToken}` });
-        credentials = response.data.data.viewer.credentials;
+        const response = await backboneApi.getCredentials(session.accessToken);
+        credentials = response;
       } catch (e) {
-        console.log(e);
+        console.error(e);
         return { valid: false };
       }
 
@@ -75,7 +64,8 @@ app.prepare().then(async () => {
           console.log(e);
         }
         if (!accessToken) {
-          return h.redirect("/login"); //return internals.renderHtml.login("Invalid username or password");
+          const next = request.query.next;
+          return h.redirect(`/login${next ? "?next=" + next : ""}`); //return internals.renderHtml.login("Invalid username or password");
         }
 
         request.cookieAuth.set({ accessToken });
@@ -88,8 +78,13 @@ app.prepare().then(async () => {
     method: "GET",
     path: "/logout",
     handler: async (request, h) => {
-      const { accessToken } = request.state;
-      await backboneApi.logout(accessToken);
+      const { sid: session } = request.state;
+      try {
+        await backboneApi.logout(session.accessToken);
+      } catch (e) {
+        console.error(e);
+        return h.response(e);
+      }
       request.cookieAuth.clear();
       return h.redirect("/login");
     }

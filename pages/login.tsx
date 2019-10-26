@@ -17,6 +17,7 @@ const Login = () => (
               id="username"
               name="username"
               placeholder="username"
+              autoComplete="username"
               large
               css={css`
                 margin-bottom: 10px;
@@ -28,6 +29,7 @@ const Login = () => (
               id="password"
               name="password"
               placeholder="password"
+              autoComplete="current-password"
               large
               css={css`
                 margin-bottom: 10px;

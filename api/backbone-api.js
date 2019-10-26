@@ -19,9 +19,15 @@ class BackboneAPI {
     return res.data.key;
   }
 
+  async getCredentials(token) {
+    let headers = { Authorization: `Token ${token}` };
+    const res = await this.axios.get("credentials/", { headers });
+    return res.data;
+  }
+
   async logout(token) {
     const body = {};
-    const headers = { Authorization: `Token ${token}` };
+    let headers = { Authorization: `Token ${token}` };
     const res = await this.axios.post("logout/", body, { headers });
     return res.data;
   }
@@ -44,4 +50,4 @@ class BackboneAPI {
   }
 }
 
-module.exports = { BackboneAPI };
+module.exports = BackboneAPI;

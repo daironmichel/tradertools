@@ -5,8 +5,8 @@ export default class BackboneAPI {
   axios: AxiosInstance;
   cancelTokenSource: CancelTokenSource | null;
 
-  constructor() {
-    const baseURL = "/api/backbone/";
+  constructor(apiHost: string = "") {
+    const baseURL = `${apiHost}/api/`;
     this.axios = axios.create({
       baseURL: baseURL,
       headers: {
