@@ -6,7 +6,9 @@
     "devnext": "next dev -p 5001",
     "dev": "node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js",
+    "relay": "relay-compiler",
+    "schema": "graphql get-schema -e default"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.19.0",
@@ -27,6 +29,7 @@
     "node-sass": "^4.12.0",
     "react": "16.10.2",
     "react-dom": "16.10.2",
+    "react-relay": "^7.0.0",
     "rebass": "^4.0.6"
   },
   "devDependencies": {
@@ -37,10 +40,15 @@
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "babel-plugin-emotion": "^10.0.21",
+    "babel-plugin-relay": "^7.0.0",
     "dotenv": "^8.1.0",
     "eslint": "^6.5.1",
     "eslint-plugin-react": "^7.16.0",
     "file-loader": "^4.2.0",
+    "graphql": "^14.5.8",
+    "graphql-cli": "^3.0.14",
+    "relay-compiler": "^7.0.0",
+    "relay-config": "^7.0.0",
     "source-map-loader": "^0.2.4",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.3",

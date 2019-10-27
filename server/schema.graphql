@@ -1,0 +1,39 @@
+# source: http://localhost:5000/api/gql/
+# timestamp: Sat Oct 26 2019 21:11:43 GMT-0400 (Eastern Daylight Time)
+
+interface DatabaseId {
+  databaseId: Int
+}
+
+"""An object with an ID"""
+interface Node {
+  """The ID of the object."""
+  id: ID!
+}
+
+type Query {
+  viewer: ViewerType
+
+  """The ID of the object"""
+  riskManagementSettings(id: ID!): RiskManagementSettingsNode
+}
+
+type RiskManagementSettingsNode implements Node & DatabaseId {
+  """The ID of the object."""
+  id: ID!
+  exposure: Int!
+  profit: Int!
+  loss: Int!
+  feePerTrade: Float!
+  databaseId: Int
+}
+
+type ViewerCredentialsType {
+  databaseId: Int
+  fullName: String
+}
+
+type ViewerType {
+  credentials: ViewerCredentialsType
+  riskManagementSettings: RiskManagementSettingsNode
+}
