@@ -11,6 +11,6 @@ module.exports = {
     "**/__mocks__/**",
     "**/__generated__/**"
   ],
-  extensions: ["js", "jsx", "tsx"],
+  extensions: ["js", "jsx", "ts", "tsx"],
   language: "typescript"
 };

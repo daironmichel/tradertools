@@ -4,11 +4,9 @@ import Nav from "../components/nav";
 import { graphql } from "react-relay";
 import { pages_indexQueryResponse } from "./__generated__/pages_indexQuery.graphql";
 
-interface Props {
-  viewer: pages_indexQueryResponse;
-}
+interface Props extends pages_indexQueryResponse {}
 
-class Home extends React.Component<Props> {
+class Index extends React.Component<Props> {
   static query = graphql`
     query pages_indexQuery {
       viewer {
@@ -22,7 +20,6 @@ class Home extends React.Component<Props> {
 
   render() {
     const { viewer } = this.props;
-    console.log("viewer:", viewer);
     return (
       <div>
         <Head>
@@ -33,7 +30,7 @@ class Home extends React.Component<Props> {
         <Nav />
 
         <div className="hero">
-          <h1 className="title">Welcome to Next.js! {/*viewer.creadentials.fullName*/}</h1>
+          <h1 className="title">Welcome to Next.js! {viewer.credentials.fullName}</h1>
           <p className="description">
             To get started, edit <code>pages/index.js</code> and save to reload.
           </p>
@@ -105,4 +102,4 @@ class Home extends React.Component<Props> {
   }
 }
 
-export default Home;
+export default Index;

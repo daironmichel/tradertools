@@ -25,7 +25,8 @@ app.prepare().then(async () => {
       // Don't forget to change it to your own secret password!
       password: process.env.COOKIE_AUTH_PASSWORD,
       // For working via HTTP in localhost
-      isSecure: !dev
+      isSecure: !dev,
+      isHttpOnly: !dev
     },
     appendNext: true,
     redirectTo: "/login",
@@ -87,6 +88,27 @@ app.prepare().then(async () => {
       }
       request.cookieAuth.clear();
       return h.redirect("/login");
+    }
+  });
+
+  server.route({
+    method: "*",
+    path: "/api/gql/",
+    // config: { payload: { output: "data" } },
+    options: {
+      payload: { output: "data" },
+      auth: false,
+      handler: {
+        proxy: {
+          mapUri: request => {
+            const { sid: session } = request.state;
+            const uri = `${process.env.BACKBONE_API}/api/gql/`;
+            const headers = { authorization: `Token ${session.accessToken}` };
+            return { uri, headers };
+          }
+          // uri: `${process.env.BACKBONE_API}/api/{endpoint}`
+        }
+      }
     }
   });
 

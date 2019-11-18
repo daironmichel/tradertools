@@ -22,7 +22,7 @@ export default {
           lookup: false
         }),
         urlMiddleware({
-          url: `${process.env.BACKBONE_API}/api/gql/`
+          url: `/api/gql/`
         })
       ])
     });
