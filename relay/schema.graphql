@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Sat Oct 26 2019 21:11:43 GMT-0400 (Eastern Daylight Time)
+# timestamp: Wed Nov 20 2019 17:40:57 GMT-0500 (Eastern Standard Time)
 
 interface DatabaseId {
   databaseId: Int
@@ -15,15 +15,16 @@ type Query {
   viewer: ViewerType
 
   """The ID of the object"""
-  riskManagementSettings(id: ID!): RiskManagementSettingsNode
+  riskStrategy(id: ID!): RiskStrategyNode
 }
 
-type RiskManagementSettingsNode implements Node & DatabaseId {
+type RiskStrategyNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
-  exposure: Int!
-  profit: Int!
-  loss: Int!
+  name: String!
+  exposurePercent: Int!
+  profitPercent: Int!
+  lossPercent: Int!
   feePerTrade: Float!
   databaseId: Int
 }
@@ -35,5 +36,5 @@ type ViewerCredentialsType {
 
 type ViewerType {
   credentials: ViewerCredentialsType
-  riskManagementSettings: RiskManagementSettingsNode
+  riskStrategies: RiskStrategyNode
 }

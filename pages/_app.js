@@ -31,7 +31,7 @@ export default class App extends NextApp {
 
   render() {
     const { Component, variables = {}, relayData } = this.props;
-    const query = Component.query ? Component.query() : {};
+    // const query = Component.query ? Component.query() : {};
     const environment = createEnvironment(
       relayData,
       JSON.stringify({

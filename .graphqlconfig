@@ -1,11 +1,11 @@
 {
-  "schemaPath": "server/schema.graphql",
+  "schemaPath": "relay/schema.graphql",
   "extensions": {
     "endpoints": {
       "default": {
         "url": "${env:BACKBONE_API}/api/gql/",
         "headers": {
-          "Authorization": "Token ${env:BACKBONE_API_TOKEN}"
+          "Authorization": "Token ${env:GRAPHQL_CLI_TOKEN}"
         }
       }
     }

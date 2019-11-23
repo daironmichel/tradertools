@@ -1,4 +1,4 @@
-import { RelayNetworkLayer, urlMiddleware, loggerMiddleware, authMiddleware } from "react-relay-network-modern/node8";
+import { RelayNetworkLayer, urlMiddleware, loggerMiddleware } from "react-relay-network-modern/node8";
 import RelaySSR from "react-relay-network-modern-ssr/node8/server";
 import { Network, Environment, RecordSource, Store } from "relay-runtime";
 
@@ -14,7 +14,7 @@ export default {
         store,
         network: new RelayNetworkLayer([
           urlMiddleware({
-            url: `localhost:5001/api/gql/`
+            url: `/api/gql/`
           }),
           loggerMiddleware(),
           relaySSR.getMiddleware()
