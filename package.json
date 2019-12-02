@@ -17,7 +17,6 @@
     "@blueprintjs/select": "^3.11.0",
     "@emotion/core": "^10.0.21",
     "@emotion/styled": "^10.0.17",
-    "@hapi/bell": "^11.1.0",
     "@hapi/cookie": "^10.1.2",
     "@hapi/h2o2": "^8.3.2",
     "@hapi/hapi": "^18.4.0",

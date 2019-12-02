@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { Navbar, Button, Alignment } from "@blueprintjs/core";
+import { Navbar, Button, Alignment, H5 } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
 const MainNavbar = () => (
@@ -12,6 +12,10 @@ const MainNavbar = () => (
       <Button minimal icon={IconNames.HOME} text="Home" />
       <Button minimal icon={IconNames.DOCUMENT} text="Files" />
       <Navbar.Divider />
+      <span css={{ marginRight: 5 }}>
+        Welcome <strong>dl</strong>
+      </span>
+      <Button minimal icon={IconNames.USER} />
     </Navbar.Group>
   </Navbar>
 );

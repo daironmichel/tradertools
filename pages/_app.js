@@ -1,45 +1,44 @@
 import React from "react";
-import { QueryRenderer, fetchQuery } from "react-relay";
+import { QueryRenderer /*, fetchQuery*/ } from "react-relay";
 import NextApp from "next/app";
 import "../scss/styles.scss";
 
-import { initEnvironment, createEnvironment } from "../relay";
+import { /*initEnvironment, */ createEnvironment } from "../relay";
 
 export default class App extends NextApp {
-  static getInitialProps = async ({ Component, ctx /*, router */ }) => {
-    const { variables } = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
+  // static getInitialProps = async ({ Component, ctx /*, router */ }) => {
+  //   const { variables } = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
 
-    try {
-      if (initEnvironment && Component.query) {
-        const { environment, relaySSR } = initEnvironment();
+  //   try {
+  //     if (initEnvironment && Component.query) {
+  //       const { environment, relaySSR } = initEnvironment();
 
-        await fetchQuery(environment, Component.query, variables);
+  //       await fetchQuery(environment, Component.query, variables);
 
-        return {
-          variables,
-          relayData: await relaySSR.getCache()
-        };
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  //       return {
+  //         variables,
+  //         relayData: await relaySSR.getCache()
+  //       };
+  //     }
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
 
-    return {
-      variables
-    };
-  };
+  //   return {
+  //     variables
+  //   };
+  // };
 
   render() {
-    const { Component, variables = {}, relayData } = this.props;
+    const { Component, variables = {} /*, relayData*/ } = this.props;
     // const query = Component.query ? Component.query() : {};
-    const environment = createEnvironment(
-      relayData,
-      JSON.stringify({
-        // queryID: Component.query ? Component.query().params.name : undefined,
-        queryID: Component.query ? Component.query().default.hash : undefined,
-        variables
-      })
-    );
+    const environment = createEnvironment();
+    // relayData
+    // JSON.stringify({
+    //   // queryID: Component.query ? Component.query().params.name : undefined,
+    //   queryID: Component.query ? Component.query().default.hash : undefined,
+    //   variables
+    // })
 
     return (
       <QueryRenderer
