@@ -40,6 +40,8 @@ export default class App extends NextApp {
     //   variables
     // })
 
+    console.log("vars:", variables);
+
     return (
       <QueryRenderer
         environment={environment}

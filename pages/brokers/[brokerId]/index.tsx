@@ -4,29 +4,21 @@ import Link from "next/link";
 import { graphql } from "react-relay";
 import { ButtonGroup, Button, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
-import Layout from "../components/Layout";
-import { pages_indexQueryResponse } from "./__generated__/pages_indexQuery.graphql";
+import Layout from "../../../components/Layout";
+import { BrokerIdQueryResponse } from "./__generated__/BrokerIdQuery.graphql";
 
-interface Props extends pages_indexQueryResponse {}
+interface Props extends BrokerIdQueryResponse {}
 
 class Index extends React.Component<Props> {
   static query = graphql`
-    query pages_indexQuery {
-      viewer {
-        brokers {
-          id
-          databaseId
-          name
+    query BrokerIdQuery($nodeId: ID!) {
+      node(id: $nodeId) {
+        ... on BrokerNode {
           serviceProviders {
             edges {
               node {
                 id
-                databaseId
                 name
-                protocol
-                session {
-                  status
-                }
               }
             }
           }
@@ -36,7 +28,8 @@ class Index extends React.Component<Props> {
   `;
 
   render() {
-    const { viewer } = this.props;
+    const { node } = this.props;
+    const { serviceProviders } = node;
     return (
       <Layout>
         <Head>
@@ -44,11 +37,11 @@ class Index extends React.Component<Props> {
         </Head>
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column">
-          <h4>SELECT BROKER</h4>
+          <h4>SELECT PROVIDER</h4>
           <ButtonGroup vertical large>
-            {viewer.brokers.map(broker => (
-              <Link href="/brokers/[brokerId]/" as="/brokers/1/" passHref>
-                <AnchorButton key={broker.id} text={broker.name} />
+            {serviceProviders.edges.map(provider => (
+              <Link href="" as="" passHref>
+                <AnchorButton key={provider.node.id} text={provider.node.name} />
               </Link>
             ))}
           </ButtonGroup>
