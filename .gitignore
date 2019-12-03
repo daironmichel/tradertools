@@ -35,5 +35,5 @@ pids
 *.pid
 *.seed
 
-yarn*
+yarn-error.log
 package-lock.json

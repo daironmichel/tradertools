@@ -10,7 +10,7 @@ interface RootQueryComponent extends React.ComponentClass {
 
 interface Props {
   Component: RootQueryComponent;
-  variables: any;
+  variables?: any;
 }
 
 export default class RelayRoot extends React.Component<Props> {
