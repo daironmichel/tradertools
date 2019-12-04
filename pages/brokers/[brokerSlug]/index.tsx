@@ -2,23 +2,29 @@ import * as React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { graphql } from "react-relay";
-import { ButtonGroup, Button, AnchorButton } from "@blueprintjs/core";
+import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../components/Layout";
-import { BrokerIdQueryResponse } from "./__generated__/BrokerIdQuery.graphql";
+import { BrokerSlugQueryResponse } from "./__generated__/BrokerSlugQuery.graphql";
 
-interface Props extends BrokerIdQueryResponse {}
+interface Props extends BrokerSlugQueryResponse {}
 
 class Index extends React.Component<Props> {
   static query = graphql`
-    query BrokerIdQuery($nodeId: ID!) {
-      node(id: $nodeId) {
-        ... on BrokerNode {
+    query BrokerSlugQuery($brokerSlug: String!) {
+      viewer {
+        broker(slug: $brokerSlug) {
+          id
+          databaseId
+          name
+          slug
           serviceProviders {
             edges {
               node {
                 id
+                databaseId
                 name
+                slug
               }
             }
           }
@@ -28,8 +34,9 @@ class Index extends React.Component<Props> {
   `;
 
   render() {
-    const { node } = this.props;
-    const { serviceProviders } = node;
+    const { viewer } = this.props;
+    const { broker } = viewer;
+    const { serviceProviders } = broker;
     return (
       <Layout>
         <Head>
@@ -40,8 +47,13 @@ class Index extends React.Component<Props> {
           <h4>SELECT PROVIDER</h4>
           <ButtonGroup vertical large>
             {serviceProviders.edges.map(provider => (
-              <Link href="" as="" passHref>
-                <AnchorButton key={provider.node.id} text={provider.node.name} />
+              <Link
+                key={provider.node.id}
+                href="/brokers/[brokerSlug]/[providerSlug]/"
+                as={`/brokers/${broker.slug}/${provider.node.slug}/`}
+                passHref
+              >
+                <AnchorButton text={provider.node.name} />
               </Link>
             ))}
           </ButtonGroup>

@@ -30,7 +30,7 @@ export default class App extends NextApp {
   // };
 
   render() {
-    const { Component, variables = {} /*, relayData*/ } = this.props;
+    const { Component, router /*, relayData*/ } = this.props;
     // const query = Component.query ? Component.query() : {};
     const environment = createEnvironment();
     // relayData
@@ -40,16 +40,16 @@ export default class App extends NextApp {
     //   variables
     // })
 
-    console.log("vars:", variables);
-
     return (
       <QueryRenderer
         environment={environment}
         query={Component.query}
-        variables={variables}
+        variables={router.query}
         render={({ error, props }) => {
-          if (error) return <div>{error.message}</div>;
-          else if (props) return <Component {...props} />;
+          if (error) {
+            console.error(error);
+            return <div>Loading</div>;
+          } else if (props) return <Component {...props} />;
           return <div>Loading</div>;
         }}
       />

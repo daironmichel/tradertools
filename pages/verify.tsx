@@ -1,48 +1,71 @@
-import { jsx, css } from "@emotion/core";
-import React, { SyntheticEvent } from "react";
+import { css } from "@emotion/core";
+import React from "react";
 import Head from "next/head";
-import router from "next/router";
-import Themed from "../../components/Themed";
+import Router from "next/router";
 import { Flex, Box } from "rebass";
-import { Button, Card, InputGroup, Icon, Classes } from "@blueprintjs/core";
+import { Button, Card, InputGroup, Icon, Classes, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
-import EtradeAPI from "../../api/etrade-client-api";
+import Layout from "../components/Layout";
+import AuthorizeConnectionMutation from "../mutations/Provider/AuthorizeConnectionMutation";
+import { AuthorizeConnectionMutationResponse } from "../mutations/Provider/__generated__/AuthorizeConnectionMutation.graphql";
 
 interface State {
   code: string;
+  providerId: string | null;
   loading: boolean;
 }
 
 class Verify extends React.Component<{}, State> {
-  etradeApi: EtradeAPI;
-
   constructor(props: any) {
     super(props);
-    this.etradeApi = new EtradeAPI();
-
     this.state = {
       code: "",
+      providerId: window.localStorage.getItem("providerId"),
       loading: false
     };
   }
 
-  _handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+  _handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (this.state.loading) return;
+
     this.setState({ loading: true });
-    this.etradeApi.verify(this.state.code).then(() => {
-      this.setState({ loading: false });
-      router.push("/");
-    });
+    AuthorizeConnectionMutation.commit(
+      { providerId: this.state.providerId, oauthVerifier: this.state.code },
+      this.onAuthorizeCompleted,
+      this.onAuthorizeError
+    );
   };
 
-  _handleCodeChange = (e: SyntheticEvent<HTMLInputElement>) => {
+  onAuthorizeCompleted = (response: AuthorizeConnectionMutationResponse | null, errors: Array<Error> | null) => {
+    this.setState({ loading: false });
+    if (errors) {
+      console.error(errors);
+      return;
+    }
+
+    const { error, errorMessage, serviceProvider } = response.authorizeConnection;
+    if (error) {
+      console.error(`${error}: ${errorMessage}`);
+      return;
+    }
+
+    window.localStorage.removeItem("providerId");
+    const { broker } = serviceProvider;
+    Router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
+  };
+
+  onAuthorizeError = (error: Error) => {
+    this.setState({ loading: false });
+    console.error(error);
+  };
+
+  _handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ code: e.currentTarget.value });
   };
 
   render() {
     return (
-      <Themed>
+      <Layout>
         <Head>
           <title>Etrade Verify</title>
         </Head>
@@ -59,7 +82,6 @@ class Verify extends React.Component<{}, State> {
               </Flex>
               <form method="POST" onSubmit={this._handleSubmit}>
                 <InputGroup
-                  leftIcon="user"
                   id="code"
                   name="code"
                   placeholder="code"
@@ -78,13 +100,13 @@ class Verify extends React.Component<{}, State> {
                     marginLeft: "auto"
                   }}
                 >
-                  <Button type="submit" large fill text="Verify" loading={this.state.loading} />
+                  <Button type="submit" intent={Intent.PRIMARY} large fill text="Verify" loading={this.state.loading} />
                 </Flex>
               </form>
             </Card>
           </Box>
         </Flex>
-      </Themed>
+      </Layout>
     );
   }
 }

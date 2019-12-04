@@ -2,7 +2,7 @@ import * as React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { graphql } from "react-relay";
-import { ButtonGroup, Button, AnchorButton } from "@blueprintjs/core";
+import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../components/Layout";
 import { pages_indexQueryResponse } from "./__generated__/pages_indexQuery.graphql";
@@ -17,19 +17,7 @@ class Index extends React.Component<Props> {
           id
           databaseId
           name
-          serviceProviders {
-            edges {
-              node {
-                id
-                databaseId
-                name
-                protocol
-                session {
-                  status
-                }
-              }
-            }
-          }
+          slug
         }
       }
     }
@@ -47,7 +35,7 @@ class Index extends React.Component<Props> {
           <h4>SELECT BROKER</h4>
           <ButtonGroup vertical large>
             {viewer.brokers.map(broker => (
-              <Link href="/brokers/[brokerId]/" as="/brokers/1/" passHref>
+              <Link key={broker.id} href="/brokers/[brokerSlug]/" as={`/brokers/${broker.slug}/`} passHref>
                 <AnchorButton key={broker.id} text={broker.name} />
               </Link>
             ))}

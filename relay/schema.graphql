@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Mon Dec 02 2019 13:32:17 GMT-0500 (Eastern Standard Time)
+# timestamp: Wed Dec 04 2019 17:24:28 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -63,7 +63,7 @@ enum AuthorizeConnectionError {
 
 input AuthorizeConnectionInput {
   providerId: ID
-  aouthVerifier: String
+  oauthVerifier: String
   clientMutationId: String
 }
 
@@ -78,9 +78,11 @@ type BrokerNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
   name: String!
+  slug: String!
   accounts(before: String, after: String, first: Int, last: Int): AccountNodeConnection!
   serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderNodeConnection!
   databaseId: Int
+  serviceProvider(databaseId: ID, slug: String): ServiceProviderNode
 }
 
 enum BuyStockError {
@@ -219,6 +221,7 @@ type ServiceProviderNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
   name: String!
+  slug: String!
   protocol: ServiceProviderProtocol!
   consumerKey: String!
   consumerSecret: String!
@@ -229,6 +232,7 @@ type ServiceProviderNode implements Node & DatabaseId {
   revokeUrl: String
   baseUrl: String
   session: ProviderSessionNode
+  broker: BrokerNode
   databaseId: Int
   quote(symbol: String): QuoteType
 }
@@ -257,6 +261,11 @@ enum ServiceProviderProtocol {
 
   """OAuth 2"""
   OAUTH2
+}
+
+input ServiceProviderSlugInput {
+  brokerSlug: String!
+  priverderSlug: String!
 }
 
 enum SessionStatus {
@@ -301,6 +310,9 @@ type ViewerType {
   credentials: ViewerCredentialsType
   tradingStrategies: [TradingStrategyNode]
   brokers: [BrokerNode]
+  broker(databaseId: ID, slug: String): BrokerNode
+  serviceProviders: [ServiceProviderNode]
+  serviceProvider(databaseId: ID, slug: ServiceProviderSlugInput): ServiceProviderNode
   accounts: [AccountNode]
   orders(providerId: ID, accountId: ID): [OrderType]
 }

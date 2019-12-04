@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Navbar, Button, Alignment } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
+import { Navbar, Alignment } from "@blueprintjs/core";
 import MainNavbarUserOptions from "./MainNavbarUserOptions";
 
 const MainNavbar = () => (

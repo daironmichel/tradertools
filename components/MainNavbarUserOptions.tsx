@@ -23,8 +23,8 @@ class UserOptions extends React.Component<Props> {
   render(): React.ReactElement<any> {
     return (
       <>
-        <span css={{ marginRight: 5 }}>
-          Welcome <strong>{this.props.viewer.credentials.fullName}</strong>
+        <span css={{ marginRight: 8 }}>
+          <strong>{this.props.viewer.credentials.fullName}</strong>
         </span>
         <Button minimal icon={IconNames.USER} />
       </>
