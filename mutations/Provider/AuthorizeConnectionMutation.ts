@@ -2,8 +2,10 @@ import { graphql, commitMutation, Environment, Disposable } from "react-relay";
 import { createEnvironment } from "../../relay";
 import {
   AuthorizeConnectionInput,
-  AuthorizeConnectionMutationResponse
+  AuthorizeConnectionMutationResponse,
+  AuthorizeConnectionMutation
 } from "./__generated__/AuthorizeConnectionMutation.graphql";
+import { PayloadError } from "relay-runtime";
 
 const mutation = graphql`
   mutation AuthorizeConnectionMutation($input: AuthorizeConnectionInput!) {
@@ -31,12 +33,12 @@ const mutation = graphql`
 
 function commit(
   input: AuthorizeConnectionInput,
-  onCompleted?: (response: AuthorizeConnectionMutationResponse | null, errors: Array<Error> | null) => void,
+  onCompleted?: (response: AuthorizeConnectionMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => void,
   onError?: (error: Error) => void,
   environment?: Environment
 ): Disposable {
   // Now we just call commitMutation with the appropriate parameters
-  return commitMutation(environment || createEnvironment(), {
+  return commitMutation<AuthorizeConnectionMutation>(environment || createEnvironment(), {
     mutation,
     variables: { input },
     onCompleted,

@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Fri Dec 06 2019 06:23:21 GMT-0500 (Eastern Standard Time)
+# timestamp: Fri Dec 06 2019 09:09:10 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -80,7 +80,7 @@ type BrokerNode implements Node & DatabaseId {
   name: String!
   slug: String!
   accounts(before: String, after: String, first: Int, last: Int): AccountNodeConnection!
-  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderNodeConnection
+  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderConnection
   databaseId: Int!
   serviceProvider(databaseId: ID, slug: String): ServiceProviderNode
 }
@@ -217,6 +217,17 @@ type QuoteType {
   companyName: String
 }
 
+type ServiceProviderConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+  edges: [ServiceProviderEdge!]!
+}
+
+type ServiceProviderEdge {
+  cursor: String!
+  node: ServiceProviderNode!
+}
+
 type ServiceProviderNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
@@ -235,23 +246,6 @@ type ServiceProviderNode implements Node & DatabaseId {
   broker: BrokerNode!
   databaseId: Int!
   quote(symbol: String): QuoteType
-}
-
-type ServiceProviderNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ServiceProviderNodeEdge]!
-}
-
-"""A Relay edge containing a `ServiceProviderNode` and its cursor."""
-type ServiceProviderNodeEdge {
-  """The item at the end of the edge"""
-  node: ServiceProviderNode!
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 """An enumeration."""
@@ -309,10 +303,10 @@ type ViewerCredentialsType {
 type ViewerType {
   credentials: ViewerCredentialsType!
   tradingStrategies: [TradingStrategyNode!]
-  brokers: [BrokerNode!]
+  brokers: [BrokerNode!]!
   broker(databaseId: ID, slug: String): BrokerNode
-  serviceProviders: [ServiceProviderNode]
+  serviceProviders: [ServiceProviderNode!]!
   serviceProvider(databaseId: ID, slug: ServiceProviderSlugInput): ServiceProviderNode
-  accounts: [AccountNode]
-  orders(providerId: ID, accountId: ID): [OrderType]
+  accounts: [AccountNode!]!
+  orders(providerId: ID, accountId: ID): [OrderType!]!
 }

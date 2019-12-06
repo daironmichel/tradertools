@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash c761287d7daf9d9fc908adb5af39a5e3 */
+/* @relayHash a32272ee6ab64ce7ffaffad1e7c6d0fb */
 
 import { ConcreteRequest } from "relay-runtime";
 export type pages_indexQueryVariables = {};
@@ -10,7 +10,7 @@ export type pages_indexQueryResponse = {
             readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
-        }> | null;
+        }>;
     };
 };
 export type pages_indexQuery = {

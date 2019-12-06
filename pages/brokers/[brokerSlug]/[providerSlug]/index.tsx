@@ -2,7 +2,7 @@ import * as React from "react";
 import Head from "next/head";
 import Router from "next/router";
 import { graphql } from "react-relay";
-import { ButtonGroup, Button, NonIdealState, Intent } from "@blueprintjs/core";
+import { Button, NonIdealState, Intent } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../../components/Layout";
 import { ProviderSlugQueryResponse } from "./__generated__/ProviderSlugQuery.graphql";
@@ -45,9 +45,22 @@ class Index extends React.Component<Props, State> {
     }
   `;
 
-  onAuthorize = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  onAuthorize = (event: React.MouseEvent<HTMLElement>) => {
+    const { viewer } = this.props;
+    const { broker } = viewer;
+    const { serviceProvider } = broker || {};
+
+    if (!serviceProvider) {
+      console.error({ message: "Service provider missing.", viewer });
+      return;
+    }
+
     this.setState({ loading: true });
-    ConnectProviderMutation.commit({ providerId: e.currentTarget.value }, this.connectCompleted, this.connectError);
+    ConnectProviderMutation.commit(
+      { providerId: serviceProvider.databaseId.toString() },
+      this.connectCompleted,
+      this.connectError
+    );
   };
 
   connectCompleted = (response: ConnectProviderMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
@@ -121,7 +134,6 @@ class Index extends React.Component<Props, State> {
                   large
                   text="Authorize"
                   intent={Intent.PRIMARY}
-                  value={serviceProvider.databaseId}
                   loading={this.state.loading}
                   onClick={this.onAuthorize}
                 />

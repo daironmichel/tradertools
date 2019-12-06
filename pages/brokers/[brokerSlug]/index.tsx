@@ -7,6 +7,7 @@ import { Flex } from "rebass";
 import Layout from "../../../components/Layout";
 import { BrokerSlugQueryResponse } from "./__generated__/BrokerSlugQuery.graphql";
 import Error from "../../_error";
+import NonIdealConnection from "../../../components/generic/NonIdealConnection";
 
 interface Props extends BrokerSlugQueryResponse {}
 
@@ -50,19 +51,25 @@ class Index extends React.Component<Props> {
         </Head>
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column">
-          <h4>SELECT PROVIDER</h4>
-          <ButtonGroup vertical large>
-            {serviceProviders.edges.map(provider => (
-              <Link
-                key={provider.node.id}
-                href="/brokers/[brokerSlug]/[providerSlug]/"
-                as={`/brokers/${broker.slug}/${provider.node.slug}/`}
-                passHref
-              >
-                <AnchorButton text={provider.node.name} />
-              </Link>
-            ))}
-          </ButtonGroup>
+          <NonIdealConnection
+            connection={serviceProviders}
+            description="There are no providers configured for this broker."
+          >
+            <h4>SELECT PROVIDER</h4>
+            <ButtonGroup vertical large>
+              {serviceProviders &&
+                serviceProviders.edges.map(provider => (
+                  <Link
+                    key={provider.node.id}
+                    href="/brokers/[brokerSlug]/[providerSlug]/"
+                    as={`/brokers/${broker.slug}/${provider.node.slug}/`}
+                    passHref
+                  >
+                    <AnchorButton text={provider.node.name} />
+                  </Link>
+                ))}
+            </ButtonGroup>
+          </NonIdealConnection>
         </Flex>
       </Layout>
     );

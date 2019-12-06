@@ -8,6 +8,7 @@ import { IconNames } from "@blueprintjs/icons";
 import Layout from "../components/Layout";
 import AuthorizeConnectionMutation from "../mutations/Provider/AuthorizeConnectionMutation";
 import { AuthorizeConnectionMutationResponse } from "../mutations/Provider/__generated__/AuthorizeConnectionMutation.graphql";
+import { PayloadError } from "relay-runtime";
 
 interface State {
   code: string;
@@ -27,16 +28,24 @@ class Verify extends React.Component<{}, State> {
 
   _handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const { providerId, code } = this.state;
+    if (!providerId || !code) {
+      console.error({ message: "Required fields missing.", providerId, code });
+      return;
+    }
 
     this.setState({ loading: true });
     AuthorizeConnectionMutation.commit(
-      { providerId: this.state.providerId, oauthVerifier: this.state.code },
+      { providerId: providerId, oauthVerifier: this.state.code },
       this.onAuthorizeCompleted,
       this.onAuthorizeError
     );
   };
 
-  onAuthorizeCompleted = (response: AuthorizeConnectionMutationResponse | null, errors: Array<Error> | null) => {
+  onAuthorizeCompleted = (
+    response: AuthorizeConnectionMutationResponse,
+    errors?: ReadonlyArray<PayloadError> | null
+  ) => {
     this.setState({ loading: false });
     if (errors) {
       console.error(errors);
@@ -49,8 +58,13 @@ class Verify extends React.Component<{}, State> {
       return;
     }
 
-    window.localStorage.removeItem("providerId");
+    if (!serviceProvider) {
+      console.error({ message: "No service provider recieved.", response });
+      return;
+    }
+
     const { broker } = serviceProvider;
+    window.localStorage.removeItem("providerId");
     Router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
   };
 

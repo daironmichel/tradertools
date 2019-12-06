@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 99f9000ae024c397dc4564b5997736f9 */
+/* @relayHash 551ab90ac2742515141adaa3f1eb38e2 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type BrokerSlugQueryVariables = {
@@ -20,7 +20,7 @@ export type BrokerSlugQueryResponse = {
                         readonly name: string;
                         readonly slug: string;
                     };
-                } | null>;
+                }>;
             } | null;
         } | null;
     };
@@ -129,7 +129,7 @@ v5 = [
             "name": "serviceProviders",
             "storageKey": null,
             "args": null,
-            "concreteType": "ServiceProviderNodeConnection",
+            "concreteType": "ServiceProviderConnection",
             "plural": false,
             "selections": [
               {
@@ -138,7 +138,7 @@ v5 = [
                 "name": "edges",
                 "storageKey": null,
                 "args": null,
-                "concreteType": "ServiceProviderNodeEdge",
+                "concreteType": "ServiceProviderEdge",
                 "plural": true,
                 "selections": [
                   {
