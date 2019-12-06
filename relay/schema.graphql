@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed Dec 04 2019 17:24:28 GMT-0500 (Eastern Standard Time)
+# timestamp: Fri Dec 06 2019 06:23:21 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -36,7 +36,7 @@ type AccountNode implements Node & DatabaseId {
   marginBuyingPower: Float!
   lastUpdated: DateTime!
   broker: BrokerNode!
-  databaseId: Int
+  databaseId: Int!
 }
 
 type AccountNodeConnection {
@@ -62,8 +62,8 @@ enum AuthorizeConnectionError {
 }
 
 input AuthorizeConnectionInput {
-  providerId: ID
-  oauthVerifier: String
+  providerId: ID!
+  oauthVerifier: String!
   clientMutationId: String
 }
 
@@ -80,8 +80,8 @@ type BrokerNode implements Node & DatabaseId {
   name: String!
   slug: String!
   accounts(before: String, after: String, first: Int, last: Int): AccountNodeConnection!
-  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderNodeConnection!
-  databaseId: Int
+  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderNodeConnection
+  databaseId: Int!
   serviceProvider(databaseId: ID, slug: String): ServiceProviderNode
 }
 
@@ -90,10 +90,10 @@ enum BuyStockError {
 }
 
 input BuyStockInput {
-  symbol: String
-  strategyId: ID
-  accountId: ID
-  providerId: ID
+  providerId: ID!
+  accountId: ID!
+  strategyId: ID!
+  symbol: String!
   clientMutationId: String
 }
 
@@ -109,9 +109,9 @@ enum CancelOrderError {
 }
 
 input CancelOrderInput {
-  accountId: ID
-  orderId: ID
-  providerId: ID
+  providerId: ID!
+  accountId: ID!
+  orderId: ID!
   clientMutationId: String
 }
 
@@ -141,7 +141,7 @@ type ConnectProviderPayload {
 }
 
 interface DatabaseId {
-  databaseId: Int
+  databaseId: Int!
 }
 
 """
@@ -152,11 +152,11 @@ value as specified by
 scalar DateTime
 
 type Mutation {
-  connectProvider(input: ConnectProviderInput!): ConnectProviderPayload
-  authorizeConnection(input: AuthorizeConnectionInput!): AuthorizeConnectionPayload
-  syncAccounts(input: SyncAccountsInput!): SyncAccountsPayload
-  buyStock(input: BuyStockInput!): BuyStockPayload
-  cancelOrder(input: CancelOrderInput!): CancelOrderPayload
+  connectProvider(input: ConnectProviderInput!): ConnectProviderPayload!
+  authorizeConnection(input: AuthorizeConnectionInput!): AuthorizeConnectionPayload!
+  syncAccounts(input: SyncAccountsInput!): SyncAccountsPayload!
+  buyStock(input: BuyStockInput!): BuyStockPayload!
+  cancelOrder(input: CancelOrderInput!): CancelOrderPayload!
 }
 
 """An object with an ID"""
@@ -198,13 +198,13 @@ type ProviderSessionNode implements Node & DatabaseId {
   requestTokenSecret: String
   accessToken: String
   accessTokenSecret: String
-  databaseId: Int
+  databaseId: Int!
 }
 
 type Query {
   """The ID of the object"""
   node(id: ID!): Node
-  viewer: ViewerType
+  viewer: ViewerType!
 }
 
 type QuoteType {
@@ -232,8 +232,8 @@ type ServiceProviderNode implements Node & DatabaseId {
   revokeUrl: String
   baseUrl: String
   session: ProviderSessionNode
-  broker: BrokerNode
-  databaseId: Int
+  broker: BrokerNode!
+  databaseId: Int!
   quote(symbol: String): QuoteType
 }
 
@@ -248,7 +248,7 @@ type ServiceProviderNodeConnection {
 """A Relay edge containing a `ServiceProviderNode` and its cursor."""
 type ServiceProviderNodeEdge {
   """The item at the end of the edge"""
-  node: ServiceProviderNode
+  node: ServiceProviderNode!
 
   """A cursor for use in pagination"""
   cursor: String!
@@ -277,7 +277,7 @@ enum SessionStatus {
 }
 
 input SyncAccountsInput {
-  providerId: ID
+  providerId: ID!
   clientMutationId: String
 }
 
@@ -298,18 +298,18 @@ type TradingStrategyNode implements Node & DatabaseId {
   feePerTrade: Float!
   priceMargin: Float!
   maxPriceMargin: Float!
-  databaseId: Int
+  databaseId: Int!
 }
 
 type ViewerCredentialsType {
-  databaseId: Int
-  fullName: String
+  databaseId: Int!
+  fullName: String!
 }
 
 type ViewerType {
-  credentials: ViewerCredentialsType
-  tradingStrategies: [TradingStrategyNode]
-  brokers: [BrokerNode]
+  credentials: ViewerCredentialsType!
+  tradingStrategies: [TradingStrategyNode!]
+  brokers: [BrokerNode!]
   broker(databaseId: ID, slug: String): BrokerNode
   serviceProviders: [ServiceProviderNode]
   serviceProvider(databaseId: ID, slug: ServiceProviderSlugInput): ServiceProviderNode

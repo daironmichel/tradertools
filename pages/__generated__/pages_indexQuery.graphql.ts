@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* @relayHash c761287d7daf9d9fc908adb5af39a5e3 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type pages_indexQueryVariables = {};
@@ -6,11 +7,11 @@ export type pages_indexQueryResponse = {
     readonly viewer: {
         readonly brokers: ReadonlyArray<{
             readonly id: string;
-            readonly databaseId: number | null;
+            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
-        } | null> | null;
-    } | null;
+        }> | null;
+    };
 };
 export type pages_indexQuery = {
     readonly response: pages_indexQueryResponse;

@@ -1,14 +1,15 @@
 /* tslint:disable */
+/* @relayHash 8c69dfda2f47cfe242366942fd468c24 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type MainNavbarUserOptionsQueryVariables = {};
 export type MainNavbarUserOptionsQueryResponse = {
     readonly viewer: {
         readonly credentials: {
-            readonly databaseId: number | null;
-            readonly fullName: string | null;
-        } | null;
-    } | null;
+            readonly databaseId: number;
+            readonly fullName: string;
+        };
+    };
 };
 export type MainNavbarUserOptionsQuery = {
     readonly response: MainNavbarUserOptionsQueryResponse;

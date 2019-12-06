@@ -9,6 +9,8 @@ import { ProviderSlugQueryResponse } from "./__generated__/ProviderSlugQuery.gra
 import { IconNames } from "@blueprintjs/icons";
 import ConnectProviderMutation from "../../../../mutations/Provider/ConnectProviderMutation";
 import { ConnectProviderMutationResponse } from "../../../../mutations/Provider/__generated__/ConnectProviderMutation.graphql";
+import { PayloadError } from "relay-runtime";
+import Error from "../../../_error";
 
 interface Props extends ProviderSlugQueryResponse {}
 interface State {
@@ -43,12 +45,12 @@ class Index extends React.Component<Props, State> {
     }
   `;
 
-  onAuthorize = (e: React.MouseEvent<HTMLButtonElement>) => {
+  onAuthorize = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     this.setState({ loading: true });
     ConnectProviderMutation.commit({ providerId: e.currentTarget.value }, this.connectCompleted, this.connectError);
   };
 
-  connectCompleted = (response?: ConnectProviderMutationResponse, errors?: Error[]) => {
+  connectCompleted = (response: ConnectProviderMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
     this.setState({ loading: false });
     if (errors) {
       console.error(errors);
@@ -58,6 +60,16 @@ class Index extends React.Component<Props, State> {
     const { serviceProvider, authorizeUrl, callbackEnabled, error, errorMessage } = response.connectProvider;
     if (error) {
       console.error(`${error}: ${errorMessage}`);
+      return;
+    }
+
+    if (!serviceProvider) {
+      console.error("service provider not recieved");
+      return;
+    }
+
+    if (!authorizeUrl) {
+      console.error("authorization url not received");
       return;
     }
 
@@ -81,13 +93,20 @@ class Index extends React.Component<Props, State> {
   render() {
     const { viewer } = this.props;
     const { broker } = viewer;
-    const { serviceProvider } = broker;
-    const { session } = serviceProvider;
+    const { serviceProvider } = broker || {};
+    const { session } = serviceProvider || {};
     const connectionStatus = session ? session.status : "CLOSED";
+
+    if (!broker || !serviceProvider) {
+      return <Error title="Not Found" description="There's nothing to see here." />;
+    }
+
     return (
       <Layout>
         <Head>
-          <title>Home</title>
+          <title>
+            {broker.name} - {serviceProvider.name}
+          </title>
         </Head>
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column">
@@ -110,10 +129,10 @@ class Index extends React.Component<Props, State> {
             />
           )}
           {connectionStatus === "CONNECTED" && (
-            <ButtonGroup vertical large>
-              <Button intent={Intent.SUCCESS} text="Buy" css={{ minWidth: 80 }} />
-              <Button intent={Intent.DANGER} text="Sell" css={{ minWidth: 80 }} />
-            </ButtonGroup>
+            <Flex justifyContent="center" alignItems="center" flexDirection="column">
+              <Button large intent={Intent.SUCCESS} text="Buy" css={{ width: 80, marginBottom: 10 }} />
+              <Button large intent={Intent.DANGER} text="Sell" css={{ width: 80 }} />
+            </Flex>
           )}
         </Flex>
       </Layout>

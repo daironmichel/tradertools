@@ -1,11 +1,12 @@
 /* tslint:disable */
+/* @relayHash d03635af1ed227054e3f8b7dea4bd163 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type AuthorizeConnectionError = "INCOMPATIBLE_STATE" | "PROVIDER_NOT_FOUND" | "%future added value";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
 export type AuthorizeConnectionInput = {
-    readonly providerId?: string | null;
-    readonly oauthVerifier?: string | null;
+    readonly providerId: string;
+    readonly oauthVerifier: string;
     readonly clientMutationId?: string | null;
 };
 export type AuthorizeConnectionMutationVariables = {
@@ -17,19 +18,19 @@ export type AuthorizeConnectionMutationResponse = {
         readonly errorMessage: string | null;
         readonly serviceProvider: {
             readonly id: string;
-            readonly databaseId: number | null;
+            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
             readonly session: {
                 readonly id: string;
-                readonly databaseId: number | null;
+                readonly databaseId: number;
                 readonly status: SessionStatus | null;
             } | null;
             readonly broker: {
                 readonly slug: string;
-            } | null;
+            };
         } | null;
-    } | null;
+    };
 };
 export type AuthorizeConnectionMutation = {
     readonly response: AuthorizeConnectionMutationResponse;

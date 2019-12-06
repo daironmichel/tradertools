@@ -1,14 +1,16 @@
 import React from "react";
 
-import { Button } from "@blueprintjs/core";
+import { Button, Classes } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { graphql } from "react-relay";
-import RelayRoot from "./RelayRoot";
+import { withRelay } from "./RelayComponent";
 import { MainNavbarUserOptionsQueryResponse } from "./__generated__/MainNavbarUserOptionsQuery.graphql";
 
-interface Props extends MainNavbarUserOptionsQueryResponse {}
+interface Props extends MainNavbarUserOptionsQueryResponse {
+  testProp: any;
+}
 
-class UserOptions extends React.Component<Props> {
+class MainNavbarUserOptions extends React.Component<Props> {
   static query = graphql`
     query MainNavbarUserOptionsQuery {
       viewer {
@@ -21,10 +23,11 @@ class UserOptions extends React.Component<Props> {
   `;
 
   render(): React.ReactElement<any> {
+    const { viewer } = this.props;
     return (
       <>
         <span css={{ marginRight: 8 }}>
-          <strong>{this.props.viewer.credentials.fullName}</strong>
+          <strong>{viewer.credentials.fullName}</strong>
         </span>
         <Button minimal icon={IconNames.USER} />
       </>
@@ -32,8 +35,4 @@ class UserOptions extends React.Component<Props> {
   }
 }
 
-const MainNavbarUserOptions = () => {
-  return <RelayRoot Component={UserOptions} />;
-};
-
-export default MainNavbarUserOptions;
+export default withRelay(MainNavbarUserOptions);

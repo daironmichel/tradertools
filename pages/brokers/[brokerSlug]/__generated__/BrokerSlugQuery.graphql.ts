@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* @relayHash 99f9000ae024c397dc4564b5997736f9 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type BrokerSlugQueryVariables = {
@@ -8,21 +9,21 @@ export type BrokerSlugQueryResponse = {
     readonly viewer: {
         readonly broker: {
             readonly id: string;
-            readonly databaseId: number | null;
+            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
             readonly serviceProviders: {
                 readonly edges: ReadonlyArray<{
                     readonly node: {
                         readonly id: string;
-                        readonly databaseId: number | null;
+                        readonly databaseId: number;
                         readonly name: string;
                         readonly slug: string;
-                    } | null;
+                    };
                 } | null>;
-            };
+            } | null;
         } | null;
-    } | null;
+    };
 };
 export type BrokerSlugQuery = {
     readonly response: BrokerSlugQueryResponse;

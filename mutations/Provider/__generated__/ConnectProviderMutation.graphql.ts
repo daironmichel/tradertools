@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* @relayHash c306a7f56bc67883bb42ece840c14f4a */
 
 import { ConcreteRequest } from "relay-runtime";
 export type ConnectProviderError = "PROVIDER_NOT_FOUND" | "%future added value";
@@ -18,16 +19,16 @@ export type ConnectProviderMutationResponse = {
         readonly callbackEnabled: boolean | null;
         readonly serviceProvider: {
             readonly id: string;
-            readonly databaseId: number | null;
+            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
             readonly session: {
                 readonly id: string;
-                readonly databaseId: number | null;
+                readonly databaseId: number;
                 readonly status: SessionStatus | null;
             } | null;
         } | null;
-    } | null;
+    };
 };
 export type ConnectProviderMutation = {
     readonly response: ConnectProviderMutationResponse;

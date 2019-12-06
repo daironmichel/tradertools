@@ -6,6 +6,7 @@ import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../components/Layout";
 import { BrokerSlugQueryResponse } from "./__generated__/BrokerSlugQuery.graphql";
+import Error from "../../_error";
 
 interface Props extends BrokerSlugQueryResponse {}
 
@@ -36,11 +37,16 @@ class Index extends React.Component<Props> {
   render() {
     const { viewer } = this.props;
     const { broker } = viewer;
-    const { serviceProviders } = broker;
+    const { serviceProviders } = broker || {};
+
+    if (!broker) {
+      return <Error title="Not Found" description="There's nothing to see here." />;
+    }
+
     return (
       <Layout>
         <Head>
-          <title>Home</title>
+          <title>{broker.name}</title>
         </Head>
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column">

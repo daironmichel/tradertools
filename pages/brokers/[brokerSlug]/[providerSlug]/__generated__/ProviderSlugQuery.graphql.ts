@@ -1,4 +1,5 @@
 /* tslint:disable */
+/* @relayHash 9cf821ea0c6bc8cbcf91c2ecbddad11b */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -10,21 +11,21 @@ export type ProviderSlugQueryResponse = {
     readonly viewer: {
         readonly broker: {
             readonly id: string;
-            readonly databaseId: number | null;
+            readonly databaseId: number;
             readonly name: string;
             readonly serviceProvider: {
                 readonly id: string;
-                readonly databaseId: number | null;
+                readonly databaseId: number;
                 readonly name: string;
                 readonly slug: string;
                 readonly session: {
                     readonly id: string;
-                    readonly databaseId: number | null;
+                    readonly databaseId: number;
                     readonly status: SessionStatus | null;
                 } | null;
             } | null;
         } | null;
-    } | null;
+    };
 };
 export type ProviderSlugQuery = {
     readonly response: ProviderSlugQueryResponse;
