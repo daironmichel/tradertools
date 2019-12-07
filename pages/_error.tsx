@@ -24,7 +24,11 @@ function Error(props: Props) {
         <title>Login</title>
       </Head>
       <Flex justifyContent="center" alignItems="center" height="100vh">
-        <NonIdealState icon={IconNames.ERROR} title={title || "Unhandled Error"} description={description} />
+        <NonIdealState
+          icon={IconNames.ERROR}
+          title={title || `Unhandled Error ${statusCode || 404}`}
+          description={description}
+        />
       </Flex>
     </Themed>
   );

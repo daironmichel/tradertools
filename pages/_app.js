@@ -2,6 +2,7 @@ import React from "react";
 import { QueryRenderer /*, fetchQuery*/ } from "react-relay";
 import NextApp from "next/app";
 import "../scss/styles.scss";
+import Error from "./_error";
 
 import { /*initEnvironment, */ createEnvironment } from "../relay";
 
@@ -48,7 +49,7 @@ export default class App extends NextApp {
         render={({ error, props }) => {
           if (error) {
             console.error(error);
-            return <div>Loading</div>;
+            return <Error description={error} />;
           } else if (props) return <Component {...props} />;
           return <div>Loading</div>;
         }}
