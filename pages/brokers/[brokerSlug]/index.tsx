@@ -8,6 +8,7 @@ import Layout from "../../../components/Layout";
 import { BrokerSlugQueryResponse } from "./__generated__/BrokerSlugQuery.graphql";
 import Error from "../../_error";
 import NonIdealConnection from "../../../components/generic/NonIdealConnection";
+import { withRelay } from "../../../components/RelayComponent";
 
 interface Props extends BrokerSlugQueryResponse {}
 
@@ -50,7 +51,7 @@ class Index extends React.Component<Props> {
           <title>{broker.name}</title>
         </Head>
 
-        <Flex justifyContent="center" alignItems="center" flexDirection="column">
+        <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
           <NonIdealConnection
             connection={serviceProviders}
             description="There are no providers configured for this broker."
@@ -76,4 +77,4 @@ class Index extends React.Component<Props> {
   }
 }
 
-export default Index;
+export default withRelay(Index, true);

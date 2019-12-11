@@ -1,8 +1,9 @@
 import React from "react";
 import { QueryRenderer /*, fetchQuery*/ } from "react-relay";
 import NextApp from "next/app";
-import "../scss/styles.scss";
+// import "../scss/styles.scss";
 import Error from "./_error";
+import Loading from "../components/generic/Loading";
 
 import { /*initEnvironment, */ createEnvironment } from "../relay";
 
@@ -47,11 +48,10 @@ export default class App extends NextApp {
         query={Component.query}
         variables={router.query}
         render={({ error, props }) => {
-          if (error) {
-            console.error(error);
-            return <Error description={error} />;
+          if (error && error.message !== "NO_RELAY_SSR") {
+            return <Error description={error.message} />;
           } else if (props) return <Component {...props} />;
-          return <div>Loading</div>;
+          return <Loading />;
         }}
       />
     );

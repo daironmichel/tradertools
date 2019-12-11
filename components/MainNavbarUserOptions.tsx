@@ -6,11 +6,11 @@ import { graphql } from "react-relay";
 import { withRelay } from "./RelayComponent";
 import { MainNavbarUserOptionsQueryResponse } from "./__generated__/MainNavbarUserOptionsQuery.graphql";
 
-interface Props extends MainNavbarUserOptionsQueryResponse {
-  testProp: any;
-}
+interface Props {}
 
-class MainNavbarUserOptions extends React.Component<Props> {
+type PropsType = Props & MainNavbarUserOptionsQueryResponse;
+
+class MainNavbarUserOptions extends React.Component<PropsType> {
   static query = graphql`
     query MainNavbarUserOptionsQuery {
       viewer {
@@ -35,4 +35,4 @@ class MainNavbarUserOptions extends React.Component<Props> {
   }
 }
 
-export default withRelay(MainNavbarUserOptions);
+export default withRelay<Props>(MainNavbarUserOptions);

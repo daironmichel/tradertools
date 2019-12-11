@@ -22,13 +22,17 @@ export default {
       })
     };
   },
-  createEnvironment: (relayData, key) => {
+  createEnvironment: (/*relayData = null, key = null*/) => {
     const source = new RecordSource();
     const store = new Store(source);
 
     return new Environment({
       store,
-      network: Network.create(() => relayData.find(([dataKey]) => dataKey === key)[1])
+      // network: Network.create(() => relayData.find(([dataKey]) => dataKey === key)[1])
+      network: Network.create(() => {
+        throw new Error("NO_RELAY_SSR");
+        // return { data: null };
+      })
     });
   }
 };

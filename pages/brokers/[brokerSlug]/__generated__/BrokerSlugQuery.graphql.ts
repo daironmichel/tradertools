@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 551ab90ac2742515141adaa3f1eb38e2 */
+/* @relayHash d268f986e54d560cb25d7a4f55d13533 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type BrokerSlugQueryVariables = {
@@ -21,7 +21,7 @@ export type BrokerSlugQueryResponse = {
                         readonly slug: string;
                     };
                 }>;
-            } | null;
+            };
         } | null;
     };
 };

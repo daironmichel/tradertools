@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Fri Dec 06 2019 09:09:10 GMT-0500 (Eastern Standard Time)
+# timestamp: Tue Dec 10 2019 10:12:15 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -17,6 +17,17 @@ enum AccountAccountStatus {
 
   """CLOSED"""
   CLOSED
+}
+
+type AccountConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+  edges: [AccountEdge!]!
+}
+
+type AccountEdge {
+  cursor: String!
+  node: AccountNode!
 }
 
 type AccountNode implements Node & DatabaseId {
@@ -37,23 +48,6 @@ type AccountNode implements Node & DatabaseId {
   lastUpdated: DateTime!
   broker: BrokerNode!
   databaseId: Int!
-}
-
-type AccountNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [AccountNodeEdge]!
-}
-
-"""A Relay edge containing a `AccountNode` and its cursor."""
-type AccountNodeEdge {
-  """The item at the end of the edge"""
-  node: AccountNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 enum AuthorizeConnectionError {
@@ -79,8 +73,8 @@ type BrokerNode implements Node & DatabaseId {
   id: ID!
   name: String!
   slug: String!
-  accounts(before: String, after: String, first: Int, last: Int): AccountNodeConnection!
-  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderConnection
+  accounts(before: String, after: String, first: Int, last: Int): AccountConnection!
+  serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderConnection!
   databaseId: Int!
   serviceProvider(databaseId: ID, slug: String): ServiceProviderNode
 }
@@ -151,11 +145,15 @@ value as specified by
 """
 scalar DateTime
 
+"""The `Decimal` scalar type represents a python Decimal."""
+scalar Decimal
+
 type Mutation {
   connectProvider(input: ConnectProviderInput!): ConnectProviderPayload!
   authorizeConnection(input: AuthorizeConnectionInput!): AuthorizeConnectionPayload!
   syncAccounts(input: SyncAccountsInput!): SyncAccountsPayload!
   buyStock(input: BuyStockInput!): BuyStockPayload!
+  sellStock(input: SellStockInput!): SellStockPayload!
   cancelOrder(input: CancelOrderInput!): CancelOrderPayload!
 }
 
@@ -169,7 +167,7 @@ type OrderType {
   orderId: ID
   symbol: String
   quantity: Int
-  limitPrice: Float
+  limitPrice: Decimal
   status: String
 }
 
@@ -198,6 +196,8 @@ type ProviderSessionNode implements Node & DatabaseId {
   requestTokenSecret: String
   accessToken: String
   accessTokenSecret: String
+  created: DateTime!
+  refreshed: DateTime!
   databaseId: Int!
 }
 
@@ -209,12 +209,30 @@ type Query {
 
 type QuoteType {
   volume: Int
-  lastTrade: Float
-  lastTradeDirection: Float
-  marketCap: Float
+  lastTrade: Decimal
+  lastTradeDirection: Decimal
+  marketCap: Decimal
   sharesOutstanding: Int
   primaryExchange: String
   companyName: String
+}
+
+enum SellStockError {
+  INVALID
+}
+
+input SellStockInput {
+  providerId: ID!
+  accountId: ID!
+  symbol: String!
+  clientMutationId: String
+}
+
+type SellStockPayload {
+  account: AccountNode
+  error: SellStockError
+  errorMessage: String
+  clientMutationId: String
 }
 
 type ServiceProviderConnection {
@@ -246,6 +264,7 @@ type ServiceProviderNode implements Node & DatabaseId {
   broker: BrokerNode!
   databaseId: Int!
   quote(symbol: String): QuoteType
+  sessionStatus: SessionStatus!
 }
 
 """An enumeration."""
@@ -276,7 +295,7 @@ input SyncAccountsInput {
 }
 
 type SyncAccountsPayload {
-  boker: BrokerNode
+  broker: BrokerNode
   error: AuthorizeConnectionError
   errorMessage: String
   clientMutationId: String
@@ -286,9 +305,9 @@ type TradingStrategyNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
   name: String!
-  exposurePercent: Int!
-  profitPercent: Int!
-  lossPercent: Int!
+  exposurePercent: Float!
+  profitPercent: Float!
+  lossPercent: Float!
   feePerTrade: Float!
   priceMargin: Float!
   maxPriceMargin: Float!
@@ -302,7 +321,7 @@ type ViewerCredentialsType {
 
 type ViewerType {
   credentials: ViewerCredentialsType!
-  tradingStrategies: [TradingStrategyNode!]
+  tradingStrategies: [TradingStrategyNode!]!
   brokers: [BrokerNode!]!
   broker(databaseId: ID, slug: String): BrokerNode
   serviceProviders: [ServiceProviderNode!]!

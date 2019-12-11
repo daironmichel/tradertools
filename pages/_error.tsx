@@ -2,7 +2,7 @@ import React from "react";
 import Themed from "../components/Themed";
 import Head from "next/head";
 import { Flex } from "rebass";
-import { NonIdealState, Intent } from "@blueprintjs/core";
+import { NonIdealState } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { NextPageContext } from "next";
 

@@ -12,7 +12,7 @@ const Login = () => (
     <Head>
       <title>Login</title>
     </Head>
-    <Flex justifyContent="center" alignItems="center" height="100vh">
+    <Flex justifyContent="center" alignItems="center" height="100vh" flex="1">
       <Box width="100%" px={2} maxWidth={400}>
         <Card
           css={css`

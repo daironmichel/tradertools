@@ -6,6 +6,7 @@ import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../components/Layout";
 import { pages_indexQueryResponse } from "./__generated__/pages_indexQuery.graphql";
+import { withRelay } from "../components/RelayComponent";
 
 interface Props extends pages_indexQueryResponse {}
 
@@ -31,7 +32,7 @@ class Index extends React.Component<Props> {
           <title>Home</title>
         </Head>
 
-        <Flex justifyContent="center" alignItems="center" flexDirection="column">
+        <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
           <h4>SELECT BROKER</h4>
           <ButtonGroup vertical large>
             {viewer.brokers.map(broker => (
@@ -46,4 +47,4 @@ class Index extends React.Component<Props> {
   }
 }
 
-export default Index;
+export default withRelay(Index, true);
