@@ -5,6 +5,7 @@ import { Flex } from "rebass";
 import { NonIdealState } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { NextPageContext } from "next";
+import ErrorState from "../components/generic/ErrorState";
 
 interface Props {
   statusCode?: string | number | null;
@@ -12,8 +13,8 @@ interface Props {
   description?: string;
 }
 
-function Error(props: Props) {
-  const { statusCode, title, description } = props;
+function ErrorPage(props: Props) {
+  const { statusCode = 404, title = "Page not found", description } = props;
   if (statusCode) {
     // error on the server
   }
@@ -24,20 +25,16 @@ function Error(props: Props) {
         <title>Login</title>
       </Head>
       <Flex justifyContent="center" alignItems="center" height="100vh">
-        <NonIdealState
-          icon={IconNames.ERROR}
-          title={title || `Unhandled Error ${statusCode || 404}`}
-          description={description}
-        />
+        <ErrorState statusCode={statusCode} title={title} description={description} />
       </Flex>
     </Themed>
   );
 }
 
-Error.getInitialProps = (context: NextPageContext) => {
+ErrorPage.getInitialProps = (context: NextPageContext) => {
   const { res, err } = context;
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
   return { statusCode };
 };
 
-export default Error;
+export default ErrorPage;

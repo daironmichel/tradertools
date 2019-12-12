@@ -12,7 +12,6 @@ import { PayloadError } from "relay-runtime";
 
 interface State {
   code: string;
-  providerId: string | null;
   loading: boolean;
 }
 
@@ -21,16 +20,16 @@ class Verify extends React.Component<{}, State> {
     super(props);
     this.state = {
       code: "",
-      providerId: window.localStorage.getItem("providerId"),
       loading: false
     };
   }
 
   _handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { providerId, code } = this.state;
+    const { code } = this.state;
+    const providerId = window.localStorage.getItem("providerId");
     if (!providerId || !code) {
-      console.error({ message: "Required fields missing.", providerId, code });
+      console.error({ message: "Required data missing.", providerId, code });
       return;
     }
 

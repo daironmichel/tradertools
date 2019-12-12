@@ -4,9 +4,10 @@ import "../scss/styles.scss";
 
 import { createEnvironment } from "../relay";
 import { NextPageContext } from "next";
-import Error from "../pages/_error";
+import ErrorPage from "../pages/_error";
 import Loading from "./generic/Loading";
 import { Flex } from "rebass";
+import ErrorState from "./generic/ErrorState";
 
 interface RootQueryComponent<P = any, S = any> extends React.ComponentClass<P, S> {
   query: GraphQLTaggedNode;
@@ -37,7 +38,16 @@ export default class RelayComponent extends React.Component<Props> {
         render={(renderProps: RenderProps) => {
           const { error, props } = renderProps;
           if (error && error.message !== "NO_RELAY_SSR") {
-            return <Error description={error.message} />;
+            console.log(renderProps);
+            if (error.constructor.name === "RRNLRequestError") {
+              return (
+                <ErrorState
+                  title="Relay Request Error"
+                  description={<pre css={{ whiteSpace: "pre-line" }}>{error.message}</pre>}
+                />
+              );
+            }
+            return <ErrorPage description={error.message} />;
           } else if (props) return <Component {...props} />;
           return (
             <Flex flex="1" justifyContent="center" alignItems="center">
@@ -74,7 +84,7 @@ export function withRelay<P>(
     return <RelayComponent Component={component} variables={variables} {...rest} />;
   };
 
-  // wrapper.displayName = `WithRelay${component.displayName}`;
+  wrapper.displayName = `WithRelay${component.displayName}`;
 
   if (asPage) {
     wrapper.getInitialProps = async (context: NextPageContext): Promise<PageInitialProps> => {

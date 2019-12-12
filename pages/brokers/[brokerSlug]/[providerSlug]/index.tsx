@@ -28,6 +28,7 @@ import SellStockMutation from "../../../../mutations/Order/SellStockMutation";
 import { SellStockMutationResponse } from "../../../../mutations/Order/__generated__/SellStockMutation.graphql";
 import BuyStockMutation from "../../../../mutations/Order/BuyStockMutation";
 import { BuyStockMutationResponse } from "../../../../mutations/Order/__generated__/BuyStockMutation.graphql";
+import OrderListRenderer from "../../../../components/Order/OrderListRenderer";
 
 interface Props extends ProviderSlugQueryResponse {}
 interface State {
@@ -302,6 +303,7 @@ class Index extends React.Component<Props, State> {
               justifyContent="center"
               alignItems="center"
               flexDirection="column"
+              width={[1, 1 / 2, 1 / 3]}
               p={3}
               css={{ "> *": { marginBottom: 15 } }}
             >
@@ -349,6 +351,14 @@ class Index extends React.Component<Props, State> {
                   onClick={this.handleSellOnClick}
                 />
               </ButtonGroup>
+              {selectedAccount && (
+                <OrderListRenderer
+                  variables={{
+                    accountId: selectedAccount.toString(),
+                    providerId: serviceProvider.databaseId.toString()
+                  }}
+                />
+              )}
             </Flex>
           )}
         </Flex>

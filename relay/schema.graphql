@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Tue Dec 10 2019 10:12:15 GMT-0500 (Eastern Standard Time)
+# timestamp: Wed Dec 11 2019 18:07:29 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -164,11 +164,11 @@ interface Node {
 }
 
 type OrderType {
-  orderId: ID
-  symbol: String
-  quantity: Int
-  limitPrice: Decimal
-  status: String
+  orderId: ID!
+  symbol: String!
+  quantity: Int!
+  limitPrice: Decimal!
+  status: String!
 }
 
 """
@@ -260,8 +260,8 @@ type ServiceProviderNode implements Node & DatabaseId {
   refreshUrl: String
   revokeUrl: String
   baseUrl: String
-  session: ProviderSessionNode
   broker: BrokerNode!
+  session: ProviderSessionNode
   databaseId: Int!
   quote(symbol: String): QuoteType
   sessionStatus: SessionStatus!
