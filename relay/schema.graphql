@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed Dec 11 2019 18:07:29 GMT-0500 (Eastern Standard Time)
+# timestamp: Sat Dec 14 2019 08:35:40 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -80,37 +80,35 @@ type BrokerNode implements Node & DatabaseId {
 }
 
 enum BuyStockError {
-  INVALID
+  ACCOUNT_NOT_PROVIDED
 }
 
 input BuyStockInput {
   providerId: ID!
-  accountId: ID!
   strategyId: ID!
   symbol: String!
+  accountId: ID
   clientMutationId: String
 }
 
 type BuyStockPayload {
-  account: AccountNode
   error: BuyStockError
   errorMessage: String
   clientMutationId: String
 }
 
 enum CancelOrderError {
-  INVALID
+  ACCOUNT_NOT_PROVIDED
 }
 
 input CancelOrderInput {
   providerId: ID!
-  accountId: ID!
   orderId: ID!
+  accountId: ID
   clientMutationId: String
 }
 
 type CancelOrderPayload {
-  account: AccountNode
   error: CancelOrderError
   errorMessage: String
   clientMutationId: String
@@ -188,14 +186,21 @@ type PageInfo {
   endCursor: String
 }
 
+type PositionType {
+  symbol: String!
+  pricePaid: Decimal!
+  quantity: Int!
+  totalGain: Decimal!
+}
+
 type ProviderSessionNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
   status: SessionStatus
-  requestToken: String
-  requestTokenSecret: String
-  accessToken: String
-  accessTokenSecret: String
+  requestToken: String!
+  requestTokenSecret: String!
+  accessToken: String!
+  accessTokenSecret: String!
   created: DateTime!
   refreshed: DateTime!
   databaseId: Int!
@@ -218,18 +223,17 @@ type QuoteType {
 }
 
 enum SellStockError {
-  INVALID
+  ACCOUNT_NOT_PROVIDED
 }
 
 input SellStockInput {
   providerId: ID!
-  accountId: ID!
   symbol: String!
+  accountId: ID
   clientMutationId: String
 }
 
 type SellStockPayload {
-  account: AccountNode
   error: SellStockError
   errorMessage: String
   clientMutationId: String
@@ -254,12 +258,13 @@ type ServiceProviderNode implements Node & DatabaseId {
   protocol: ServiceProviderProtocol!
   consumerKey: String!
   consumerSecret: String!
-  requestTokenUrl: String
-  authorizeUrl: String
-  accessTokenUrl: String
-  refreshUrl: String
-  revokeUrl: String
-  baseUrl: String
+  requestTokenUrl: String!
+  authorizeUrl: String!
+  accessTokenUrl: String!
+  refreshUrl: String!
+  revokeUrl: String!
+  baseUrl: String!
+  accountKey: String!
   broker: BrokerNode!
   session: ProviderSessionNode
   databaseId: Int!
@@ -310,7 +315,6 @@ type TradingStrategyNode implements Node & DatabaseId {
   lossPercent: Float!
   feePerTrade: Float!
   priceMargin: Float!
-  maxPriceMargin: Float!
   databaseId: Int!
 }
 
@@ -327,5 +331,6 @@ type ViewerType {
   serviceProviders: [ServiceProviderNode!]!
   serviceProvider(databaseId: ID, slug: ServiceProviderSlugInput): ServiceProviderNode
   accounts: [AccountNode!]!
-  orders(providerId: ID, accountId: ID): [OrderType!]!
+  orders(providerId: ID!, accountId: ID): [OrderType!]!
+  positions(providerId: ID!, accountId: ID): [PositionType!]!
 }

@@ -1,12 +1,12 @@
 /* tslint:disable */
-/* @relayHash 84254045b0f784186170d03b946d2e92 */
+/* @relayHash 06164ee95cbfbdc0c9c343e71b89a1bb */
 
 import { ConcreteRequest } from "relay-runtime";
-export type CancelOrderError = "INVALID" | "%future added value";
+export type CancelOrderError = "ACCOUNT_NOT_PROVIDED" | "%future added value";
 export type CancelOrderInput = {
     readonly providerId: string;
-    readonly accountId: string;
     readonly orderId: string;
+    readonly accountId?: string | null;
     readonly clientMutationId?: string | null;
 };
 export type CancelOrderMutationVariables = {

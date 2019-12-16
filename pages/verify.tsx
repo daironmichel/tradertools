@@ -1,7 +1,7 @@
 import { css } from "@emotion/core";
 import React from "react";
 import Head from "next/head";
-import Router from "next/router";
+import { withRouter } from "next/router";
 import { Flex, Box } from "rebass";
 import { Button, Card, InputGroup, Icon, Classes, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
@@ -9,19 +9,37 @@ import Layout from "../components/Layout";
 import AuthorizeConnectionMutation from "../mutations/Provider/AuthorizeConnectionMutation";
 import { AuthorizeConnectionMutationResponse } from "../mutations/Provider/__generated__/AuthorizeConnectionMutation.graphql";
 import { PayloadError } from "relay-runtime";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { NextPageContext } from "next";
+import { ParsedUrlQuery, parse } from "querystring";
 
 interface State {
   code: string;
   loading: boolean;
 }
 
-class Verify extends React.Component<{}, State> {
-  constructor(props: any) {
+type Props = {
+  query: ParsedUrlQuery;
+} & WithRouterProps;
+
+class Verify extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       code: "",
       loading: false
     };
+  }
+
+  componentDidMount() {
+    const { router } = this.props;
+    const search = router.asPath.substring(router.asPath.indexOf("?") + 1);
+    const query = parse(search);
+    const { oauth_verifier } = query;
+    const providerId = window.localStorage.getItem("providerId");
+    if (providerId && oauth_verifier) {
+      this.verify(providerId, oauth_verifier.toString());
+    }
   }
 
   _handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,12 +51,12 @@ class Verify extends React.Component<{}, State> {
       return;
     }
 
+    this.verify(providerId, code);
+  };
+
+  verify = (providerId: string, oauthVerifier: string) => {
     this.setState({ loading: true });
-    AuthorizeConnectionMutation.commit(
-      { providerId: providerId, oauthVerifier: this.state.code },
-      this.onAuthorizeCompleted,
-      this.onAuthorizeError
-    );
+    AuthorizeConnectionMutation.commit({ providerId, oauthVerifier }, this.onAuthorizeCompleted, this.onAuthorizeError);
   };
 
   onAuthorizeCompleted = (
@@ -64,7 +82,7 @@ class Verify extends React.Component<{}, State> {
 
     const { broker } = serviceProvider;
     window.localStorage.removeItem("providerId");
-    Router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
+    this.props.router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
   };
 
   onAuthorizeError = (error: Error) => {
@@ -99,6 +117,7 @@ class Verify extends React.Component<{}, State> {
                   name="code"
                   placeholder="code"
                   autoComplete="code"
+                  disabled={this.state.loading}
                   large
                   value={this.state.code}
                   onChange={this._handleCodeChange}
@@ -124,4 +143,4 @@ class Verify extends React.Component<{}, State> {
   }
 }
 
-export default Verify;
+export default withRouter(Verify);

@@ -7,11 +7,11 @@ import {
   NonIdealState,
   Intent,
   InputGroup,
-  ButtonGroup,
   ControlGroup,
-  HTMLSelect,
-  IOptionProps,
-  Classes
+  Popover,
+  Menu,
+  MenuItem,
+  Position
 } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../../components/Layout";
@@ -28,16 +28,18 @@ import SellStockMutation from "../../../../mutations/Order/SellStockMutation";
 import { SellStockMutationResponse } from "../../../../mutations/Order/__generated__/SellStockMutation.graphql";
 import BuyStockMutation from "../../../../mutations/Order/BuyStockMutation";
 import { BuyStockMutationResponse } from "../../../../mutations/Order/__generated__/BuyStockMutation.graphql";
-import OrderListRenderer from "../../../../components/Order/OrderListRenderer";
+import ErrorState from "../../../../components/generic/ErrorState";
+import PositionAndOrderListRenderer from "../../../../components/Account/PositionAndOrderListRenderer";
+
+type TradingStrategy = ProviderSlugQueryResponse["viewer"]["tradingStrategies"][0];
 
 interface Props extends ProviderSlugQueryResponse {}
 interface State {
   loading: boolean;
-  stratOptions: IOptionProps[];
-  accountOptions: IOptionProps[];
-  selectedStrategy: string | number;
-  selectedAccount: string | number;
+  strategies: ReadonlyArray<TradingStrategy>;
+  selectedStrategy: TradingStrategy | null;
   symbol: string;
+  connectError: PayloadError | Error | null;
 }
 
 class Index extends React.Component<Props, State> {
@@ -83,20 +85,14 @@ class Index extends React.Component<Props, State> {
     super(props);
 
     const { viewer } = this.props;
-    const { broker, tradingStrategies } = viewer;
-    const { accounts } = broker || {};
-    const stratOptions = tradingStrategies.map(s => ({ label: s.name, value: s.databaseId }));
-    const accountOptions = accounts
-      ? accounts.edges.map(a => ({ label: a.node.name || a.node.accountId, value: a.node.databaseId }))
-      : [];
+    const { tradingStrategies } = viewer;
 
     this.state = {
       loading: false,
-      stratOptions: stratOptions,
-      accountOptions: accountOptions,
-      selectedStrategy: stratOptions.length > 0 ? stratOptions[0].value : "",
-      selectedAccount: accountOptions.length > 0 ? accountOptions[0].value : "",
-      symbol: ""
+      strategies: tradingStrategies,
+      selectedStrategy: tradingStrategies.length > 0 ? tradingStrategies[0] : null,
+      symbol: "",
+      connectError: null
     };
   }
 
@@ -122,6 +118,7 @@ class Index extends React.Component<Props, State> {
     this.setState({ loading: false });
     if (errors) {
       console.error(errors);
+      this.setState({ connectError: errors[0] });
       return;
     }
 
@@ -154,23 +151,19 @@ class Index extends React.Component<Props, State> {
   };
 
   connectError = (error: Error) => {
-    this.setState({ loading: false });
+    this.setState({ loading: false, connectError: error });
     console.error(error);
   };
 
-  handleStrategyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ selectedStrategy: event.currentTarget.value });
-  };
-
-  handleAccountChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ selectedAccount: event.currentTarget.value });
+  handleStrategyChange = (newStrategy: TradingStrategy) => {
+    this.setState({ selectedStrategy: newStrategy });
   };
 
   handleSymbolChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ symbol: event.currentTarget.value.toUpperCase() });
   };
 
-  handleSyncOnClick = (event: React.MouseEvent<HTMLElement>) => {
+  handleSyncOnClick = () => {
     if (this.state.loading) return;
 
     const { viewer } = this.props;
@@ -216,7 +209,6 @@ class Index extends React.Component<Props, State> {
     sell.commit(
       {
         providerId: serviceProvider.databaseId.toString(),
-        accountId: this.state.selectedAccount.toString(),
         symbol: this.state.symbol
       },
       this.sellCompleted,
@@ -238,9 +230,15 @@ class Index extends React.Component<Props, State> {
     const { viewer } = this.props;
     const { broker } = viewer;
     const { serviceProvider } = broker || {};
+    const { selectedStrategy } = this.state;
 
     if (!serviceProvider) {
       console.warn("No service provider supplied");
+      return;
+    }
+
+    if (!selectedStrategy) {
+      console.warn("No strategy selected");
       return;
     }
 
@@ -249,8 +247,7 @@ class Index extends React.Component<Props, State> {
     buy.commit(
       {
         providerId: serviceProvider.databaseId.toString(),
-        strategyId: this.state.selectedStrategy.toString(),
-        accountId: this.state.selectedAccount.toString(),
+        strategyId: selectedStrategy.databaseId.toString(),
         symbol: this.state.symbol
       },
       this.buyCompleted,
@@ -268,11 +265,11 @@ class Index extends React.Component<Props, State> {
 
   render() {
     const { viewer } = this.props;
-    const { broker } = viewer;
+    const { broker, tradingStrategies } = viewer;
     const { serviceProvider } = broker || {};
     const { sessionStatus = "CLOSED" } = serviceProvider || {};
 
-    const { stratOptions, accountOptions, selectedStrategy, selectedAccount, symbol, loading } = this.state;
+    const { selectedStrategy, symbol, loading, connectError } = this.state;
 
     if (!broker || !serviceProvider) {
       return <Error title="Not Found" description="There's nothing to see here." />;
@@ -288,7 +285,16 @@ class Index extends React.Component<Props, State> {
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
           <h4>Status: {sessionStatus}</h4>
-          {sessionStatus !== "CONNECTED" && (
+          {sessionStatus !== "CONNECTED" && connectError && (
+            <ErrorState
+              title="Error Connecting"
+              description={connectError.message}
+              action={
+                <Button large text="Try Again" intent={Intent.PRIMARY} loading={loading} onClick={this.onAuthorize} />
+              }
+            />
+          )}
+          {sessionStatus !== "CONNECTED" && !connectError && (
             <NonIdealState
               icon={IconNames.OFFLINE}
               title="Authorize Application"
@@ -308,34 +314,42 @@ class Index extends React.Component<Props, State> {
               css={{ "> *": { marginBottom: 15 } }}
             >
               <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
-              <InputGroup
-                placeholder="SYMBOL"
-                fill
-                large
-                css={{ input: { textTransform: "uppercase" } }}
-                disabled={loading}
-                value={symbol}
-                onChange={this.handleSymbolChange}
-              />
               <ControlGroup css={{ width: "100%" }}>
-                <HTMLSelect
-                  large
+                <InputGroup
+                  placeholder="SYMBOL"
                   fill
-                  disabled={loading}
-                  options={accountOptions}
-                  value={selectedAccount}
-                  onChange={this.handleAccountChange}
-                />
-                <HTMLSelect
                   large
-                  fill
+                  css={{ input: { textTransform: "uppercase" } }}
                   disabled={loading}
-                  options={stratOptions}
-                  value={selectedStrategy}
-                  onChange={this.handleStrategyChange}
+                  value={symbol}
+                  onChange={this.handleSymbolChange}
+                  rightElement={
+                    <Popover
+                      content={
+                        <Menu>
+                          {tradingStrategies.map(strat => (
+                            <MenuItem
+                              key={strat.id}
+                              text={strat.name}
+                              onClick={this.handleStrategyChange.bind(this, strat)}
+                            />
+                          ))}
+                        </Menu>
+                      }
+                      disabled={loading}
+                      position={Position.BOTTOM_RIGHT}
+                    >
+                      <Button
+                        disabled={loading}
+                        minimal={true}
+                        rightIcon="caret-down"
+                        intent={selectedStrategy ? Intent.NONE : Intent.DANGER}
+                      >
+                        {selectedStrategy ? selectedStrategy.name : "Strategy?"}
+                      </Button>
+                    </Popover>
+                  }
                 />
-              </ControlGroup>
-              <ButtonGroup large fill>
                 <Button
                   large
                   intent={Intent.SUCCESS}
@@ -343,22 +357,13 @@ class Index extends React.Component<Props, State> {
                   disabled={loading || !symbol}
                   onClick={this.handleBuyOnClick}
                 />
-                <Button
-                  large
-                  intent={Intent.DANGER}
-                  text="Sell"
-                  disabled={loading || !symbol}
-                  onClick={this.handleSellOnClick}
-                />
-              </ButtonGroup>
-              {selectedAccount && (
-                <OrderListRenderer
-                  variables={{
-                    accountId: selectedAccount.toString(),
-                    providerId: serviceProvider.databaseId.toString()
-                  }}
-                />
-              )}
+              </ControlGroup>
+              <PositionAndOrderListRenderer
+                autoRefetch={false}
+                variables={{
+                  providerId: serviceProvider.databaseId.toString()
+                }}
+              />
             </Flex>
           )}
         </Flex>
@@ -367,4 +372,4 @@ class Index extends React.Component<Props, State> {
   }
 }
 
-export default withRelay(Index, true);
+export default withRelay<Props>(Index, true);

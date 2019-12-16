@@ -38,7 +38,6 @@ export default class RelayComponent extends React.Component<Props> {
         render={(renderProps: RenderProps) => {
           const { error, props } = renderProps;
           if (error && error.message !== "NO_RELAY_SSR") {
-            console.log(renderProps);
             if (error.constructor.name === "RRNLRequestError") {
               return (
                 <ErrorState
@@ -48,7 +47,7 @@ export default class RelayComponent extends React.Component<Props> {
               );
             }
             return <ErrorPage description={error.message} />;
-          } else if (props) return <Component {...props} />;
+          } else if (props) return <Component variables={variables} {...props} />;
           return (
             <Flex flex="1" justifyContent="center" alignItems="center">
               <Loading />

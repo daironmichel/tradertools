@@ -1,26 +1,24 @@
 import React, { Component } from "react";
-import { HTMLSelect, IOptionProps, Callout } from "@blueprintjs/core";
+import { Callout } from "@blueprintjs/core";
 import { Flex, Box } from "rebass";
 import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { OrderList_viewer } from "./__generated__/OrderList_viewer.graphql";
-import OrderListItem from "./OrderListItem";
+import { PositionList_viewer } from "./__generated__/PositionList_viewer.graphql";
+import PositionListItem from "./PositionListItem";
 import ErrorState from "../generic/ErrorState";
 import { IconNames } from "@blueprintjs/icons";
 
 interface Props {
   relay: RelayRefetchProp;
-  viewer: OrderList_viewer;
+  viewer: PositionList_viewer;
   providerId: string;
   autoRefetch?: boolean;
 }
 
 interface State {
-  statusOptions: IOptionProps[];
-  selectedStatus: IOptionProps["value"];
   refetchError: Error | null;
 }
 
-class OrderList extends Component<Props, State> {
+class PositionList extends Component<Props, State> {
   static defaultProps = {
     autoRefetch: true
   };
@@ -30,16 +28,7 @@ class OrderList extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const statusOptions = [
-      { label: "ALL", value: "ALL" },
-      { label: "PENDING", value: "PENDING" },
-      { label: "REJECTED", value: "REJECTED" },
-      { label: "EXECUTED", value: "EXECUTED" }
-    ];
-
     this.state = {
-      statusOptions: statusOptions,
-      selectedStatus: statusOptions[0].value,
       refetchError: null
     };
   }
@@ -68,22 +57,23 @@ class OrderList extends Component<Props, State> {
 
   render() {
     const { viewer, providerId } = this.props;
-    const { statusOptions, selectedStatus, refetchError } = this.state;
+    const { refetchError } = this.state;
 
     return (
       <Flex flexDirection="column" width={[1]}>
         <Flex justifyContent="space-between" alignItems="center">
-          <h3>Orders</h3>
-          <HTMLSelect options={statusOptions} value={selectedStatus} />
+          <h3>Positions</h3>
         </Flex>
         {refetchError ? (
-          <ErrorState title="Error fetching orders" description={refetchError.message} />
+          <ErrorState title="Error fetching positions" description={refetchError.message} />
         ) : (
           <Box css={{ "> div": { marginBottom: 4 } }}>
-            {viewer.orders.length > 0 ? (
-              viewer.orders.map((order, idx) => <OrderListItem key={idx} order={order} providerId={providerId} />)
+            {viewer.positions.length > 0 ? (
+              viewer.positions.map((position, idx) => (
+                <PositionListItem key={idx} position={position} providerId={providerId} />
+              ))
             ) : (
-              <Callout icon={IconNames.INBOX}>No orders to show at this moment...</Callout>
+              <Callout icon={IconNames.INBOX}>No positions to show at this moment...</Callout>
             )}
           </Box>
         )}
@@ -93,21 +83,21 @@ class OrderList extends Component<Props, State> {
 }
 
 export default createRefetchContainer(
-  OrderList,
+  PositionList,
   {
     viewer: graphql`
-      fragment OrderList_viewer on ViewerType
+      fragment PositionList_viewer on ViewerType
         @argumentDefinitions(providerId: { type: "ID!" }, accountId: { type: "ID" }) {
-        orders(providerId: $providerId, accountId: $accountId) {
-          ...OrderListItem_order
+        positions(providerId: $providerId, accountId: $accountId) {
+          ...PositionListItem_position
         }
       }
     `
   },
   graphql`
-    query OrderListRefetchQuery($providerId: ID!, $accountId: ID) {
+    query PositionListRefetchQuery($providerId: ID!, $accountId: ID) {
       viewer {
-        ...OrderList_viewer @arguments(providerId: $providerId, accountId: $accountId)
+        ...PositionList_viewer @arguments(providerId: $providerId, accountId: $accountId)
       }
     }
   `

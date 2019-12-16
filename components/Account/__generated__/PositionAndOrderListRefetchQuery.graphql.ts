@@ -1,30 +1,31 @@
 /* tslint:disable */
-/* @relayHash 65e10263335fb02b2c9684f903cefc5d */
+/* @relayHash 525a9d72d32e6c49884ac54a7f35aa17 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
-export type OrderListRefetchQueryVariables = {
+export type PositionAndOrderListRefetchQueryVariables = {
     providerId: string;
     accountId?: string | null;
 };
-export type OrderListRefetchQueryResponse = {
+export type PositionAndOrderListRefetchQueryResponse = {
     readonly viewer: {
-        readonly " $fragmentRefs": FragmentRefs<"OrderList_viewer">;
+        readonly " $fragmentRefs": FragmentRefs<"PositionList_viewer" | "OrderList_viewer">;
     };
 };
-export type OrderListRefetchQuery = {
-    readonly response: OrderListRefetchQueryResponse;
-    readonly variables: OrderListRefetchQueryVariables;
+export type PositionAndOrderListRefetchQuery = {
+    readonly response: PositionAndOrderListRefetchQueryResponse;
+    readonly variables: PositionAndOrderListRefetchQueryVariables;
 };
 
 
 
 /*
-query OrderListRefetchQuery(
+query PositionAndOrderListRefetchQuery(
   $providerId: ID!
   $accountId: ID
 ) {
   viewer {
+    ...PositionList_viewer_15bWwS
     ...OrderList_viewer_15bWwS
   }
 }
@@ -40,6 +41,19 @@ fragment OrderListItem_order on OrderType {
 fragment OrderList_viewer_15bWwS on ViewerType {
   orders(providerId: $providerId, accountId: $accountId) {
     ...OrderListItem_order
+  }
+}
+
+fragment PositionListItem_position on PositionType {
+  symbol
+  quantity
+  pricePaid
+  totalGain
+}
+
+fragment PositionList_viewer_15bWwS on ViewerType {
+  positions(providerId: $providerId, accountId: $accountId) {
+    ...PositionListItem_position
   }
 }
 */
@@ -70,12 +84,26 @@ v1 = [
     "name": "providerId",
     "variableName": "providerId"
   }
-];
+],
+v2 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "symbol",
+  "args": null,
+  "storageKey": null
+},
+v3 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "quantity",
+  "args": null,
+  "storageKey": null
+};
 return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "OrderListRefetchQuery",
+    "name": "PositionAndOrderListRefetchQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -91,6 +119,11 @@ return {
         "selections": [
           {
             "kind": "FragmentSpread",
+            "name": "PositionList_viewer",
+            "args": (v1/*: any*/)
+          },
+          {
+            "kind": "FragmentSpread",
             "name": "OrderList_viewer",
             "args": (v1/*: any*/)
           }
@@ -100,7 +133,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "OrderListRefetchQuery",
+    "name": "PositionAndOrderListRefetchQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -112,6 +145,33 @@ return {
         "concreteType": "ViewerType",
         "plural": false,
         "selections": [
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "positions",
+            "storageKey": null,
+            "args": (v1/*: any*/),
+            "concreteType": "PositionType",
+            "plural": true,
+            "selections": [
+              (v2/*: any*/),
+              (v3/*: any*/),
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "pricePaid",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "totalGain",
+                "args": null,
+                "storageKey": null
+              }
+            ]
+          },
           {
             "kind": "LinkedField",
             "alias": null,
@@ -128,20 +188,8 @@ return {
                 "args": null,
                 "storageKey": null
               },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "symbol",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "quantity",
-                "args": null,
-                "storageKey": null
-              },
+              (v2/*: any*/),
+              (v3/*: any*/),
               {
                 "kind": "ScalarField",
                 "alias": null,
@@ -164,12 +212,12 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "OrderListRefetchQuery",
+    "name": "PositionAndOrderListRefetchQuery",
     "id": null,
-    "text": "query OrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  status\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
+    "text": "query PositionAndOrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  status\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '3012fe98e34c0b7b358fa883831f8895';
+(node as any).hash = '7b7339ed0dd8ce35bbb11823ba3d5abd';
 export default node;

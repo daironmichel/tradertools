@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { Flex, Box } from "rebass";
 import { createFragmentContainer, graphql } from "react-relay";
-import { OrderListItem_order } from "./__generated__/OrderListItem_order.graphql";
+import { PositionListItem_position } from "./__generated__/PositionListItem_position.graphql";
 import { Button, Intent, Card } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
-import CancelOrderMutation from "../../mutations/Order/CancelOrderMutation";
+import SellStockMutation from "../../mutations/Order/SellStockMutation";
 
 interface Props {
-  order: OrderListItem_order;
+  position: PositionListItem_position;
   providerId: string;
 }
 
@@ -15,7 +15,7 @@ interface State {
   loading: boolean;
 }
 
-class OrderListItem extends Component<Props, State> {
+class PositionListItem extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -24,46 +24,47 @@ class OrderListItem extends Component<Props, State> {
     };
   }
 
-  handleCancelOnClick = () => {
-    const { order, providerId } = this.props;
-    this.cancelOrder(providerId, order.orderId);
+  handleSellOnClick = () => {
+    const { position, providerId } = this.props;
+    this.sellStock(providerId, position.symbol);
   };
 
-  cancelOrder = (providerId: string, orderId: string) => {
+  sellStock = (providerId: string, symbol: string) => {
     this.setState({ loading: true });
-    const cancel = new CancelOrderMutation();
-    cancel.commit({ providerId, orderId }, this.cancelOrderCompleted, this.cancelOrderError);
+    const sell = new SellStockMutation();
+    sell.commit({ providerId, symbol }, this.sellStockCompleted, this.sellStockError);
   };
 
-  cancelOrderCompleted = () => {
+  sellStockCompleted = () => {
     this.setState({ loading: false });
   };
 
-  cancelOrderError = (error: Error) => {
+  sellStockError = (error: Error) => {
     this.setState({ loading: false });
   };
 
   render() {
-    const { order } = this.props;
+    const { position } = this.props;
     const { loading } = this.state;
     return (
       <Card css={{ padding: 0 }}>
         <Flex alignItems="center">
           <Box flex="1" m={2}>
-            {order.symbol}
+            {position.symbol}
           </Box>
           <Flex m={2} justifyContent="flex-end">
-            {order.quantity}@{order.limitPrice}
+            {position.quantity}@{position.pricePaid}
           </Flex>
-          <Box m={2}>{order.status}</Box>
+          <Flex m={2} justifyContent="flex-end">
+            {new String(position.totalGain)}
+          </Flex>
           <Box ml={2}>
             <Button
               large
-              icon={IconNames.CROSS}
               intent={Intent.DANGER}
+              icon={IconNames.DOLLAR}
               loading={loading}
-              disabled={order.status === "EXECUTED" || order.status === "REJECTED"}
-              onClick={this.handleCancelOnClick}
+              onClick={this.handleSellOnClick}
               css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: -1 }}
             />
           </Box>
@@ -73,14 +74,13 @@ class OrderListItem extends Component<Props, State> {
   }
 }
 
-export default createFragmentContainer(OrderListItem, {
-  order: graphql`
-    fragment OrderListItem_order on OrderType {
-      orderId
+export default createFragmentContainer(PositionListItem, {
+  position: graphql`
+    fragment PositionListItem_position on PositionType {
       symbol
       quantity
-      limitPrice
-      status
+      pricePaid
+      totalGain
     }
   `
 });

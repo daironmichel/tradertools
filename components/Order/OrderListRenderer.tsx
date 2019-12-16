@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { graphql, Variables } from "react-relay";
+import { graphql } from "react-relay";
 import {
   OrderListRendererQueryResponse,
   OrderListRendererQueryVariables
@@ -13,7 +13,7 @@ interface RendererProps {
 
 class OrderListRenderer extends Component<RendererProps & OrderListRendererQueryResponse> {
   static query = graphql`
-    query OrderListRendererQuery($providerId: ID!, $accountId: ID!) {
+    query OrderListRendererQuery($providerId: ID!, $accountId: ID) {
       viewer {
         ...OrderList_viewer @arguments(providerId: $providerId, accountId: $accountId)
       }
@@ -21,7 +21,7 @@ class OrderListRenderer extends Component<RendererProps & OrderListRendererQuery
   `;
 
   render() {
-    return <OrderList viewer={this.props.viewer} />;
+    return <OrderList viewer={this.props.viewer} providerId={this.props.variables.providerId} />;
   }
 }
 
