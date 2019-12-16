@@ -1,5 +1,5 @@
-import React, { ComponentPropsWithoutRef } from "react";
-import { QueryRenderer, GraphQLTaggedNode, Variables, createFragmentContainer } from "react-relay";
+import React from "react";
+import { QueryRenderer, GraphQLTaggedNode, Variables } from "react-relay";
 import "../scss/styles.scss";
 
 import { createEnvironment } from "../relay";
