@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Callout } from "@blueprintjs/core";
 import { Flex, Box } from "rebass";
 import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { PositionList_viewer } from "./__generated__/PositionList_viewer.graphql";
+import { PositionList_viewer } from "../../__generated__/PositionList_viewer.graphql";
 import PositionListItem from "./PositionListItem";
 import ErrorState from "../generic/ErrorState";
 import { IconNames } from "@blueprintjs/icons";

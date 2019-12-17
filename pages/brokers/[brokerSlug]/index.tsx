@@ -5,7 +5,7 @@ import { graphql } from "react-relay";
 import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../components/Layout";
-import { BrokerSlugQueryResponse } from "./__generated__/BrokerSlugQuery.graphql";
+import { BrokerSlugQueryResponse } from "../../../__generated__/BrokerSlugQuery.graphql";
 import Error from "../../_error";
 import NonIdealConnection from "../../../components/generic/NonIdealConnection";
 import { withRelay } from "../../../components/RelayComponent";

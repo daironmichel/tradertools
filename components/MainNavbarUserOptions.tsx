@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Button, Classes } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { graphql } from "react-relay";
 import { withRelay } from "./RelayComponent";
-import { MainNavbarUserOptionsQueryResponse } from "./__generated__/MainNavbarUserOptionsQuery.graphql";
+import { MainNavbarUserOptionsQueryResponse } from "../__generated__/MainNavbarUserOptionsQuery.graphql";
 
 interface Props {}
 

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Flex, Box } from "rebass";
 import { createFragmentContainer, graphql } from "react-relay";
-import { PositionListItem_position } from "./__generated__/PositionListItem_position.graphql";
+import { PositionListItem_position } from "../../__generated__/PositionListItem_position.graphql";
 import { Button, Intent, Card } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import SellStockMutation from "../../mutations/Order/SellStockMutation";

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { PositionAndOrderList_viewer } from "./__generated__/PositionAndOrderList_viewer.graphql";
+import { PositionAndOrderList_viewer } from "../../__generated__/PositionAndOrderList_viewer.graphql";
 import PositionList from "./PositionList";
 import OrderList from "../Order/OrderList";
 import ErrorState from "../generic/ErrorState";

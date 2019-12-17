@@ -12,6 +12,10 @@ module.exports = withSass({
         }
       }
     });
+    // config.module.rules.push({
+    //   test: /\.graphql.ts$/,
+    //   loader: "ignore-loader"
+    // });
     return config;
   }
 });

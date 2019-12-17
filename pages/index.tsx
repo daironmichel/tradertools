@@ -5,7 +5,7 @@ import { graphql } from "react-relay";
 import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../components/Layout";
-import { pages_indexQueryResponse } from "./__generated__/pages_indexQuery.graphql";
+import { pages_indexQueryResponse } from "../__generated__/pages_indexQuery.graphql";
 import { withRelay } from "../components/RelayComponent";
 
 interface Props extends pages_indexQueryResponse {}

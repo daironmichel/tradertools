@@ -4,7 +4,7 @@ import {
   ConnectProviderInput,
   ConnectProviderMutationResponse,
   ConnectProviderMutation
-} from "./__generated__/ConnectProviderMutation.graphql";
+} from "../../__generated__/ConnectProviderMutation.graphql";
 import { PayloadError } from "relay-runtime";
 
 const mutation = graphql`

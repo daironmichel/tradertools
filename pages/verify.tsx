@@ -7,7 +7,7 @@ import { Button, Card, InputGroup, Icon, Classes, Intent } from "@blueprintjs/co
 import { IconNames } from "@blueprintjs/icons";
 import Layout from "../components/Layout";
 import AuthorizeConnectionMutation from "../mutations/Provider/AuthorizeConnectionMutation";
-import { AuthorizeConnectionMutationResponse } from "../mutations/Provider/__generated__/AuthorizeConnectionMutation.graphql";
+import { AuthorizeConnectionMutationResponse } from "../__generated__/AuthorizeConnectionMutation.graphql";
 import { PayloadError } from "relay-runtime";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextPageContext } from "next";

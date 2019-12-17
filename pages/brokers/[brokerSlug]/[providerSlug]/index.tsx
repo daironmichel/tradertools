@@ -15,19 +15,19 @@ import {
 } from "@blueprintjs/core";
 import { Flex } from "rebass";
 import Layout from "../../../../components/Layout";
-import { ProviderSlugQueryResponse } from "./__generated__/ProviderSlugQuery.graphql";
+import { ProviderSlugQueryResponse } from "../../../../__generated__/ProviderSlugQuery.graphql";
 import { IconNames } from "@blueprintjs/icons";
 import ConnectProviderMutation from "../../../../mutations/Provider/ConnectProviderMutation";
-import { ConnectProviderMutationResponse } from "../../../../mutations/Provider/__generated__/ConnectProviderMutation.graphql";
+import { ConnectProviderMutationResponse } from "../../../../__generated__/ConnectProviderMutation.graphql";
 import { PayloadError } from "relay-runtime";
 import Error from "../../../_error";
 import { withRelay } from "../../../../components/RelayComponent";
 import SyncAccountsMutation from "../../../../mutations/Account/SyncAccountsMutation";
-import { SyncAccountsMutationResponse } from "../../../../mutations/Account/__generated__/SyncAccountsMutation.graphql";
+import { SyncAccountsMutationResponse } from "../../../../__generated__/SyncAccountsMutation.graphql";
 import SellStockMutation from "../../../../mutations/Order/SellStockMutation";
-import { SellStockMutationResponse } from "../../../../mutations/Order/__generated__/SellStockMutation.graphql";
+import { SellStockMutationResponse } from "../../../../__generated__/SellStockMutation.graphql";
 import BuyStockMutation from "../../../../mutations/Order/BuyStockMutation";
-import { BuyStockMutationResponse } from "../../../../mutations/Order/__generated__/BuyStockMutation.graphql";
+import { BuyStockMutationResponse } from "../../../../__generated__/BuyStockMutation.graphql";
 import ErrorState from "../../../../components/generic/ErrorState";
 import PositionAndOrderListRenderer from "../../../../components/Account/PositionAndOrderListRenderer";
 

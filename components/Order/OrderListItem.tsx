@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Flex, Box } from "rebass";
 import { createFragmentContainer, graphql } from "react-relay";
-import { OrderListItem_order } from "./__generated__/OrderListItem_order.graphql";
+import { OrderListItem_order } from "../../__generated__/OrderListItem_order.graphql";
 import { Button, Intent, Card } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import CancelOrderMutation from "../../mutations/Order/CancelOrderMutation";

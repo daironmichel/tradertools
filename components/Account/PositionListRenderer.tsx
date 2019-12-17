@@ -3,7 +3,7 @@ import { graphql } from "react-relay";
 import {
   PositionListRendererQueryResponse,
   PositionListRendererQueryVariables
-} from "./__generated__/PositionListRendererQuery.graphql";
+} from "../../__generated__/PositionListRendererQuery.graphql";
 import PositionList from "./PositionList";
 import { withRelay } from "../RelayComponent";
 

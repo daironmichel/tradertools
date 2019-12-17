@@ -3,6 +3,7 @@ module.exports = {
   // Configuration options accepted by the `relay-compiler` command-line tool and `babel-plugin-relay`.
   src: "./",
   schema: "./relay/schema.graphql",
+  artifactDirectory: "./__generated__",
   exclude: [
     "**/.next/**",
     "**/server/**",

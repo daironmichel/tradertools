@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { HTMLSelect, IOptionProps, Callout } from "@blueprintjs/core";
 import { Flex, Box } from "rebass";
 import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { OrderList_viewer } from "./__generated__/OrderList_viewer.graphql";
+import { OrderList_viewer } from "../../__generated__/OrderList_viewer.graphql";
 import OrderListItem from "./OrderListItem";
 import ErrorState from "../generic/ErrorState";
 import { IconNames } from "@blueprintjs/icons";

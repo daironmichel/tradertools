@@ -4,7 +4,7 @@ import {
   AuthorizeConnectionInput,
   AuthorizeConnectionMutationResponse,
   AuthorizeConnectionMutation
-} from "./__generated__/AuthorizeConnectionMutation.graphql";
+} from "../../__generated__/AuthorizeConnectionMutation.graphql";
 import { PayloadError } from "relay-runtime";
 
 const mutation = graphql`
