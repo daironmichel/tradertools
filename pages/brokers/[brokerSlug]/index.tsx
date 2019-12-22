@@ -1,16 +1,16 @@
-import * as React from "react";
-import Head from "next/head";
-import Link from "next/link";
-import { graphql } from "react-relay";
-import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
-import { Flex } from "rebass";
-import Layout from "../../../components/Layout";
-import { BrokerSlugQueryResponse } from "../../../__generated__/BrokerSlugQuery.graphql";
-import Error from "../../_error";
-import NonIdealConnection from "../../../components/generic/NonIdealConnection";
-import { withRelay } from "../../../components/RelayComponent";
+import * as React from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import { graphql } from 'react-relay';
+import { ButtonGroup, AnchorButton } from '@blueprintjs/core';
+import { Flex } from 'rebass';
+import Layout from '../../../components/Layout';
+import { BrokerSlugQueryResponse } from '../../../__generated__/BrokerSlugQuery.graphql';
+import Error from '../../_error';
+import NonIdealConnection from '../../../components/generic/NonIdealConnection';
+import { withRelay } from '../../../components/RelayComponent';
 
-interface Props extends BrokerSlugQueryResponse {}
+type Props = BrokerSlugQueryResponse;
 
 class Index extends React.Component<Props> {
   static query = graphql`
@@ -18,14 +18,12 @@ class Index extends React.Component<Props> {
       viewer {
         broker(slug: $brokerSlug) {
           id
-          databaseId
           name
           slug
           serviceProviders {
             edges {
               node {
                 id
-                databaseId
                 name
                 slug
               }
@@ -36,7 +34,7 @@ class Index extends React.Component<Props> {
     }
   `;
 
-  render() {
+  render(): JSX.Element {
     const { viewer } = this.props;
     const { broker } = viewer;
     const { serviceProviders } = broker || {};

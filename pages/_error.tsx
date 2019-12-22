@@ -1,11 +1,11 @@
-import React from "react";
-import Themed from "../components/Themed";
-import Head from "next/head";
-import { Flex } from "rebass";
-import { NonIdealState } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import { NextPageContext } from "next";
-import ErrorState from "../components/generic/ErrorState";
+import React from 'react';
+import Themed from '../components/Themed';
+import Head from 'next/head';
+import { Flex } from 'rebass';
+import { NonIdealState } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { NextPageContext } from 'next';
+import ErrorState from '../components/generic/ErrorState';
 
 interface Props {
   statusCode?: string | number | null;
@@ -13,8 +13,8 @@ interface Props {
   description?: string;
 }
 
-function ErrorPage(props: Props) {
-  const { statusCode = 404, title = "Page not found", description } = props;
+function ErrorPage(props: Props): JSX.Element {
+  const { statusCode = 404, title = 'Page not found', description } = props;
   if (statusCode) {
     // error on the server
   }
@@ -31,7 +31,7 @@ function ErrorPage(props: Props) {
   );
 }
 
-ErrorPage.getInitialProps = (context: NextPageContext) => {
+ErrorPage.getInitialProps = (context: NextPageContext): {} => {
   const { res, err } = context;
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
   return { statusCode };

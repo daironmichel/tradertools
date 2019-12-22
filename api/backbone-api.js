@@ -1,34 +1,34 @@
-const axios = require("axios");
+const axios = require('axios');
 
 // traing something
 class BackboneAPI {
-  constructor(apiHost = "") {
+  constructor(apiHost = '') {
     const baseURL = `${apiHost}/api/`;
     this.axios = axios.create({
       baseURL: baseURL,
       headers: {
-        Accept: "application/json"
-      }
+        Accept: 'application/json',
+      },
     });
     this.cancelTokenSource = null;
   }
 
   async login(username, password) {
     const body = { username, password };
-    const res = await this.axios.post("login/", body);
+    const res = await this.axios.post('login/', body);
     return res.data.key;
   }
 
   async getCredentials(token) {
-    let headers = { Authorization: `Token ${token}` };
-    const res = await this.axios.get("credentials/", { headers });
+    const headers = { Authorization: `Token ${token}` };
+    const res = await this.axios.get('credentials/', { headers });
     return res.data;
   }
 
   async logout(token) {
     const body = {};
-    let headers = { Authorization: `Token ${token}` };
-    const res = await this.axios.post("logout/", body, { headers });
+    const headers = { Authorization: `Token ${token}` };
+    const res = await this.axios.post('logout/', body, { headers });
     return res.data;
   }
 
@@ -39,9 +39,9 @@ class BackboneAPI {
     const CancelToken = axios.CancelToken;
     this.cancelTokenSource = CancelToken.source();
 
-    let req = this.axios.post("gql/", body, {
+    const req = this.axios.post('gql/', body, {
       headers: headers,
-      cancelToken: this.cancelTokenSource.token
+      cancelToken: this.cancelTokenSource.token,
     });
 
     // req = this.defaultErrorHandler(req);

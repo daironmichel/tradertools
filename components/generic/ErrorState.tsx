@@ -1,7 +1,7 @@
-import React from "react";
-import { NonIdealState } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import { Flex } from "rebass";
+import React from 'react';
+import { NonIdealState } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { Flex } from 'rebass';
 
 interface Props {
   title?: React.ReactNode;
@@ -10,7 +10,7 @@ interface Props {
   action?: JSX.Element;
 }
 
-export default function ErrorState(props: Props) {
+export default function ErrorState(props: Props): JSX.Element {
   const { title, statusCode, description, action } = props;
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" flex="1" p={3}>

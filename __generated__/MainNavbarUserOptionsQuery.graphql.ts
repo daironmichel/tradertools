@@ -1,12 +1,11 @@
 /* tslint:disable */
-/* @relayHash 8c69dfda2f47cfe242366942fd468c24 */
+/* @relayHash 17bb3cb2b21fa0f24a1ea3c5ef9f342b */
 
 import { ConcreteRequest } from "relay-runtime";
 export type MainNavbarUserOptionsQueryVariables = {};
 export type MainNavbarUserOptionsQueryResponse = {
     readonly viewer: {
         readonly credentials: {
-            readonly databaseId: number;
             readonly fullName: string;
         };
     };
@@ -22,7 +21,6 @@ export type MainNavbarUserOptionsQuery = {
 query MainNavbarUserOptionsQuery {
   viewer {
     credentials {
-      databaseId
       fullName
     }
   }
@@ -49,13 +47,6 @@ var v0 = [
         "concreteType": "ViewerCredentialsType",
         "plural": false,
         "selections": [
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "databaseId",
-            "args": null,
-            "storageKey": null
-          },
           {
             "kind": "ScalarField",
             "alias": null,
@@ -88,10 +79,10 @@ return {
     "operationKind": "query",
     "name": "MainNavbarUserOptionsQuery",
     "id": null,
-    "text": "query MainNavbarUserOptionsQuery {\n  viewer {\n    credentials {\n      databaseId\n      fullName\n    }\n  }\n}\n",
+    "text": "query MainNavbarUserOptionsQuery {\n  viewer {\n    credentials {\n      fullName\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '7b9b3d0751fe9df956b7210dbd624d90';
+(node as any).hash = '7e2bfbd3907abace46dc91ae6d8ec22d';
 export default node;

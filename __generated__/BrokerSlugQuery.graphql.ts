@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash d268f986e54d560cb25d7a4f55d13533 */
+/* @relayHash a18742a556fb9f21335f2f36dde91bd5 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type BrokerSlugQueryVariables = {
@@ -9,14 +9,12 @@ export type BrokerSlugQueryResponse = {
     readonly viewer: {
         readonly broker: {
             readonly id: string;
-            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
             readonly serviceProviders: {
                 readonly edges: ReadonlyArray<{
                     readonly node: {
                         readonly id: string;
-                        readonly databaseId: number;
                         readonly name: string;
                         readonly slug: string;
                     };
@@ -39,14 +37,12 @@ query BrokerSlugQuery(
   viewer {
     broker(slug: $brokerSlug) {
       id
-      databaseId
       name
       slug
       serviceProviders {
         edges {
           node {
             id
-            databaseId
             name
             slug
           }
@@ -76,25 +72,18 @@ v1 = {
 v2 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "databaseId",
+  "name": "name",
   "args": null,
   "storageKey": null
 },
 v3 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "name",
-  "args": null,
-  "storageKey": null
-},
-v4 = {
-  "kind": "ScalarField",
-  "alias": null,
   "name": "slug",
   "args": null,
   "storageKey": null
 },
-v5 = [
+v4 = [
   {
     "kind": "LinkedField",
     "alias": null,
@@ -122,7 +111,6 @@ v5 = [
           (v1/*: any*/),
           (v2/*: any*/),
           (v3/*: any*/),
-          (v4/*: any*/),
           {
             "kind": "LinkedField",
             "alias": null,
@@ -152,8 +140,7 @@ v5 = [
                     "selections": [
                       (v1/*: any*/),
                       (v2/*: any*/),
-                      (v3/*: any*/),
-                      (v4/*: any*/)
+                      (v3/*: any*/)
                     ]
                   }
                 ]
@@ -173,22 +160,22 @@ return {
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
-    "selections": (v5/*: any*/)
+    "selections": (v4/*: any*/)
   },
   "operation": {
     "kind": "Operation",
     "name": "BrokerSlugQuery",
     "argumentDefinitions": (v0/*: any*/),
-    "selections": (v5/*: any*/)
+    "selections": (v4/*: any*/)
   },
   "params": {
     "operationKind": "query",
     "name": "BrokerSlugQuery",
     "id": null,
-    "text": "query BrokerSlugQuery(\n  $brokerSlug: String!\n) {\n  viewer {\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      slug\n      serviceProviders {\n        edges {\n          node {\n            id\n            databaseId\n            name\n            slug\n          }\n        }\n      }\n    }\n  }\n}\n",
+    "text": "query BrokerSlugQuery(\n  $brokerSlug: String!\n) {\n  viewer {\n    broker(slug: $brokerSlug) {\n      id\n      name\n      slug\n      serviceProviders {\n        edges {\n          node {\n            id\n            name\n            slug\n          }\n        }\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '7409fb3da8fdb85b5e6a4b3536e0af54';
+(node as any).hash = '986a3a5acc79453779f855f8c9fc980b';
 export default node;

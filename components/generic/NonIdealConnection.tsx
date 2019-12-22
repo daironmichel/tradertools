@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { IconName, NonIdealState } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
+import React, { Component } from 'react';
+import { IconName, NonIdealState } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 
 type ConnectionType = {
-  readonly edges?: ReadonlyArray<any>;
+  readonly edges?: ReadonlyArray<unknown>;
 };
 
 interface Props {
@@ -22,11 +22,11 @@ interface Defaults {
 export default class NonIdealConnection extends Component<Props, {}, Defaults> {
   static defaultProps: Defaults = {
     icon: IconNames.INBOX,
-    title: "Nothing Here",
-    description: "This list is empty."
+    title: 'Nothing Here',
+    description: 'This list is empty.',
   };
 
-  render() {
+  render(): JSX.Element {
     const { connection, icon, title, description, children } = this.props;
     return (
       <>

@@ -1,10 +1,11 @@
-import React, { Component } from "react";
-import { Flex, Box } from "rebass";
-import { createFragmentContainer, graphql } from "react-relay";
-import { PositionListItem_position } from "../../__generated__/PositionListItem_position.graphql";
-import { Button, Intent, Card } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import SellStockMutation from "../../mutations/Order/SellStockMutation";
+/* eslint-disable @typescript-eslint/camelcase */
+import React, { Component } from 'react';
+import { Flex, Box } from 'rebass';
+import { createFragmentContainer, graphql } from 'react-relay';
+import { PositionListItem_position } from '../../__generated__/PositionListItem_position.graphql';
+import { Button, Intent, Card } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import SellStockMutation from '../../mutations/Order/SellStockMutation';
 
 interface Props {
   position: PositionListItem_position;
@@ -20,30 +21,30 @@ class PositionListItem extends Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
-  handleSellOnClick = () => {
+  handleSellOnClick = (): void => {
     const { position, providerId } = this.props;
     this.sellStock(providerId, position.symbol);
   };
 
-  sellStock = (providerId: string, symbol: string) => {
+  sellStock = (providerId: string, symbol: string): void => {
     this.setState({ loading: true });
     const sell = new SellStockMutation();
     sell.commit({ providerId, symbol }, this.sellStockCompleted, this.sellStockError);
   };
 
-  sellStockCompleted = () => {
+  sellStockCompleted = (): void => {
     this.setState({ loading: false });
   };
 
-  sellStockError = (error: Error) => {
+  sellStockError = (): void => {
     this.setState({ loading: false });
   };
 
-  render() {
+  render(): JSX.Element {
     const { position } = this.props;
     const { loading } = this.state;
     return (
@@ -82,5 +83,5 @@ export default createFragmentContainer(PositionListItem, {
       pricePaid
       totalGain
     }
-  `
+  `,
 });

@@ -1,33 +1,37 @@
-import React from "react";
-import { QueryRenderer, GraphQLTaggedNode, Variables } from "react-relay";
-import "../scss/styles.scss";
+import React from 'react';
+import { QueryRenderer, GraphQLTaggedNode, Variables } from 'react-relay';
+import '../scss/styles.scss';
 
-import { createEnvironment } from "../relay";
-import { NextPageContext } from "next";
-import ErrorPage from "../pages/_error";
-import Loading from "./generic/Loading";
-import { Flex } from "rebass";
-import ErrorState from "./generic/ErrorState";
+import { createEnvironment } from '../relay';
+import { NextPageContext } from 'next';
+import ErrorPage from '../pages/_error';
+import Loading from './generic/Loading';
+import { Flex } from 'rebass';
+import ErrorState from './generic/ErrorState';
 
-interface RootQueryComponent<P = any, S = any> extends React.ComponentClass<P, S> {
-  query: GraphQLTaggedNode;
-  getInitialProps?: (ctx: NextPageContext) => Promise<{ [name: string]: any } | null | undefined>;
+interface PropsWithVars {
+  variables?: Variables;
 }
 
-interface Props {
-  Component: RootQueryComponent;
-  variables?: Variables;
+interface RootQueryComponent<P extends PropsWithVars = {}, S = unknown> extends React.ComponentClass<P, S> {
+  query: GraphQLTaggedNode;
+  getInitialProps?: (ctx: NextPageContext) => Promise<{ [name: string]: {} } | null | undefined>;
+}
+
+interface Props extends PropsWithVars {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Component: RootQueryComponent<any>;
 }
 
 interface RenderProps {
   error: Error | null;
-  props: any;
+  props: unknown;
   retry: (() => void) | null;
 }
 
 export default class RelayComponent extends React.Component<Props> {
-  render(): React.ReactElement<any> {
-    const { Component, variables = {}, ...rest } = this.props;
+  render(): JSX.Element {
+    const { Component, variables = {} } = this.props;
     const environment = createEnvironment();
 
     return (
@@ -35,14 +39,14 @@ export default class RelayComponent extends React.Component<Props> {
         environment={environment}
         query={Component.query}
         variables={variables}
-        render={(renderProps: RenderProps) => {
+        render={(renderProps: RenderProps): React.ReactNode => {
           const { error, props } = renderProps;
-          if (error && error.message !== "NO_RELAY_SSR") {
-            if (error.constructor.name === "RRNLRequestError") {
+          if (error && error.message !== 'NO_RELAY_SSR') {
+            if (error.constructor.name === 'RRNLRequestError') {
               return (
                 <ErrorState
                   title="Relay Request Error"
-                  description={<pre css={{ whiteSpace: "pre-line" }}>{error.message}</pre>}
+                  description={<pre css={{ whiteSpace: 'pre-line' }}>{error.message}</pre>}
                 />
               );
             }
@@ -59,21 +63,20 @@ export default class RelayComponent extends React.Component<Props> {
   }
 }
 
-interface RelayComponentProps {
-  variables?: Variables;
-  url?: any; // this is a deprecated nextjs prop for pages
+interface RelayComponentProps extends PropsWithVars {
+  url?: unknown; // this is a deprecated nextjs prop for pages
 }
 
-interface PageInitialProps {
-  variables?: Variables;
-  [name: string]: any;
+interface PageInitialProps extends PropsWithVars {
+  [name: string]: unknown;
 }
 
 export function withRelay<P>(
-  component: RootQueryComponent,
-  asPage: boolean = false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: RootQueryComponent<any>,
+  asPage = false,
 ): React.FunctionComponent<RelayComponentProps & P> {
-  const wrapper = (props: RelayComponentProps & P) => {
+  const wrapper = (props: RelayComponentProps & P): JSX.Element => {
     const {
       variables,
       // url, // we unpack this here and ignore it since its deprecated
@@ -95,7 +98,7 @@ export function withRelay<P>(
 
       return {
         variables,
-        ...componentProps
+        ...componentProps,
       };
     };
   }

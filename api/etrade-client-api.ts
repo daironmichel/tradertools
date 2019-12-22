@@ -1,25 +1,26 @@
-import axios, { AxiosInstance, CancelTokenSource, AxiosResponse } from "axios";
+import axios, { AxiosInstance, CancelTokenSource } from 'axios';
 
 // traing something
 export default class EtradeAPI {
   axios: AxiosInstance;
   cancelTokenSource: CancelTokenSource | null;
 
-  constructor(apiHost: string = "") {
+  constructor(apiHost = '') {
     const baseURL = `${apiHost}/api/etrade/`;
     this.axios = axios.create({
       baseURL: baseURL,
       headers: {
-        Accept: "application/json"
-      }
+        Accept: 'application/json',
+      },
     });
     this.cancelTokenSource = null;
   }
 
-  async verify(oauth_verifier: string): Promise<boolean> {
-    const params = { oauth_verifier };
+  async verify(code: string): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    const params = { oauth_verifier: code };
     try {
-      await this.axios.post("oauth", null, { params });
+      await this.axios.post('oauth', null, { params });
       return true;
     } catch (e) {
       console.error(e);

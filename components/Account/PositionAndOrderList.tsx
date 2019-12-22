@@ -1,9 +1,10 @@
-import React, { Component } from "react";
-import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { PositionAndOrderList_viewer } from "../../__generated__/PositionAndOrderList_viewer.graphql";
-import PositionList from "./PositionList";
-import OrderList from "../Order/OrderList";
-import ErrorState from "../generic/ErrorState";
+/* eslint-disable @typescript-eslint/camelcase */
+import React, { Component } from 'react';
+import { createRefetchContainer, graphql, RelayRefetchProp } from 'react-relay';
+import { PositionAndOrderList_viewer } from '../../__generated__/PositionAndOrderList_viewer.graphql';
+import PositionList from './PositionList';
+import OrderList from '../Order/OrderList';
+import ErrorState from '../generic/ErrorState';
 
 interface Props {
   relay: RelayRefetchProp;
@@ -18,7 +19,7 @@ interface State {
 
 class PositionAndOrderList extends Component<Props, State> {
   static defaultProps = {
-    autoRefetch: true
+    autoRefetch: true,
   };
 
   timeoutId: number | null = null;
@@ -27,25 +28,25 @@ class PositionAndOrderList extends Component<Props, State> {
     super(props);
 
     this.state = {
-      refetchError: null
+      refetchError: null,
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     if (this.props.autoRefetch) {
       this.timeoutId = setInterval(this.refresh, 2000);
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     if (this.timeoutId) clearInterval(this.timeoutId);
   }
 
-  refresh = () => {
+  refresh = (): void => {
     this.props.relay.refetch(fragmentVariables => fragmentVariables, null, this.refetchDone, { force: true });
   };
 
-  refetchDone = (error?: Error | null) => {
+  refetchDone = (error?: Error | null): void => {
     if (error && !this.state.refetchError) {
       this.setState({ refetchError: error });
     } else if (!error && this.state.refetchError) {
@@ -53,7 +54,7 @@ class PositionAndOrderList extends Component<Props, State> {
     }
   };
 
-  render() {
+  render(): JSX.Element {
     const { viewer, providerId } = this.props;
     const { refetchError } = this.state;
 
@@ -77,7 +78,7 @@ export default createRefetchContainer(
         ...PositionList_viewer @arguments(providerId: $providerId, accountId: $accountId)
         ...OrderList_viewer @arguments(providerId: $providerId, accountId: $accountId)
       }
-    `
+    `,
   },
   graphql`
     query PositionAndOrderListRefetchQuery($providerId: ID!, $accountId: ID) {
@@ -86,5 +87,5 @@ export default createRefetchContainer(
         ...OrderList_viewer @arguments(providerId: $providerId, accountId: $accountId)
       }
     }
-  `
+  `,
 );

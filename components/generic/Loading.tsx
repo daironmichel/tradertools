@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { NonIdealState, Spinner } from "@blueprintjs/core";
+import React, { Component } from 'react';
+import { NonIdealState, Spinner } from '@blueprintjs/core';
 
 interface Props {
   title: string;
@@ -12,10 +12,10 @@ interface Defaults {
 
 export default class Loading extends Component<Props, {}, Defaults> {
   static defaultProps: Defaults = {
-    title: "Loading"
+    title: 'Loading',
   };
 
-  render() {
+  render(): JSX.Element {
     const { title, description } = this.props;
     return (
       <div>

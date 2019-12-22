@@ -1,7 +1,7 @@
-import * as React from "react";
-import Head from "next/head";
-import Router from "next/router";
-import { graphql } from "react-relay";
+import * as React from 'react';
+import Head from 'next/head';
+import Router from 'next/router';
+import { graphql } from 'react-relay';
 import {
   Button,
   NonIdealState,
@@ -11,29 +11,26 @@ import {
   Popover,
   Menu,
   MenuItem,
-  Position
-} from "@blueprintjs/core";
-import { Flex } from "rebass";
-import Layout from "../../../../components/Layout";
-import { ProviderSlugQueryResponse } from "../../../../__generated__/ProviderSlugQuery.graphql";
-import { IconNames } from "@blueprintjs/icons";
-import ConnectProviderMutation from "../../../../mutations/Provider/ConnectProviderMutation";
-import { ConnectProviderMutationResponse } from "../../../../__generated__/ConnectProviderMutation.graphql";
-import { PayloadError } from "relay-runtime";
-import Error from "../../../_error";
-import { withRelay } from "../../../../components/RelayComponent";
-import SyncAccountsMutation from "../../../../mutations/Account/SyncAccountsMutation";
-import { SyncAccountsMutationResponse } from "../../../../__generated__/SyncAccountsMutation.graphql";
-import SellStockMutation from "../../../../mutations/Order/SellStockMutation";
-import { SellStockMutationResponse } from "../../../../__generated__/SellStockMutation.graphql";
-import BuyStockMutation from "../../../../mutations/Order/BuyStockMutation";
-import { BuyStockMutationResponse } from "../../../../__generated__/BuyStockMutation.graphql";
-import ErrorState from "../../../../components/generic/ErrorState";
-import PositionAndOrderListRenderer from "../../../../components/Account/PositionAndOrderListRenderer";
+  Position,
+} from '@blueprintjs/core';
+import { Flex } from 'rebass';
+import Layout from '../../../../components/Layout';
+import { ProviderSlugQueryResponse } from '../../../../__generated__/ProviderSlugQuery.graphql';
+import { IconNames } from '@blueprintjs/icons';
+import ConnectProviderMutation from '../../../../mutations/Provider/ConnectProviderMutation';
+import { ConnectProviderMutationResponse } from '../../../../__generated__/ConnectProviderMutation.graphql';
+import { PayloadError } from 'relay-runtime';
+import Error from '../../../_error';
+import { withRelay } from '../../../../components/RelayComponent';
+import SyncAccountsMutation from '../../../../mutations/Account/SyncAccountsMutation';
+import SellStockMutation from '../../../../mutations/Order/SellStockMutation';
+import BuyStockMutation from '../../../../mutations/Order/BuyStockMutation';
+import ErrorState from '../../../../components/generic/ErrorState';
+import PositionAndOrderListRenderer from '../../../../components/Account/PositionAndOrderListRenderer';
 
-type TradingStrategy = ProviderSlugQueryResponse["viewer"]["tradingStrategies"][0];
+type TradingStrategy = ProviderSlugQueryResponse['viewer']['tradingStrategies'][0];
 
-interface Props extends ProviderSlugQueryResponse {}
+type Props = ProviderSlugQueryResponse;
 interface State {
   loading: boolean;
   strategies: ReadonlyArray<TradingStrategy>;
@@ -58,22 +55,10 @@ class Index extends React.Component<Props, State> {
           id
           databaseId
           name
-          accounts {
-            edges {
-              node {
-                id
-                databaseId
-                name
-                accountId
-                accountKey
-              }
-            }
-          }
           serviceProvider(slug: $providerSlug) {
             id
             databaseId
             name
-            slug
             sessionStatus
           }
         }
@@ -91,30 +76,27 @@ class Index extends React.Component<Props, State> {
       loading: false,
       strategies: tradingStrategies,
       selectedStrategy: tradingStrategies.length > 0 ? tradingStrategies[0] : null,
-      symbol: "",
-      connectError: null
+      symbol: '',
+      connectError: null,
     };
   }
 
-  onAuthorize = (event: React.MouseEvent<HTMLElement>) => {
+  onAuthorize = (): void => {
     const { viewer } = this.props;
     const { broker } = viewer;
     const { serviceProvider } = broker || {};
 
     if (!serviceProvider) {
-      console.error({ message: "Service provider missing.", viewer });
+      console.error({ message: 'Service provider missing.', viewer });
       return;
     }
 
     this.setState({ loading: true });
-    ConnectProviderMutation.commit(
-      { providerId: serviceProvider.databaseId.toString() },
-      this.connectCompleted,
-      this.connectError
-    );
+    const connect = new ConnectProviderMutation();
+    connect.commit({ providerId: serviceProvider.databaseId.toString() }, this.connectCompleted, this.connectError);
   };
 
-  connectCompleted = (response: ConnectProviderMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
+  connectCompleted = (response: ConnectProviderMutationResponse, errors?: ReadonlyArray<PayloadError> | null): void => {
     this.setState({ loading: false });
     if (errors) {
       console.error(errors);
@@ -129,41 +111,41 @@ class Index extends React.Component<Props, State> {
     }
 
     if (!serviceProvider) {
-      console.error("service provider not recieved");
+      console.error('service provider not recieved');
       return;
     }
 
     if (!authorizeUrl) {
-      console.error("authorization url not received");
+      console.error('authorization url not received');
       return;
     }
 
     // save provider id in local storage
-    window.localStorage.setItem("providerId", serviceProvider.databaseId.toString());
+    window.localStorage.setItem('providerId', serviceProvider.databaseId.toString());
     // if callback is configured redirect to authorizeUrl
     // else open authorizeUrl in new window and redirect to verification page
     if (callbackEnabled) {
       Router.push(authorizeUrl);
     } else {
       window.open(authorizeUrl);
-      Router.push("/verify");
+      Router.push('/verify');
     }
   };
 
-  connectError = (error: Error) => {
+  connectError = (error: Error): void => {
     this.setState({ loading: false, connectError: error });
     console.error(error);
   };
 
-  handleStrategyChange = (newStrategy: TradingStrategy) => {
+  handleStrategyChange = (newStrategy: TradingStrategy): void => {
     this.setState({ selectedStrategy: newStrategy });
   };
 
-  handleSymbolChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  handleSymbolChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     this.setState({ symbol: event.currentTarget.value.toUpperCase() });
   };
 
-  handleSyncOnClick = () => {
+  handleSyncOnClick = (): void => {
     if (this.state.loading) return;
 
     const { viewer } = this.props;
@@ -171,7 +153,7 @@ class Index extends React.Component<Props, State> {
     const { serviceProvider } = broker || {};
 
     if (!serviceProvider) {
-      console.warn("No service provider supplied");
+      console.warn('No service provider supplied');
       return;
     }
 
@@ -180,19 +162,19 @@ class Index extends React.Component<Props, State> {
     sync.commit(
       { providerId: serviceProvider.databaseId.toString() },
       this.syncAccountsCompleted,
-      this.syncAccountsError
+      this.syncAccountsError,
     );
   };
 
-  syncAccountsCompleted = (response: SyncAccountsMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
+  syncAccountsCompleted = (): void => {
     this.setState({ loading: false });
   };
 
-  syncAccountsError = (error: Error) => {
+  syncAccountsError = (): void => {
     this.setState({ loading: false });
   };
 
-  handleSellOnClick = (event: React.MouseEvent<HTMLElement>) => {
+  handleSellOnClick = (): void => {
     if (this.state.loading) return;
 
     const { viewer } = this.props;
@@ -200,7 +182,7 @@ class Index extends React.Component<Props, State> {
     const { serviceProvider } = broker || {};
 
     if (!serviceProvider) {
-      console.warn("No service provider supplied");
+      console.warn('No service provider supplied');
       return;
     }
 
@@ -209,22 +191,22 @@ class Index extends React.Component<Props, State> {
     sell.commit(
       {
         providerId: serviceProvider.databaseId.toString(),
-        symbol: this.state.symbol
+        symbol: this.state.symbol,
       },
       this.sellCompleted,
-      this.sellError
+      this.sellError,
     );
   };
 
-  sellCompleted = (response: SellStockMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
+  sellCompleted = (): void => {
     this.setState({ loading: false });
   };
 
-  sellError = (error: Error) => {
+  sellError = (): void => {
     this.setState({ loading: false });
   };
 
-  handleBuyOnClick = (event: React.MouseEvent<HTMLElement>) => {
+  handleBuyOnClick = (): void => {
     if (this.state.loading) return;
 
     const { viewer } = this.props;
@@ -233,12 +215,12 @@ class Index extends React.Component<Props, State> {
     const { selectedStrategy } = this.state;
 
     if (!serviceProvider) {
-      console.warn("No service provider supplied");
+      console.warn('No service provider supplied');
       return;
     }
 
     if (!selectedStrategy) {
-      console.warn("No strategy selected");
+      console.warn('No strategy selected');
       return;
     }
 
@@ -248,26 +230,26 @@ class Index extends React.Component<Props, State> {
       {
         providerId: serviceProvider.databaseId.toString(),
         strategyId: selectedStrategy.databaseId.toString(),
-        symbol: this.state.symbol
+        symbol: this.state.symbol,
       },
       this.buyCompleted,
-      this.buyError
+      this.buyError,
     );
   };
 
-  buyCompleted = (response: BuyStockMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => {
+  buyCompleted = (): void => {
     this.setState({ loading: false });
   };
 
-  buyError = (error: Error) => {
+  buyError = (): void => {
     this.setState({ loading: false });
   };
 
-  render() {
+  render(): JSX.Element {
     const { viewer } = this.props;
     const { broker, tradingStrategies } = viewer;
     const { serviceProvider } = broker || {};
-    const { sessionStatus = "CLOSED" } = serviceProvider || {};
+    const { sessionStatus = 'CLOSED' } = serviceProvider || {};
 
     const { selectedStrategy, symbol, loading, connectError } = this.state;
 
@@ -285,7 +267,7 @@ class Index extends React.Component<Props, State> {
 
         <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
           <h4>Status: {sessionStatus}</h4>
-          {sessionStatus !== "CONNECTED" && connectError && (
+          {sessionStatus !== 'CONNECTED' && connectError && (
             <ErrorState
               title="Error Connecting"
               description={connectError.message}
@@ -294,7 +276,7 @@ class Index extends React.Component<Props, State> {
               }
             />
           )}
-          {sessionStatus !== "CONNECTED" && !connectError && (
+          {sessionStatus !== 'CONNECTED' && !connectError && (
             <NonIdealState
               icon={IconNames.OFFLINE}
               title="Authorize Application"
@@ -304,22 +286,22 @@ class Index extends React.Component<Props, State> {
               }
             />
           )}
-          {sessionStatus === "CONNECTED" && (
+          {sessionStatus === 'CONNECTED' && (
             <Flex
               justifyContent="center"
               alignItems="center"
               flexDirection="column"
               width={[1, 1 / 2, 1 / 3]}
               p={3}
-              css={{ "> *": { marginBottom: 15 } }}
+              css={{ '> *': { marginBottom: 15 } }}
             >
               <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
-              <ControlGroup css={{ width: "100%" }}>
+              <ControlGroup css={{ width: '100%' }}>
                 <InputGroup
                   placeholder="SYMBOL"
                   fill
                   large
-                  css={{ input: { textTransform: "uppercase" } }}
+                  css={{ input: { textTransform: 'uppercase' } }}
                   disabled={loading}
                   value={symbol}
                   onChange={this.handleSymbolChange}
@@ -330,7 +312,7 @@ class Index extends React.Component<Props, State> {
                           {tradingStrategies.map(strat => (
                             <MenuItem
                               key={strat.id}
-                              text={strat.name}
+                              text={`${strat.name} (${strat.exposurePercent}%, ${strat.profitPercent}%, ${strat.lossPercent})`}
                               onClick={this.handleStrategyChange.bind(this, strat)}
                             />
                           ))}
@@ -345,7 +327,7 @@ class Index extends React.Component<Props, State> {
                         rightIcon="caret-down"
                         intent={selectedStrategy ? Intent.NONE : Intent.DANGER}
                       >
-                        {selectedStrategy ? selectedStrategy.name : "Strategy?"}
+                        {selectedStrategy ? selectedStrategy.name : 'Strategy?'}
                       </Button>
                     </Popover>
                   }
@@ -361,7 +343,7 @@ class Index extends React.Component<Props, State> {
               <PositionAndOrderListRenderer
                 autoRefetch={false}
                 variables={{
-                  providerId: serviceProvider.databaseId.toString()
+                  providerId: serviceProvider.databaseId.toString(),
                 }}
               />
             </Flex>

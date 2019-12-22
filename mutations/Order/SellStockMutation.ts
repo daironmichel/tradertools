@@ -1,6 +1,6 @@
-import { graphql } from "react-relay";
-import { Mutation } from "../relay";
-import { SellStockMutation as SellStockMutationType } from "../../__generated__/SellStockMutation.graphql";
+import { graphql } from 'react-relay';
+import { Mutation } from '../relay';
+import { SellStockMutation as SellStockMutationType } from '../../__generated__/SellStockMutation.graphql';
 
 export default class SellStockMutation extends Mutation<SellStockMutationType> {
   mutation = graphql`

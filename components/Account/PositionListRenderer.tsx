@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { graphql } from "react-relay";
+import React, { Component } from 'react';
+import { graphql } from 'react-relay';
 import {
   PositionListRendererQueryResponse,
-  PositionListRendererQueryVariables
-} from "../../__generated__/PositionListRendererQuery.graphql";
-import PositionList from "./PositionList";
-import { withRelay } from "../RelayComponent";
+  PositionListRendererQueryVariables,
+} from '../../__generated__/PositionListRendererQuery.graphql';
+import PositionList from './PositionList';
+import { withRelay } from '../RelayComponent';
 
 interface RendererProps {
   variables: PositionListRendererQueryVariables;
@@ -20,7 +20,7 @@ class PositionListRenderer extends Component<RendererProps & PositionListRendere
     }
   `;
 
-  render() {
+  render(): JSX.Element {
     return <PositionList viewer={this.props.viewer} providerId={this.props.variables.providerId} />;
   }
 }

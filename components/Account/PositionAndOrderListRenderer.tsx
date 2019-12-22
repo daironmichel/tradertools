@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { graphql } from "react-relay";
+import React, { Component } from 'react';
+import { graphql } from 'react-relay';
 import {
   PositionAndOrderListRendererQueryResponse,
-  PositionAndOrderListRendererQueryVariables
-} from "../../__generated__/PositionAndOrderListRendererQuery.graphql";
-import { withRelay } from "../RelayComponent";
-import PositionAndOrderList from "./PositionAndOrderList";
+  PositionAndOrderListRendererQueryVariables,
+} from '../../__generated__/PositionAndOrderListRendererQuery.graphql';
+import { withRelay } from '../RelayComponent';
+import PositionAndOrderList from './PositionAndOrderList';
 
 interface RendererProps {
   variables: PositionAndOrderListRendererQueryVariables;
@@ -14,7 +14,7 @@ interface RendererProps {
 
 class PositionAndOrderListRenderer extends Component<RendererProps & PositionAndOrderListRendererQueryResponse> {
   static defaultProps = {
-    autoRefetch: false
+    autoRefetch: false,
   };
 
   static query = graphql`
@@ -25,7 +25,7 @@ class PositionAndOrderListRenderer extends Component<RendererProps & PositionAnd
     }
   `;
 
-  render() {
+  render(): JSX.Element {
     return (
       <PositionAndOrderList
         viewer={this.props.viewer}

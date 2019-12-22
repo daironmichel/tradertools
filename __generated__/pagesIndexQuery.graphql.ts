@@ -1,31 +1,29 @@
 /* tslint:disable */
-/* @relayHash a32272ee6ab64ce7ffaffad1e7c6d0fb */
+/* @relayHash d1435a363360f6f7360b5ff409697c84 */
 
 import { ConcreteRequest } from "relay-runtime";
-export type pages_indexQueryVariables = {};
-export type pages_indexQueryResponse = {
+export type pagesIndexQueryVariables = {};
+export type pagesIndexQueryResponse = {
     readonly viewer: {
         readonly brokers: ReadonlyArray<{
             readonly id: string;
-            readonly databaseId: number;
             readonly name: string;
             readonly slug: string;
         }>;
     };
 };
-export type pages_indexQuery = {
-    readonly response: pages_indexQueryResponse;
-    readonly variables: pages_indexQueryVariables;
+export type pagesIndexQuery = {
+    readonly response: pagesIndexQueryResponse;
+    readonly variables: pagesIndexQueryVariables;
 };
 
 
 
 /*
-query pages_indexQuery {
+query pagesIndexQuery {
   viewer {
     brokers {
       id
-      databaseId
       name
       slug
     }
@@ -63,13 +61,6 @@ var v0 = [
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "databaseId",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
             "name": "name",
             "args": null,
             "storageKey": null
@@ -90,7 +81,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "pages_indexQuery",
+    "name": "pagesIndexQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
@@ -98,18 +89,18 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "pages_indexQuery",
+    "name": "pagesIndexQuery",
     "argumentDefinitions": [],
     "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
-    "name": "pages_indexQuery",
+    "name": "pagesIndexQuery",
     "id": null,
-    "text": "query pages_indexQuery {\n  viewer {\n    brokers {\n      id\n      databaseId\n      name\n      slug\n    }\n  }\n}\n",
+    "text": "query pagesIndexQuery {\n  viewer {\n    brokers {\n      id\n      name\n      slug\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'fb1e965f06b6d05cc3f79e721f45a0ff';
+(node as any).hash = 'b55f65fae6e39864a3f001018377ab39';
 export default node;

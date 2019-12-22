@@ -1,28 +1,27 @@
-import React from "react";
+import React from 'react';
 
-import { Button } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import { graphql } from "react-relay";
-import { withRelay } from "./RelayComponent";
-import { MainNavbarUserOptionsQueryResponse } from "../__generated__/MainNavbarUserOptionsQuery.graphql";
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { graphql, Variables } from 'react-relay';
+import { withRelay } from './RelayComponent';
+import { MainNavbarUserOptionsQueryResponse } from '../__generated__/MainNavbarUserOptionsQuery.graphql';
 
-interface Props {}
+type PropsType = {
+  variables?: Variables;
+};
 
-type PropsType = Props & MainNavbarUserOptionsQueryResponse;
-
-class MainNavbarUserOptions extends React.Component<PropsType> {
+class MainNavbarUserOptions extends React.Component<PropsType & MainNavbarUserOptionsQueryResponse> {
   static query = graphql`
     query MainNavbarUserOptionsQuery {
       viewer {
         credentials {
-          databaseId
           fullName
         }
       }
     }
   `;
 
-  render(): React.ReactElement<any> {
+  render(): React.ReactElement {
     const { viewer } = this.props;
     return (
       <>
@@ -35,4 +34,4 @@ class MainNavbarUserOptions extends React.Component<PropsType> {
   }
 }
 
-export default withRelay<Props>(MainNavbarUserOptions);
+export default withRelay<PropsType>(MainNavbarUserOptions);

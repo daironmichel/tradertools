@@ -1,17 +1,16 @@
-import { css } from "@emotion/core";
-import React from "react";
-import Head from "next/head";
-import { withRouter } from "next/router";
-import { Flex, Box } from "rebass";
-import { Button, Card, InputGroup, Icon, Classes, Intent } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import Layout from "../components/Layout";
-import AuthorizeConnectionMutation from "../mutations/Provider/AuthorizeConnectionMutation";
-import { AuthorizeConnectionMutationResponse } from "../__generated__/AuthorizeConnectionMutation.graphql";
-import { PayloadError } from "relay-runtime";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { NextPageContext } from "next";
-import { ParsedUrlQuery, parse } from "querystring";
+import { css } from '@emotion/core';
+import React from 'react';
+import Head from 'next/head';
+import { withRouter } from 'next/router';
+import { Flex, Box } from 'rebass';
+import { Button, Card, InputGroup, Icon, Classes, Intent } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import Layout from '../components/Layout';
+import AuthorizeConnectionMutation from '../mutations/Provider/AuthorizeConnectionMutation';
+import { AuthorizeConnectionMutationResponse } from '../__generated__/AuthorizeConnectionMutation.graphql';
+import { PayloadError } from 'relay-runtime';
+import { WithRouterProps } from 'next/dist/client/with-router';
+import { ParsedUrlQuery, parse } from 'querystring';
 
 interface State {
   code: string;
@@ -26,43 +25,45 @@ class Verify extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      code: "",
-      loading: false
+      code: '',
+      loading: false,
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     const { router } = this.props;
-    const search = router.asPath.substring(router.asPath.indexOf("?") + 1);
+    const search = router.asPath.substring(router.asPath.indexOf('?') + 1);
     const query = parse(search);
-    const { oauth_verifier } = query;
-    const providerId = window.localStorage.getItem("providerId");
-    if (providerId && oauth_verifier) {
-      this.verify(providerId, oauth_verifier.toString());
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    const { oauth_verifier: code } = query;
+    const providerId = window.localStorage.getItem('providerId');
+    if (providerId && code) {
+      this.verify(providerId, code.toString());
     }
   }
 
-  _handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  _handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     const { code } = this.state;
-    const providerId = window.localStorage.getItem("providerId");
+    const providerId = window.localStorage.getItem('providerId');
     if (!providerId || !code) {
-      console.error({ message: "Required data missing.", providerId, code });
+      console.error({ message: 'Required data missing.', providerId, code });
       return;
     }
 
     this.verify(providerId, code);
   };
 
-  verify = (providerId: string, oauthVerifier: string) => {
+  verify = (providerId: string, oauthVerifier: string): void => {
     this.setState({ loading: true });
-    AuthorizeConnectionMutation.commit({ providerId, oauthVerifier }, this.onAuthorizeCompleted, this.onAuthorizeError);
+    const authorize = new AuthorizeConnectionMutation();
+    authorize.commit({ providerId, oauthVerifier }, this.onAuthorizeCompleted, this.onAuthorizeError);
   };
 
   onAuthorizeCompleted = (
     response: AuthorizeConnectionMutationResponse,
-    errors?: ReadonlyArray<PayloadError> | null
-  ) => {
+    errors?: ReadonlyArray<PayloadError> | null,
+  ): void => {
     this.setState({ loading: false });
     if (errors) {
       console.error(errors);
@@ -76,25 +77,25 @@ class Verify extends React.Component<Props, State> {
     }
 
     if (!serviceProvider) {
-      console.error({ message: "No service provider recieved.", response });
+      console.error({ message: 'No service provider recieved.', response });
       return;
     }
 
     const { broker } = serviceProvider;
-    window.localStorage.removeItem("providerId");
+    window.localStorage.removeItem('providerId');
     this.props.router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
   };
 
-  onAuthorizeError = (error: Error) => {
+  onAuthorizeError = (error: Error): void => {
     this.setState({ loading: false });
     console.error(error);
   };
 
-  _handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  _handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     this.setState({ code: e.currentTarget.value });
   };
 
-  render() {
+  render(): JSX.Element {
     return (
       <Layout>
         <Head>
@@ -129,7 +130,7 @@ class Verify extends React.Component<Props, State> {
                   justifyContent="center"
                   sx={{
                     marginTop: 20,
-                    marginLeft: "auto"
+                    marginLeft: 'auto',
                   }}
                 >
                   <Button type="submit" intent={Intent.PRIMARY} large fill text="Verify" loading={this.state.loading} />

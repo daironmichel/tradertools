@@ -1,49 +1,29 @@
-import { graphql, commitMutation, Environment, Disposable } from "react-relay";
-import { createEnvironment } from "../../relay";
-import {
-  AuthorizeConnectionInput,
-  AuthorizeConnectionMutationResponse,
-  AuthorizeConnectionMutation
-} from "../../__generated__/AuthorizeConnectionMutation.graphql";
-import { PayloadError } from "relay-runtime";
+import { graphql } from 'react-relay';
+import { AuthorizeConnectionMutation as AuthorizeConnectionMutationType } from '../../__generated__/AuthorizeConnectionMutation.graphql';
+import { Mutation } from '../relay';
 
-const mutation = graphql`
-  mutation AuthorizeConnectionMutation($input: AuthorizeConnectionInput!) {
-    authorizeConnection(input: $input) {
-      error
-      errorMessage
+export default class AuthorizeConnectionMutation extends Mutation<AuthorizeConnectionMutationType> {
+  mutation = graphql`
+    mutation AuthorizeConnectionMutation($input: AuthorizeConnectionInput!) {
+      authorizeConnection(input: $input) {
+        error
+        errorMessage
 
-      serviceProvider {
-        id
-        databaseId
-        name
-        slug
-        session {
+        serviceProvider {
           id
           databaseId
-          status
-        }
-        broker {
+          name
           slug
+          session {
+            id
+            databaseId
+            status
+          }
+          broker {
+            slug
+          }
         }
       }
     }
-  }
-`;
-
-function commit(
-  input: AuthorizeConnectionInput,
-  onCompleted?: (response: AuthorizeConnectionMutationResponse, errors?: ReadonlyArray<PayloadError> | null) => void,
-  onError?: (error: Error) => void,
-  environment?: Environment
-): Disposable {
-  // Now we just call commitMutation with the appropriate parameters
-  return commitMutation<AuthorizeConnectionMutation>(environment || createEnvironment(), {
-    mutation,
-    variables: { input },
-    onCompleted,
-    onError
-  });
+  `;
 }
-
-export default { commit };

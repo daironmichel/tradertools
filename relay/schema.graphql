@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Sat Dec 14 2019 08:35:40 GMT-0500 (Eastern Standard Time)
+# timestamp: Sat Dec 21 2019 18:57:27 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -47,7 +47,25 @@ type AccountNode implements Node & DatabaseId {
   marginBuyingPower: Float!
   lastUpdated: DateTime!
   broker: BrokerNode!
+  provider: ServiceProviderNode!
   databaseId: Int!
+}
+
+type AccountNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [AccountNodeEdge]!
+}
+
+"""A Relay edge containing a `AccountNode` and its cursor."""
+type AccountNodeEdge {
+  """The item at the end of the edge"""
+  node: AccountNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 enum AuthorizeConnectionError {
@@ -73,6 +91,7 @@ type BrokerNode implements Node & DatabaseId {
   id: ID!
   name: String!
   slug: String!
+  defaultProvider: ServiceProviderNode
   accounts(before: String, after: String, first: Int, last: Int): AccountConnection!
   serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderConnection!
   databaseId: Int!
@@ -264,8 +283,10 @@ type ServiceProviderNode implements Node & DatabaseId {
   refreshUrl: String!
   revokeUrl: String!
   baseUrl: String!
+  callbackConfigured: Boolean!
   accountKey: String!
   broker: BrokerNode!
+  accounts(before: String, after: String, first: Int, last: Int): AccountNodeConnection!
   session: ProviderSessionNode
   databaseId: Int!
   quote(symbol: String): QuoteType
@@ -292,6 +313,15 @@ enum SessionStatus {
   INACTIVE
   EXPIRED
   CLOSED
+}
+
+type SettingsNode implements Node & DatabaseId {
+  """The ID of the object."""
+  id: ID!
+  refreshRate: Int!
+  defaultBroker: BrokerNode
+  defaultStrategy: TradingStrategyNode
+  databaseId: Int!
 }
 
 input SyncAccountsInput {
@@ -325,6 +355,7 @@ type ViewerCredentialsType {
 
 type ViewerType {
   credentials: ViewerCredentialsType!
+  settings: SettingsNode
   tradingStrategies: [TradingStrategyNode!]!
   brokers: [BrokerNode!]!
   broker(databaseId: ID, slug: String): BrokerNode

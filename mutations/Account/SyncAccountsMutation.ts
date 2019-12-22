@@ -1,6 +1,6 @@
-import { graphql } from "react-relay";
-import { Mutation } from "../relay";
-import { SyncAccountsMutation as SyncAccountsMutationType } from "../../__generated__/SyncAccountsMutation.graphql";
+import { graphql } from 'react-relay';
+import { Mutation } from '../relay';
+import { SyncAccountsMutation as SyncAccountsMutationType } from '../../__generated__/SyncAccountsMutation.graphql';
 
 export default class SyncAccountsMutation extends Mutation<SyncAccountsMutationType> {
   mutation = graphql`

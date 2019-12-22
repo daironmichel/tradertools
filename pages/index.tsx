@@ -1,22 +1,21 @@
-import * as React from "react";
-import Head from "next/head";
-import Link from "next/link";
-import { graphql } from "react-relay";
-import { ButtonGroup, AnchorButton } from "@blueprintjs/core";
-import { Flex } from "rebass";
-import Layout from "../components/Layout";
-import { pages_indexQueryResponse } from "../__generated__/pages_indexQuery.graphql";
-import { withRelay } from "../components/RelayComponent";
+import * as React from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import { graphql } from 'react-relay';
+import { ButtonGroup, AnchorButton } from '@blueprintjs/core';
+import { Flex } from 'rebass';
+import Layout from '../components/Layout';
+import { pagesIndexQueryResponse } from '../__generated__/pagesindexQuery.graphql';
+import { withRelay } from '../components/RelayComponent';
 
-interface Props extends pages_indexQueryResponse {}
+type Props = {} & pagesIndexQueryResponse;
 
 class Index extends React.Component<Props> {
   static query = graphql`
-    query pages_indexQuery {
+    query pagesIndexQuery {
       viewer {
         brokers {
           id
-          databaseId
           name
           slug
         }
@@ -24,7 +23,7 @@ class Index extends React.Component<Props> {
     }
   `;
 
-  render() {
+  render(): JSX.Element {
     const { viewer } = this.props;
     return (
       <Layout>

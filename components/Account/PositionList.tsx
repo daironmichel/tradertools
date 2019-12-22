@@ -1,11 +1,12 @@
-import React, { Component } from "react";
-import { Callout } from "@blueprintjs/core";
-import { Flex, Box } from "rebass";
-import { createRefetchContainer, graphql, RelayRefetchProp } from "react-relay";
-import { PositionList_viewer } from "../../__generated__/PositionList_viewer.graphql";
-import PositionListItem from "./PositionListItem";
-import ErrorState from "../generic/ErrorState";
-import { IconNames } from "@blueprintjs/icons";
+/* eslint-disable @typescript-eslint/camelcase */
+import React, { Component } from 'react';
+import { Callout } from '@blueprintjs/core';
+import { Flex, Box } from 'rebass';
+import { createRefetchContainer, graphql, RelayRefetchProp } from 'react-relay';
+import { PositionList_viewer } from '../../__generated__/PositionList_viewer.graphql';
+import PositionListItem from './PositionListItem';
+import ErrorState from '../generic/ErrorState';
+import { IconNames } from '@blueprintjs/icons';
 
 interface Props {
   relay: RelayRefetchProp;
@@ -20,7 +21,7 @@ interface State {
 
 class PositionList extends Component<Props, State> {
   static defaultProps = {
-    autoRefetch: true
+    autoRefetch: true,
   };
 
   timeoutId: number | null = null;
@@ -29,25 +30,25 @@ class PositionList extends Component<Props, State> {
     super(props);
 
     this.state = {
-      refetchError: null
+      refetchError: null,
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     if (this.props.autoRefetch) {
       this.timeoutId = setInterval(this.refresh, 2000);
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     if (this.timeoutId) clearInterval(this.timeoutId);
   }
 
-  refresh = () => {
+  refresh = (): void => {
     this.props.relay.refetch(fragmentVariables => fragmentVariables, null, this.refetchDone, { force: true });
   };
 
-  refetchDone = (error?: Error | null) => {
+  refetchDone = (error?: Error | null): void => {
     if (error && !this.state.refetchError) {
       this.setState({ refetchError: error });
     } else if (!error && this.state.refetchError) {
@@ -55,7 +56,7 @@ class PositionList extends Component<Props, State> {
     }
   };
 
-  render() {
+  render(): JSX.Element {
     const { viewer, providerId } = this.props;
     const { refetchError } = this.state;
 
@@ -67,7 +68,7 @@ class PositionList extends Component<Props, State> {
         {refetchError ? (
           <ErrorState title="Error fetching positions" description={refetchError.message} />
         ) : (
-          <Box css={{ "> div": { marginBottom: 4 } }}>
+          <Box css={{ '> div': { marginBottom: 4 } }}>
             {viewer.positions.length > 0 ? (
               viewer.positions.map((position, idx) => (
                 <PositionListItem key={idx} position={position} providerId={providerId} />
@@ -92,7 +93,7 @@ export default createRefetchContainer(
           ...PositionListItem_position
         }
       }
-    `
+    `,
   },
   graphql`
     query PositionListRefetchQuery($providerId: ID!, $accountId: ID) {
@@ -100,5 +101,5 @@ export default createRefetchContainer(
         ...PositionList_viewer @arguments(providerId: $providerId, accountId: $accountId)
       }
     }
-  `
+  `,
 );
