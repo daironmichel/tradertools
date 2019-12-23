@@ -5,7 +5,7 @@ import React from 'react';
 import Head from 'next/head';
 import Themed from '../components/Themed';
 import { Flex, Box } from 'rebass';
-import { Button, Card, InputGroup, Icon, Classes } from '@blueprintjs/core';
+import { Button, Card, InputGroup, Icon, Classes, Intent } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
 const Login = (): JSX.Element => (
@@ -55,7 +55,7 @@ const Login = (): JSX.Element => (
                 marginLeft: 'auto',
               }}
             >
-              <Button type="submit" large fill>
+              <Button type="submit" large fill intent={Intent.PRIMARY}>
                 Login
               </Button>
             </Flex>

@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Sat Dec 21 2019 18:57:27 GMT-0500 (Eastern Standard Time)
+# timestamp: Mon Dec 23 2019 10:30:07 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -172,6 +172,7 @@ type Mutation {
   buyStock(input: BuyStockInput!): BuyStockPayload!
   sellStock(input: SellStockInput!): SellStockPayload!
   cancelOrder(input: CancelOrderInput!): CancelOrderPayload!
+  saveSettings(input: SaveSettingsInput!): SaveSettingsPayload!
 }
 
 """An object with an ID"""
@@ -239,6 +240,28 @@ type QuoteType {
   sharesOutstanding: Int
   primaryExchange: String
   companyName: String
+}
+
+enum SaveSettingsError {
+  INVALID_REFRESH_RATE
+  DEFAULT_BROKER_REQUIRED
+  DEFAULT_PROVIDER_REQUIRED
+}
+
+input SaveSettingsInput {
+  """Data refresh rate in milliseconds."""
+  refreshRate: Int
+  defaultBrokerId: ID
+  defaultProviderId: ID
+  defaultAccountId: ID
+  clientMutationId: String
+}
+
+type SaveSettingsPayload {
+  error: SaveSettingsError
+  errorMessage: String
+  settings: SettingsNode
+  clientMutationId: String
 }
 
 enum SellStockError {

@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
+import { Button, Popover, Menu } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { graphql, Variables } from 'react-relay';
 import { withRelay } from './RelayComponent';
 import { MainNavbarUserOptionsQueryResponse } from '../__generated__/MainNavbarUserOptionsQuery.graphql';
+import Router from 'next/router';
 
 type PropsType = {
   variables?: Variables;
@@ -21,6 +22,10 @@ class MainNavbarUserOptions extends React.Component<PropsType & MainNavbarUserOp
     }
   `;
 
+  handleSettingsOnClick = (): void => {
+    Router.push('/settings');
+  };
+
   render(): React.ReactElement {
     const { viewer } = this.props;
     return (
@@ -28,7 +33,20 @@ class MainNavbarUserOptions extends React.Component<PropsType & MainNavbarUserOp
         <span css={{ marginRight: 8 }}>
           <strong>{viewer.credentials.fullName}</strong>
         </span>
-        <Button minimal icon={IconNames.USER} />
+        <Popover
+          content={
+            <Menu>
+              <Menu.Item
+                key="settingsMenuItem"
+                icon={IconNames.COG}
+                text="Settings"
+                onClick={this.handleSettingsOnClick}
+              />
+            </Menu>
+          }
+        >
+          <Button minimal icon={IconNames.USER} />
+        </Popover>
       </>
     );
   }

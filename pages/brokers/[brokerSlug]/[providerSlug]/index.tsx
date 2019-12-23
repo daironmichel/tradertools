@@ -43,6 +43,9 @@ class Index extends React.Component<Props, State> {
   static query = graphql`
     query ProviderSlugQuery($brokerSlug: String!, $providerSlug: String!) {
       viewer {
+        settings {
+          refreshRate
+        }
         tradingStrategies {
           id
           databaseId
@@ -247,7 +250,7 @@ class Index extends React.Component<Props, State> {
 
   render(): JSX.Element {
     const { viewer } = this.props;
-    const { broker, tradingStrategies } = viewer;
+    const { broker, tradingStrategies, settings } = viewer;
     const { serviceProvider } = broker || {};
     const { sessionStatus = 'CLOSED' } = serviceProvider || {};
 
@@ -341,7 +344,7 @@ class Index extends React.Component<Props, State> {
                 />
               </ControlGroup>
               <PositionAndOrderListRenderer
-                autoRefetch={false}
+                autoRefetch={settings?.refreshRate || 0}
                 variables={{
                   providerId: serviceProvider.databaseId.toString(),
                 }}

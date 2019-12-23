@@ -10,7 +10,7 @@ interface Props {
   relay: RelayRefetchProp;
   viewer: PositionAndOrderList_viewer;
   providerId: string;
-  autoRefetch?: boolean;
+  autoRefetch?: number;
 }
 
 interface State {
@@ -19,7 +19,7 @@ interface State {
 
 class PositionAndOrderList extends Component<Props, State> {
   static defaultProps = {
-    autoRefetch: true,
+    autoRefetch: 0,
   };
 
   timeoutId: number | null = null;
@@ -33,8 +33,8 @@ class PositionAndOrderList extends Component<Props, State> {
   }
 
   componentDidMount(): void {
-    if (this.props.autoRefetch) {
-      this.timeoutId = setInterval(this.refresh, 2000);
+    if (this.props.autoRefetch && this.props.autoRefetch > 0) {
+      this.timeoutId = setInterval(this.refresh, this.props.autoRefetch);
     }
   }
 

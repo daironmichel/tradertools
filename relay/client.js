@@ -1,6 +1,6 @@
-import { RelayNetworkLayer, cacheMiddleware, urlMiddleware } from "react-relay-network-modern/node8";
+import { RelayNetworkLayer, cacheMiddleware, urlMiddleware } from 'react-relay-network-modern/node8';
 // import RelaySSR from "react-relay-network-modern-ssr/node8/client";
-import { Environment, RecordSource, Store } from "relay-runtime";
+import { Environment, RecordSource, Store } from 'relay-runtime';
 
 const source = new RecordSource();
 const store = new Store(source);
@@ -40,16 +40,16 @@ export default {
     storeEnvironment = new Environment({
       store,
       network: new RelayNetworkLayer([
-        cacheMiddleware({
-          size: 100,
-          ttl: 60 * 1000
-        }),
+        // cacheMiddleware({
+        //   size: 100,
+        //   ttl: 60 * 1000
+        // }),
         urlMiddleware({
-          url: `/api/gql/`
-        })
-      ])
+          url: `/api/gql/`,
+        }),
+      ]),
     });
 
     return storeEnvironment;
-  }
+  },
 };

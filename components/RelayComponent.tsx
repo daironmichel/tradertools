@@ -31,7 +31,7 @@ interface RenderProps {
 
 export default class RelayComponent extends React.Component<Props> {
   render(): JSX.Element {
-    const { Component, variables = {} } = this.props;
+    const { Component, variables = {}, ...rest } = this.props;
     const environment = createEnvironment();
 
     return (
@@ -51,7 +51,7 @@ export default class RelayComponent extends React.Component<Props> {
               );
             }
             return <ErrorPage description={error.message} />;
-          } else if (props) return <Component variables={variables} {...props} />;
+          } else if (props) return <Component variables={variables} {...props} {...rest} />;
           return (
             <Flex flex="1" justifyContent="center" alignItems="center">
               <Loading />

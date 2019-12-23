@@ -5,12 +5,12 @@ import { withRouter } from 'next/router';
 import { Flex, Box } from 'rebass';
 import { Button, Card, InputGroup, Icon, Classes, Intent } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import Layout from '../components/Layout';
 import AuthorizeConnectionMutation from '../mutations/Provider/AuthorizeConnectionMutation';
 import { AuthorizeConnectionMutationResponse } from '../__generated__/AuthorizeConnectionMutation.graphql';
 import { PayloadError } from 'relay-runtime';
 import { WithRouterProps } from 'next/dist/client/with-router';
 import { ParsedUrlQuery, parse } from 'querystring';
+import Themed from '../components/Themed';
 
 interface State {
   code: string;
@@ -97,9 +97,9 @@ class Verify extends React.Component<Props, State> {
 
   render(): JSX.Element {
     return (
-      <Layout>
+      <Themed>
         <Head>
-          <title>Etrade Verify</title>
+          <title>Verify</title>
         </Head>
         <Flex justifyContent="center" alignItems="center" flex="1">
           <Box width="100%" px={2} maxWidth={400}>
@@ -139,7 +139,7 @@ class Verify extends React.Component<Props, State> {
             </Card>
           </Box>
         </Flex>
-      </Layout>
+      </Themed>
     );
   }
 }

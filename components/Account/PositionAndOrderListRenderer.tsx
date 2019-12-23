@@ -9,12 +9,12 @@ import PositionAndOrderList from './PositionAndOrderList';
 
 interface RendererProps {
   variables: PositionAndOrderListRendererQueryVariables;
-  autoRefetch?: boolean;
+  autoRefetch?: number;
 }
 
 class PositionAndOrderListRenderer extends Component<RendererProps & PositionAndOrderListRendererQueryResponse> {
   static defaultProps = {
-    autoRefetch: false,
+    autoRefetch: 0,
   };
 
   static query = graphql`

@@ -7,6 +7,7 @@ import { Flex } from 'rebass';
 import Layout from '../components/Layout';
 import { pagesIndexQueryResponse } from '../__generated__/pagesIndexQuery.graphql';
 import { withRelay } from '../components/RelayComponent';
+import Router from 'next/router';
 
 type Props = {} & pagesIndexQueryResponse;
 
@@ -14,6 +15,14 @@ class Index extends React.Component<Props> {
   static query = graphql`
     query pagesIndexQuery {
       viewer {
+        settings {
+          defaultBroker {
+            slug
+            defaultProvider {
+              slug
+            }
+          }
+        }
         brokers {
           id
           name
@@ -22,6 +31,15 @@ class Index extends React.Component<Props> {
       }
     }
   `;
+
+  componentDidMount(): void {
+    const { viewer } = this.props;
+    const { defaultBroker } = viewer.settings || {};
+
+    if (defaultBroker && defaultBroker.defaultProvider) {
+      Router.push(`/brokers/${defaultBroker.slug}/${defaultBroker.defaultProvider.slug}/`);
+    }
+  }
 
   render(): JSX.Element {
     const { viewer } = this.props;
