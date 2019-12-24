@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 2d0d35f0063e66c3525a9f308a841cda */
+/* @relayHash 5f39a64b41eb62e11faf4a06d344ef96 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -35,6 +35,7 @@ fragment OrderListItem_order on OrderType {
   quantity
   limitPrice
   status
+  action
 }
 
 fragment OrderList_viewer_15bWwS on ViewerType {
@@ -155,6 +156,13 @@ return {
                 "name": "status",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "action",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
@@ -166,7 +174,7 @@ return {
     "operationKind": "query",
     "name": "OrderListRendererQuery",
     "id": null,
-    "text": "query OrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  status\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
+    "text": "query OrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
     "metadata": {}
   }
 };

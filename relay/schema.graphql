@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Mon Dec 23 2019 10:30:07 GMT-0500 (Eastern Standard Time)
+# timestamp: Tue Dec 24 2019 10:19:13 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -187,6 +187,7 @@ type OrderType {
   quantity: Int!
   limitPrice: Decimal!
   status: String!
+  action: String!
 }
 
 """

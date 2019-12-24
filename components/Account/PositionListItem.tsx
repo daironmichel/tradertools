@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { PositionListItem_position } from '../../__generated__/PositionListItem_position.graphql';
-import { Button, Intent, Card } from '@blueprintjs/core';
+import { Button, Intent, Card, Text, Colors } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from '../../mutations/Order/SellStockMutation';
 import toaster from '../toaster';
@@ -59,7 +59,9 @@ class PositionListItem extends Component<Props, State> {
             {position.quantity}@{position.pricePaid}
           </Flex>
           <Flex m={2} justifyContent="flex-end">
-            {new String(position.totalGain)}
+            <Text css={{ color: parseFloat(position.totalGain as string) >= 0 ? Colors.GREEN3 : Colors.RED3 }}>
+              ${position.totalGain as string}
+            </Text>
           </Flex>
           <Box ml={2}>
             <Button
