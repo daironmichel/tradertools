@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { graphql } from "react-relay";
+import React, { Component } from 'react';
+import { graphql } from 'react-relay';
 import {
   OrderListRendererQueryResponse,
-  OrderListRendererQueryVariables
-} from "../../__generated__/OrderListRendererQuery.graphql";
-import OrderList from "./OrderList";
-import { withRelay } from "../RelayComponent";
+  OrderListRendererQueryVariables,
+} from '../../__generated__/OrderListRendererQuery.graphql';
+import OrderList from './OrderList';
+import { withRelay } from '../RelayComponent';
 
 interface RendererProps {
   variables: OrderListRendererQueryVariables;
@@ -20,7 +20,7 @@ class OrderListRenderer extends Component<RendererProps & OrderListRendererQuery
     }
   `;
 
-  render() {
+  render(): JSX.Element {
     return <OrderList viewer={this.props.viewer} providerId={this.props.variables.providerId} />;
   }
 }

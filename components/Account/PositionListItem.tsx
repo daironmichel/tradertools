@@ -6,6 +6,7 @@ import { PositionListItem_position } from '../../__generated__/PositionListItem_
 import { Button, Intent, Card } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from '../../mutations/Order/SellStockMutation';
+import toaster from '../toaster';
 
 interface Props {
   position: PositionListItem_position;
@@ -38,6 +39,7 @@ class PositionListItem extends Component<Props, State> {
 
   sellStockCompleted = (): void => {
     this.setState({ loading: false });
+    toaster.showSuccess('Sell order placed.');
   };
 
   sellStockError = (): void => {

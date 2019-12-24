@@ -7,10 +7,10 @@ import { Button, Card, InputGroup, Icon, Classes, Intent } from '@blueprintjs/co
 import { IconNames } from '@blueprintjs/icons';
 import AuthorizeConnectionMutation from '../mutations/Provider/AuthorizeConnectionMutation';
 import { AuthorizeConnectionMutationResponse } from '../__generated__/AuthorizeConnectionMutation.graphql';
-import { PayloadError } from 'relay-runtime';
 import { WithRouterProps } from 'next/dist/client/with-router';
 import { ParsedUrlQuery, parse } from 'querystring';
 import Themed from '../components/Themed';
+import toaster from '../components/toaster';
 
 interface State {
   code: string;
@@ -60,24 +60,13 @@ class Verify extends React.Component<Props, State> {
     authorize.commit({ providerId, oauthVerifier }, this.onAuthorizeCompleted, this.onAuthorizeError);
   };
 
-  onAuthorizeCompleted = (
-    response: AuthorizeConnectionMutationResponse,
-    errors?: ReadonlyArray<PayloadError> | null,
-  ): void => {
-    this.setState({ loading: false });
-    if (errors) {
-      console.error(errors);
-      return;
-    }
-
-    const { error, errorMessage, serviceProvider } = response.authorizeConnection;
-    if (error) {
-      console.error(`${error}: ${errorMessage}`);
-      return;
-    }
+  onAuthorizeCompleted = (response: AuthorizeConnectionMutationResponse): void => {
+    const { serviceProvider } = response.authorizeConnection;
 
     if (!serviceProvider) {
+      this.setState({ loading: false });
       console.error({ message: 'No service provider recieved.', response });
+      toaster.showError('No service provider recieved.');
       return;
     }
 
@@ -86,9 +75,8 @@ class Verify extends React.Component<Props, State> {
     this.props.router.push(`/brokers/${broker.slug}/${serviceProvider.slug}/`);
   };
 
-  onAuthorizeError = (error: Error): void => {
+  onAuthorizeError = (): void => {
     this.setState({ loading: false });
-    console.error(error);
   };
 
   _handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

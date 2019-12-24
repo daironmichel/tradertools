@@ -23,10 +23,10 @@ import { PayloadError } from 'relay-runtime';
 import Error from '../../../_error';
 import { withRelay } from '../../../../components/RelayComponent';
 import SyncAccountsMutation from '../../../../mutations/Account/SyncAccountsMutation';
-import SellStockMutation from '../../../../mutations/Order/SellStockMutation';
 import BuyStockMutation from '../../../../mutations/Order/BuyStockMutation';
 import ErrorState from '../../../../components/generic/ErrorState';
 import PositionAndOrderListRenderer from '../../../../components/Account/PositionAndOrderListRenderer';
+import toaster from '../../../../components/toaster';
 
 type TradingStrategy = ProviderSlugQueryResponse['viewer']['tradingStrategies'][0];
 
@@ -171,42 +171,16 @@ class Index extends React.Component<Props, State> {
 
   syncAccountsCompleted = (): void => {
     this.setState({ loading: false });
+    toaster.showSuccess('Accounts synched.');
   };
 
   syncAccountsError = (): void => {
     this.setState({ loading: false });
   };
 
-  handleSellOnClick = (): void => {
-    if (this.state.loading) return;
-
-    const { viewer } = this.props;
-    const { broker } = viewer;
-    const { serviceProvider } = broker || {};
-
-    if (!serviceProvider) {
-      console.warn('No service provider supplied');
-      return;
-    }
-
-    this.setState({ loading: true });
-    const sell = new SellStockMutation();
-    sell.commit(
-      {
-        providerId: serviceProvider.databaseId.toString(),
-        symbol: this.state.symbol,
-      },
-      this.sellCompleted,
-      this.sellError,
-    );
-  };
-
-  sellCompleted = (): void => {
-    this.setState({ loading: false });
-  };
-
-  sellError = (): void => {
-    this.setState({ loading: false });
+  handleBuyOnSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    this.handleBuyOnClick();
   };
 
   handleBuyOnClick = (): void => {
@@ -215,7 +189,7 @@ class Index extends React.Component<Props, State> {
     const { viewer } = this.props;
     const { broker } = viewer;
     const { serviceProvider } = broker || {};
-    const { selectedStrategy } = this.state;
+    const { selectedStrategy, symbol } = this.state;
 
     if (!serviceProvider) {
       console.warn('No service provider supplied');
@@ -227,13 +201,17 @@ class Index extends React.Component<Props, State> {
       return;
     }
 
+    this.buy(serviceProvider.databaseId, selectedStrategy.databaseId, symbol);
+  };
+
+  buy = (providerId: number, strategyId: number, symbol: string): void => {
     this.setState({ loading: true });
     const buy = new BuyStockMutation();
     buy.commit(
       {
-        providerId: serviceProvider.databaseId.toString(),
-        strategyId: selectedStrategy.databaseId.toString(),
-        symbol: this.state.symbol,
+        providerId: providerId.toString(),
+        strategyId: strategyId.toString(),
+        symbol: symbol,
       },
       this.buyCompleted,
       this.buyError,
@@ -242,6 +220,7 @@ class Index extends React.Component<Props, State> {
 
   buyCompleted = (): void => {
     this.setState({ loading: false });
+    toaster.showSuccess('Buy order placed.');
   };
 
   buyError = (): void => {
@@ -268,90 +247,97 @@ class Index extends React.Component<Props, State> {
           </title>
         </Head>
 
-        <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
-          <h4>Status: {sessionStatus}</h4>
-          {sessionStatus !== 'CONNECTED' && connectError && (
-            <ErrorState
-              title="Error Connecting"
-              description={connectError.message}
-              action={
-                <Button large text="Try Again" intent={Intent.PRIMARY} loading={loading} onClick={this.onAuthorize} />
-              }
-            />
-          )}
-          {sessionStatus !== 'CONNECTED' && !connectError && (
-            <NonIdealState
-              icon={IconNames.OFFLINE}
-              title="Authorize Application"
-              description={`${broker.name} requires that you authorize this application to access data and place orders on your behalf.`}
-              action={
-                <Button large text="Authorize" intent={Intent.PRIMARY} loading={loading} onClick={this.onAuthorize} />
-              }
-            />
-          )}
-          {sessionStatus === 'CONNECTED' && (
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              flexDirection="column"
-              width={[1, 1 / 2, 1 / 3]}
-              p={3}
-              css={{ '> *': { marginBottom: 15 } }}
-            >
-              <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
-              <ControlGroup css={{ width: '100%' }}>
-                <InputGroup
-                  placeholder="SYMBOL"
-                  fill
-                  large
-                  css={{ input: { textTransform: 'uppercase' } }}
-                  disabled={loading}
-                  value={symbol}
-                  onChange={this.handleSymbolChange}
-                  rightElement={
-                    <Popover
-                      content={
-                        <Menu>
-                          {tradingStrategies.map(strat => (
-                            <MenuItem
-                              key={strat.id}
-                              text={`${strat.name} (${strat.exposurePercent}%, ${strat.profitPercent}%, ${strat.lossPercent})`}
-                              onClick={this.handleStrategyChange.bind(this, strat)}
-                            />
-                          ))}
-                        </Menu>
-                      }
-                      disabled={loading}
-                      position={Position.BOTTOM_RIGHT}
-                    >
-                      <Button
-                        disabled={loading}
-                        minimal={true}
-                        rightIcon="caret-down"
-                        intent={selectedStrategy ? Intent.NONE : Intent.DANGER}
-                      >
-                        {selectedStrategy ? selectedStrategy.name : 'Strategy?'}
-                      </Button>
-                    </Popover>
-                  }
-                />
-                <Button
-                  large
-                  intent={Intent.SUCCESS}
-                  text="Buy"
-                  disabled={loading || !symbol}
-                  onClick={this.handleBuyOnClick}
-                />
-              </ControlGroup>
-              <PositionAndOrderListRenderer
-                autoRefetch={settings?.refreshRate || 0}
-                variables={{
-                  providerId: serviceProvider.databaseId.toString(),
-                }}
+        <Layout.Main>
+          <h4 css={{ padding: '0 20px', textAlign: 'center' }}>
+            {broker.name} - {serviceProvider.name}: {sessionStatus}
+          </h4>
+          <Flex justifyContent="center" alignItems="center" flexDirection="column" flex="1">
+            {sessionStatus !== 'CONNECTED' && connectError && (
+              <ErrorState
+                title="Error Connecting"
+                description={connectError.message}
+                action={
+                  <Button large text="Try Again" intent={Intent.PRIMARY} loading={loading} onClick={this.onAuthorize} />
+                }
               />
-            </Flex>
-          )}
-        </Flex>
+            )}
+            {sessionStatus !== 'CONNECTED' && !connectError && (
+              <NonIdealState
+                icon={IconNames.OFFLINE}
+                title="Authorize Application"
+                description={`${broker.name} requires that you authorize this application to access data and place orders on your behalf.`}
+                action={
+                  <Button large text="Authorize" intent={Intent.PRIMARY} loading={loading} onClick={this.onAuthorize} />
+                }
+              />
+            )}
+            {sessionStatus === 'CONNECTED' && (
+              <Flex
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                width={[1, 1 / 2, 1 / 3]}
+                p={3}
+                css={{ '> *': { marginBottom: 15 } }}
+              >
+                <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
+                <form onSubmit={this.handleBuyOnSubmit}>
+                  <ControlGroup css={{ width: '100%' }}>
+                    <InputGroup
+                      placeholder="SYMBOL"
+                      fill
+                      large
+                      css={{ input: { textTransform: 'uppercase' } }}
+                      disabled={loading}
+                      value={symbol}
+                      onChange={this.handleSymbolChange}
+                      rightElement={
+                        <Popover
+                          content={
+                            <Menu>
+                              {tradingStrategies.map(strat => (
+                                <MenuItem
+                                  key={strat.id}
+                                  text={`${strat.name} (${strat.exposurePercent}%, ${strat.profitPercent}%, ${strat.lossPercent})`}
+                                  onClick={this.handleStrategyChange.bind(this, strat)}
+                                />
+                              ))}
+                            </Menu>
+                          }
+                          disabled={loading}
+                          position={Position.BOTTOM_RIGHT}
+                        >
+                          <Button
+                            disabled={loading}
+                            minimal={true}
+                            rightIcon="caret-down"
+                            intent={selectedStrategy ? Intent.NONE : Intent.DANGER}
+                          >
+                            {selectedStrategy ? selectedStrategy.name : 'Strategy?'}
+                          </Button>
+                        </Popover>
+                      }
+                    />
+                    <Button
+                      type="submit"
+                      large
+                      intent={Intent.SUCCESS}
+                      text="Buy"
+                      disabled={loading || !symbol}
+                      onClick={this.handleBuyOnClick}
+                    />
+                  </ControlGroup>
+                </form>
+                <PositionAndOrderListRenderer
+                  autoRefetch={settings?.refreshRate || 0}
+                  variables={{
+                    providerId: serviceProvider.databaseId.toString(),
+                  }}
+                />
+              </Flex>
+            )}
+          </Flex>
+        </Layout.Main>
       </Layout>
     );
   }

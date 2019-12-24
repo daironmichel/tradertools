@@ -1,13 +1,14 @@
-import React, { Component } from "react";
-import { Flex, Box } from "rebass";
-import { createFragmentContainer, graphql } from "react-relay";
-import { OrderListItem_order } from "../../__generated__/OrderListItem_order.graphql";
-import { Button, Intent, Card } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
-import CancelOrderMutation from "../../mutations/Order/CancelOrderMutation";
+import React, { Component } from 'react';
+import { Flex, Box } from 'rebass';
+import { createFragmentContainer, graphql } from 'react-relay';
+import { OrderListItem_order as Order } from '../../__generated__/OrderListItem_order.graphql';
+import { Button, Intent, Card } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import CancelOrderMutation from '../../mutations/Order/CancelOrderMutation';
+import toaster from '../toaster';
 
 interface Props {
-  order: OrderListItem_order;
+  order: Order;
   providerId: string;
 }
 
@@ -20,30 +21,31 @@ class OrderListItem extends Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
-  handleCancelOnClick = () => {
+  handleCancelOnClick = (): void => {
     const { order, providerId } = this.props;
     this.cancelOrder(providerId, order.orderId);
   };
 
-  cancelOrder = (providerId: string, orderId: string) => {
+  cancelOrder = (providerId: string, orderId: string): void => {
     this.setState({ loading: true });
     const cancel = new CancelOrderMutation();
     cancel.commit({ providerId, orderId }, this.cancelOrderCompleted, this.cancelOrderError);
   };
 
-  cancelOrderCompleted = () => {
+  cancelOrderCompleted = (): void => {
+    this.setState({ loading: false });
+    toaster.showSuccess('Order cancelled.');
+  };
+
+  cancelOrderError = (): void => {
     this.setState({ loading: false });
   };
 
-  cancelOrderError = (error: Error) => {
-    this.setState({ loading: false });
-  };
-
-  render() {
+  render(): JSX.Element {
     const { order } = this.props;
     const { loading } = this.state;
     return (
@@ -62,7 +64,7 @@ class OrderListItem extends Component<Props, State> {
               icon={IconNames.CROSS}
               intent={Intent.DANGER}
               loading={loading}
-              disabled={order.status === "EXECUTED" || order.status === "REJECTED"}
+              disabled={order.status === 'EXECUTED' || order.status === 'REJECTED'}
               onClick={this.handleCancelOnClick}
               css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: -1 }}
             />
@@ -82,5 +84,5 @@ export default createFragmentContainer(OrderListItem, {
       limitPrice
       status
     }
-  `
+  `,
 });

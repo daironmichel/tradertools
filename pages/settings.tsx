@@ -10,6 +10,7 @@ import Layout from '../components/Layout';
 import { withRelay } from '../components/RelayComponent';
 import { settingsQueryResponse } from '../__generated__/settingsQuery.graphql';
 import SaveSettingsMutation from '../mutations/UserSettings/SaveSettingsMutation';
+import toaster from '../components/toaster';
 
 interface State {
   refreshRate: number;
@@ -77,6 +78,7 @@ class Settings extends React.Component<Props, State> {
 
   onSaveCompleted = (): void => {
     this.setState({ loading: false });
+    toaster.showSuccess('Saved.');
   };
 
   onSaveError = (): void => {
