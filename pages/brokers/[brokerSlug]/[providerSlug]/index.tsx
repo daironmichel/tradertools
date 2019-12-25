@@ -45,6 +45,14 @@ class Index extends React.Component<Props, State> {
       viewer {
         settings {
           refreshRate
+          defaultStrategy {
+            id
+            databaseId
+            name
+            exposurePercent
+            profitPercent
+            lossPercent
+          }
         }
         tradingStrategies {
           id
@@ -73,12 +81,13 @@ class Index extends React.Component<Props, State> {
     super(props);
 
     const { viewer } = this.props;
-    const { tradingStrategies } = viewer;
+    const { tradingStrategies, settings } = viewer;
+    const { defaultStrategy } = settings || {};
 
     this.state = {
       loading: false,
       strategies: tradingStrategies,
-      selectedStrategy: tradingStrategies.length > 0 ? tradingStrategies[0] : null,
+      selectedStrategy: defaultStrategy || null,
       symbol: '',
       connectError: null,
     };

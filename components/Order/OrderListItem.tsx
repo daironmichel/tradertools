@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { OrderListItem_order as Order } from '../../__generated__/OrderListItem_order.graphql';
-import { Button, Intent, Card, Text, Colors } from '@blueprintjs/core';
+import { Button, Intent, Card, Text, Colors, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import CancelOrderMutation from '../../mutations/Order/CancelOrderMutation';
 import toaster from '../toaster';
@@ -52,6 +52,9 @@ class OrderListItem extends Component<Props, State> {
   render(): JSX.Element {
     const { order } = this.props;
     const { loading } = this.state;
+    const actionColor = order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
+    const priceToShow = order.status === 'EXECUTED' ? order.executionPrice : order.limitPrice;
+    const cancelDisabled = !this.cancelAllowed(order.status);
     return (
       <Card css={{ padding: 0 }}>
         <Flex alignItems="center">
@@ -60,18 +63,21 @@ class OrderListItem extends Component<Props, State> {
           </Box>
           <Flex m={2} justifyContent="flex-end">
             <Text>
-              <span css={{ color: order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3 }}>{order.action}</span>{' '}
-              {order.quantity}@{order.limitPrice}
+              <span css={{ color: actionColor }}>{order.action}</span> {order.quantity}@{priceToShow}
             </Text>
           </Flex>
-          <Box m={2}>{order.status}</Box>
+          <Box m={2}>
+            <Tooltip content={order.status}>
+              <span>{order.status.substring(0, 2)}</span>
+            </Tooltip>
+          </Box>
           <Box ml={2}>
             <Button
               large
               icon={IconNames.CROSS}
-              intent={Intent.DANGER}
+              intent={cancelDisabled ? Intent.NONE : Intent.DANGER}
               loading={loading}
-              disabled={!this.cancelAllowed(order.status)}
+              disabled={cancelDisabled}
               onClick={this.handleCancelOnClick}
               css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: -1 }}
             />
@@ -89,6 +95,7 @@ export default createFragmentContainer(OrderListItem, {
       symbol
       quantity
       limitPrice
+      executionPrice
       status
       action
     }

@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 4431326fee6b7ebb57901842741fe172 */
+/* @relayHash cd12eb53033a55cebbd6cf29c9d2d866 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -34,6 +34,7 @@ fragment OrderListItem_order on OrderType {
   symbol
   quantity
   limitPrice
+  executionPrice
   status
   action
 }
@@ -200,6 +201,13 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "executionPrice",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "status",
                 "args": null,
                 "storageKey": null
@@ -221,7 +229,7 @@ return {
     "operationKind": "query",
     "name": "PositionAndOrderListRendererQuery",
     "id": null,
-    "text": "query PositionAndOrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionAndOrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionAndOrderList_viewer_15bWwS on ViewerType {\n  ...PositionList_viewer_15bWwS\n  ...OrderList_viewer_15bWwS\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
+    "text": "query PositionAndOrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionAndOrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionAndOrderList_viewer_15bWwS on ViewerType {\n  ...PositionList_viewer_15bWwS\n  ...OrderList_viewer_15bWwS\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };

@@ -7,6 +7,7 @@ export type OrderListItem_order = {
     readonly symbol: string;
     readonly quantity: number;
     readonly limitPrice: unknown;
+    readonly executionPrice: unknown;
     readonly status: string;
     readonly action: string;
     readonly " $refType": "OrderListItem_order";
@@ -57,6 +58,13 @@ const node: ReaderFragment = {
     {
       "kind": "ScalarField",
       "alias": null,
+      "name": "executionPrice",
+      "args": null,
+      "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
       "name": "status",
       "args": null,
       "storageKey": null
@@ -70,5 +78,5 @@ const node: ReaderFragment = {
     }
   ]
 };
-(node as any).hash = 'df3e0e53c309a6c24da60c8fdbeb6d6b';
+(node as any).hash = 'f6de70e6764e8ba19a9cba6c7f194195';
 export default node;

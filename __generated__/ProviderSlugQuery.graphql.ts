@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 09a585c89149d41f32a097d6eb2c5d8f */
+/* @relayHash 8b8fab99e8c0651cb713eea14860686d */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -11,6 +11,14 @@ export type ProviderSlugQueryResponse = {
     readonly viewer: {
         readonly settings: {
             readonly refreshRate: number;
+            readonly defaultStrategy: {
+                readonly id: string;
+                readonly databaseId: number;
+                readonly name: string;
+                readonly exposurePercent: number;
+                readonly profitPercent: number;
+                readonly lossPercent: number;
+            } | null;
         } | null;
         readonly tradingStrategies: ReadonlyArray<{
             readonly id: string;
@@ -48,6 +56,14 @@ query ProviderSlugQuery(
   viewer {
     settings {
       refreshRate
+      defaultStrategy {
+        id
+        databaseId
+        name
+        exposurePercent
+        profitPercent
+        lossPercent
+      }
       id
     }
     tradingStrategies {
@@ -116,7 +132,43 @@ v4 = {
   "args": null,
   "storageKey": null
 },
-v5 = {
+v5 = [
+  (v2/*: any*/),
+  (v3/*: any*/),
+  (v4/*: any*/),
+  {
+    "kind": "ScalarField",
+    "alias": null,
+    "name": "exposurePercent",
+    "args": null,
+    "storageKey": null
+  },
+  {
+    "kind": "ScalarField",
+    "alias": null,
+    "name": "profitPercent",
+    "args": null,
+    "storageKey": null
+  },
+  {
+    "kind": "ScalarField",
+    "alias": null,
+    "name": "lossPercent",
+    "args": null,
+    "storageKey": null
+  }
+],
+v6 = {
+  "kind": "LinkedField",
+  "alias": null,
+  "name": "defaultStrategy",
+  "storageKey": null,
+  "args": null,
+  "concreteType": "TradingStrategyNode",
+  "plural": false,
+  "selections": (v5/*: any*/)
+},
+v7 = {
   "kind": "LinkedField",
   "alias": null,
   "name": "tradingStrategies",
@@ -124,34 +176,9 @@ v5 = {
   "args": null,
   "concreteType": "TradingStrategyNode",
   "plural": true,
-  "selections": [
-    (v2/*: any*/),
-    (v3/*: any*/),
-    (v4/*: any*/),
-    {
-      "kind": "ScalarField",
-      "alias": null,
-      "name": "exposurePercent",
-      "args": null,
-      "storageKey": null
-    },
-    {
-      "kind": "ScalarField",
-      "alias": null,
-      "name": "profitPercent",
-      "args": null,
-      "storageKey": null
-    },
-    {
-      "kind": "ScalarField",
-      "alias": null,
-      "name": "lossPercent",
-      "args": null,
-      "storageKey": null
-    }
-  ]
+  "selections": (v5/*: any*/)
 },
-v6 = {
+v8 = {
   "kind": "LinkedField",
   "alias": null,
   "name": "broker",
@@ -225,11 +252,12 @@ return {
             "concreteType": "SettingsNode",
             "plural": false,
             "selections": [
-              (v1/*: any*/)
+              (v1/*: any*/),
+              (v6/*: any*/)
             ]
           },
-          (v5/*: any*/),
-          (v6/*: any*/)
+          (v7/*: any*/),
+          (v8/*: any*/)
         ]
       }
     ]
@@ -258,11 +286,12 @@ return {
             "plural": false,
             "selections": [
               (v1/*: any*/),
+              (v6/*: any*/),
               (v2/*: any*/)
             ]
           },
-          (v5/*: any*/),
-          (v6/*: any*/)
+          (v7/*: any*/),
+          (v8/*: any*/)
         ]
       }
     ]
@@ -271,10 +300,10 @@ return {
     "operationKind": "query",
     "name": "ProviderSlugQuery",
     "id": null,
-    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n      }\n    }\n  }\n}\n",
+    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '639baf3cd1742ff95af05271ef17ab11';
+(node as any).hash = '702b12cf0b3aaee30adec38fc7bc7159';
 export default node;
