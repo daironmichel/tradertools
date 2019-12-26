@@ -7,6 +7,7 @@ export type PositionListItem_position = {
     readonly quantity: number;
     readonly pricePaid: unknown;
     readonly totalGain: unknown;
+    readonly totalGainPct: unknown;
     readonly " $refType": "PositionListItem_position";
 };
 export type PositionListItem_position$data = PositionListItem_position;
@@ -51,8 +52,15 @@ const node: ReaderFragment = {
       "name": "totalGain",
       "args": null,
       "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "totalGainPct",
+      "args": null,
+      "storageKey": null
     }
   ]
 };
-(node as any).hash = '0ebe38c5e12ba5a8aa3dd1d23f54b38e';
+(node as any).hash = 'e252cb16c64bffd05de44e42a6d950a5';
 export default node;

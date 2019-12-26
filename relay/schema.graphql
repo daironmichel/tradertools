@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed Dec 25 2019 12:31:57 GMT-0500 (Eastern Standard Time)
+# timestamp: Thu Dec 26 2019 14:40:45 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -213,6 +213,7 @@ type PositionType {
   pricePaid: Decimal!
   quantity: Int!
   totalGain: Decimal!
+  totalGainPct: Decimal!
 }
 
 type ProviderSessionNode implements Node & DatabaseId {

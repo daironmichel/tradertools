@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 24afa87ec3ad3094d8cc6dd85607ced1 */
+/* @relayHash e6cbb35f0c2345f72ba3fd5637c20992 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -34,6 +34,7 @@ fragment PositionListItem_position on PositionType {
   quantity
   pricePaid
   totalGain
+  totalGainPct
 }
 
 fragment PositionList_viewer_15bWwS on ViewerType {
@@ -147,6 +148,13 @@ return {
                 "name": "totalGain",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "totalGainPct",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
@@ -158,7 +166,7 @@ return {
     "operationKind": "query",
     "name": "PositionListRefetchQuery",
     "id": null,
-    "text": "query PositionListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
+    "text": "query PositionListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };

@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
-import { PositionListItem_position } from '../../__generated__/PositionListItem_position.graphql';
-import { Button, Intent, Card, Text, Colors } from '@blueprintjs/core';
+import { PositionListItem_position as Position } from '../../__generated__/PositionListItem_position.graphql';
+import { Button, Intent, Card, Text, Colors, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from '../../mutations/Order/SellStockMutation';
 import toaster from '../toaster';
 
 interface Props {
-  position: PositionListItem_position;
+  position: Position;
   providerId: string;
 }
 
@@ -49,6 +48,11 @@ class PositionListItem extends Component<Props, State> {
   render(): JSX.Element {
     const { position } = this.props;
     const { loading } = this.state;
+    const totalGain = position.totalGain as string;
+    const totalGainPct = position.totalGainPct as string;
+    const loss = parseFloat(totalGain) < 0;
+    const gainDisplay = totalGain.replace('-', '');
+    const gainPercentDisplay = totalGainPct.replace('-', '');
     return (
       <Card css={{ padding: 0 }}>
         <Flex alignItems="center">
@@ -59,8 +63,12 @@ class PositionListItem extends Component<Props, State> {
             {position.quantity}@{position.pricePaid}
           </Flex>
           <Flex m={2} justifyContent="flex-end">
-            <Text css={{ color: parseFloat(position.totalGain as string) >= 0 ? Colors.GREEN3 : Colors.RED3 }}>
-              ${position.totalGain as string}
+            {loss ? '-' : ''}${gainDisplay}
+          </Flex>
+          <Flex m={2} justifyContent="flex-end">
+            <Text css={{ color: loss ? Colors.RED3 : Colors.GREEN3 }}>
+              <Icon icon={loss ? IconNames.ARROW_DOWN : IconNames.ARROW_UP} iconSize={12} css={{ paddingBottom: 2 }} />{' '}
+              <span>{gainPercentDisplay} %</span>
             </Text>
           </Flex>
           <Box ml={2}>
@@ -86,6 +94,7 @@ export default createFragmentContainer(PositionListItem, {
       quantity
       pricePaid
       totalGain
+      totalGainPct
     }
   `,
 });
