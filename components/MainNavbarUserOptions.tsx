@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Popover, Menu } from '@blueprintjs/core';
+import { Button, Popover, Menu, Classes } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { graphql, Variables } from 'react-relay';
 import { withRelay } from './RelayComponent';
@@ -52,4 +52,15 @@ class MainNavbarUserOptions extends React.Component<PropsType & MainNavbarUserOp
   }
 }
 
-export default withRelay<PropsType>(MainNavbarUserOptions);
+const UserOptionsLoading = (): JSX.Element => {
+  return (
+    <div>
+      <span className={Classes.SKELETON} css={{ marginRight: 8 }}>
+        USERNAME
+      </span>
+      <Button className={Classes.SKELETON} icon={IconNames.BLANK} />
+    </div>
+  );
+};
+
+export default withRelay<PropsType>(MainNavbarUserOptions, false, UserOptionsLoading);

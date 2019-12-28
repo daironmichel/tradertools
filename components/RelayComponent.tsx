@@ -21,6 +21,7 @@ interface RootQueryComponent<P extends PropsWithVars = {}, S = unknown> extends 
 interface Props extends PropsWithVars {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Component: RootQueryComponent<any>;
+  LoadingComponent: React.ComponentType;
 }
 
 interface RenderProps {
@@ -29,9 +30,21 @@ interface RenderProps {
   retry: (() => void) | null;
 }
 
+const DefaultLoader = (): JSX.Element => {
+  return (
+    <Flex flex="1" justifyContent="center" alignItems="center">
+      <Loading />
+    </Flex>
+  );
+};
+
 export default class RelayComponent extends React.Component<Props> {
+  static defaultProps = {
+    LoadingComponent: DefaultLoader,
+  };
+
   render(): JSX.Element {
-    const { Component, variables = {}, ...rest } = this.props;
+    const { Component, LoadingComponent, variables = {}, ...rest } = this.props;
     const environment = createEnvironment();
 
     return (
@@ -52,11 +65,7 @@ export default class RelayComponent extends React.Component<Props> {
             }
             return <ErrorPage description={error.message} />;
           } else if (props) return <Component variables={variables} {...props} {...rest} />;
-          return (
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Loading />
-            </Flex>
-          );
+          return <LoadingComponent />;
         }}
       />
     );
@@ -75,7 +84,8 @@ export function withRelay<P>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: RootQueryComponent<any>,
   asPage = false,
-): React.FunctionComponent<RelayComponentProps & P> {
+  loadingComponent?: React.ComponentType,
+): React.ComponentType<RelayComponentProps & P> {
   const wrapper = (props: RelayComponentProps & P): JSX.Element => {
     const {
       variables,
@@ -83,7 +93,7 @@ export function withRelay<P>(
       ...rest
     } = props;
 
-    return <RelayComponent Component={component} variables={variables} {...rest} />;
+    return <RelayComponent Component={component} LoadingComponent={loadingComponent} variables={variables} {...rest} />;
   };
 
   wrapper.displayName = `WithRelay${component.displayName}`;
