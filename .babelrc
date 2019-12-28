@@ -12,5 +12,13 @@
       }
     ]
   ],
-  "plugins": ["relay"]
+  "plugins": [
+    "relay",
+    // configure import alias for generated relay types folder
+    ["module-resolver", {
+      "alias": {
+        "gen": "./__generated__"
+      }
+    }]
+  ]
 }

@@ -1,11 +1,11 @@
-require('newrelic');
+const dev = process.env.NODE_ENV !== 'production';
+if (!dev) require('newrelic');
 const next = require('next');
 const Hapi = require('@hapi/hapi');
 const H2o2 = require('@hapi/h2o2');
 const CookieAuth = require('@hapi/cookie');
 const { nextHandlerWrapper } = require('./next-wrapper');
 const BackboneAPI = require('../api/backbone-api');
-const dev = process.env.NODE_ENV !== 'production';
 
 if (dev) require('dotenv').config();
 

@@ -4,7 +4,7 @@ import { Button, Popover, Menu } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { graphql, Variables } from 'react-relay';
 import { withRelay } from './RelayComponent';
-import { MainNavbarUserOptionsQueryResponse } from '../__generated__/MainNavbarUserOptionsQuery.graphql';
+import { MainNavbarUserOptionsQueryResponse } from 'gen/MainNavbarUserOptionsQuery.graphql';
 import Router from 'next/router';
 
 type PropsType = {

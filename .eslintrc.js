@@ -26,6 +26,7 @@ module.exports = {
     SharedArrayBuffer: 'readonly',
   },
   plugins: ['react', 'relay', '@typescript-eslint'],
+  // ignorePatterns: ['node_modules/', 'server/', 'relay/'],
   rules: {},
   settings: {
     react: {

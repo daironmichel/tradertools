@@ -12,8 +12,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    // configure import alias for generated relay types folder
+    "baseUrl": ".",
+    "paths": {
+      "gen/*": ["__generated__/*"]
+    }
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "server", "relay"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
