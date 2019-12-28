@@ -1,5 +1,4 @@
 const dev = process.env.NODE_ENV !== 'production';
-if (!dev) require('newrelic');
 const next = require('next');
 const Hapi = require('@hapi/hapi');
 const H2o2 = require('@hapi/h2o2');
