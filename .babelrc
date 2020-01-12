@@ -17,7 +17,9 @@
     // configure import alias for generated relay types folder
     ["module-resolver", {
       "alias": {
-        "gen": "./__generated__"
+        "gen": "./__generated__",
+        "mutations": "./mutations",
+        "components": "./components"
       }
     }]
   ]

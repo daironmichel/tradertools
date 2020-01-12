@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 7f2742f35947b2ac65981681ad26e757 */
+/* @relayHash c76ce8aebc1858b29b398d89dc4ddc3c */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -34,6 +34,8 @@ fragment OrderListItem_order on OrderType {
   symbol
   quantity
   limitPrice
+  stopPrice
+  stopLimitPrice
   executionPrice
   status
   action
@@ -154,6 +156,20 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "stopPrice",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "stopLimitPrice",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "executionPrice",
                 "args": null,
                 "storageKey": null
@@ -182,7 +198,7 @@ return {
     "operationKind": "query",
     "name": "OrderListRendererQuery",
     "id": null,
-    "text": "query OrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
+    "text": "query OrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
     "metadata": {}
   }
 };

@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Thu Dec 26 2019 14:40:45 GMT-0500 (Eastern Standard Time)
+# timestamp: Fri Jan 10 2020 12:04:00 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -171,6 +171,7 @@ type Mutation {
   syncAccounts(input: SyncAccountsInput!): SyncAccountsPayload!
   buyStock(input: BuyStockInput!): BuyStockPayload!
   sellStock(input: SellStockInput!): SellStockPayload!
+  placeStopLoss(input: PlaceStopLossInput!): PlaceStopLossPayload!
   cancelOrder(input: CancelOrderInput!): CancelOrderPayload!
   saveSettings(input: SaveSettingsInput!): SaveSettingsPayload!
 }
@@ -184,8 +185,11 @@ interface Node {
 type OrderType {
   orderId: ID!
   symbol: String!
+  priceType: String!
   quantity: Int!
   limitPrice: Decimal!
+  stopPrice: Decimal
+  stopLimitPrice: Decimal
   executionPrice: Decimal!
   status: String!
   action: String!
@@ -206,6 +210,30 @@ type PageInfo {
 
   """When paginating forwards, the cursor to continue."""
   endCursor: String
+}
+
+type PerformanceType {
+  symbol: String!
+  quantity: Int!
+  amount: Decimal!
+  date: DateTime!
+}
+
+enum PlaceStopLossError {
+  ACCOUNT_NOT_PROVIDED
+}
+
+input PlaceStopLossInput {
+  providerId: ID!
+  symbol: String!
+  accountId: ID
+  clientMutationId: String
+}
+
+type PlaceStopLossPayload {
+  error: PlaceStopLossError
+  errorMessage: String
+  clientMutationId: String
 }
 
 type PositionType {
@@ -374,6 +402,16 @@ type TradingStrategyNode implements Node & DatabaseId {
   databaseId: Int!
 }
 
+type TransactionType {
+  symbol: String!
+  transactionType: String!
+  quantity: Int!
+  amount: Decimal!
+  price: Decimal!
+  fee: Decimal!
+  transactionDate: DateTime!
+}
+
 type ViewerCredentialsType {
   databaseId: Int!
   fullName: String!
@@ -390,4 +428,6 @@ type ViewerType {
   accounts: [AccountNode!]!
   orders(providerId: ID!, accountId: ID): [OrderType!]!
   positions(providerId: ID!, accountId: ID): [PositionType!]!
+  transactions(providerId: ID!, accountId: ID): [TransactionType!]!
+  performances(providerId: ID!, accountId: ID): [PerformanceType!]!
 }

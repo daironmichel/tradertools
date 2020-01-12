@@ -19,6 +19,6 @@
       "gen/*": ["__generated__/*"]
     }
   },
-  "exclude": ["node_modules", "server", "relay"],
+  "exclude": ["node_modules", "server", "relay", "**/*.js"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

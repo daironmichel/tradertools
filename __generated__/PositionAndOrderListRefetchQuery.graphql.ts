@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 4ab5edf5a936f4bf4eaa25dfe3184aef */
+/* @relayHash 06fbd53764e494c7439fab938ced4810 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -35,6 +35,8 @@ fragment OrderListItem_order on OrderType {
   symbol
   quantity
   limitPrice
+  stopPrice
+  stopLimitPrice
   executionPrice
   status
   action
@@ -210,6 +212,20 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "stopPrice",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "stopLimitPrice",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "executionPrice",
                 "args": null,
                 "storageKey": null
@@ -238,7 +254,7 @@ return {
     "operationKind": "query",
     "name": "PositionAndOrderListRefetchQuery",
     "id": null,
-    "text": "query PositionAndOrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
+    "text": "query PositionAndOrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };

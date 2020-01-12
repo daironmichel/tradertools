@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
-import { PositionListItem_position as Position } from '../../__generated__/PositionListItem_position.graphql';
-import { Button, Intent, Card, Text, Colors, Icon } from '@blueprintjs/core';
+import { PositionListItem_position as Position } from 'gen/PositionListItem_position.graphql';
+import { Button, Intent, Card, Text, Colors, Icon, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import SellStockMutation from '../../mutations/Order/SellStockMutation';
+import SellStockMutation from 'mutations/Order/SellStockMutation';
+import PlaceStopLossMutation from 'mutations/Order/PlaceStopLossMutation';
 import toaster from '../toaster';
+import At from 'components/generic/At';
 
 interface Props {
   position: Position;
@@ -45,6 +47,26 @@ class PositionListItem extends Component<Props, State> {
     this.setState({ loading: false });
   };
 
+  handleStopLossOnClick = (): void => {
+    const { position, providerId } = this.props;
+    this.placeStopLoss(providerId, position.symbol);
+  };
+
+  placeStopLoss = (providerId: string, symbol: string): void => {
+    this.setState({ loading: true });
+    const sell = new PlaceStopLossMutation();
+    sell.commit({ providerId, symbol }, this.placeStopLossCompleted, this.placeStopLossError);
+  };
+
+  placeStopLossCompleted = (): void => {
+    this.setState({ loading: false });
+    toaster.showSuccess('Sell order placed.');
+  };
+
+  placeStopLossError = (): void => {
+    this.setState({ loading: false });
+  };
+
   render(): JSX.Element {
     const { position } = this.props;
     const { loading } = this.state;
@@ -60,7 +82,9 @@ class PositionListItem extends Component<Props, State> {
             {position.symbol}
           </Box>
           <Flex m={2} justifyContent="flex-end">
-            {position.quantity}@{position.pricePaid}
+            {position.quantity}
+            <At />
+            {position.pricePaid}
           </Flex>
           <Flex m={2} justifyContent="flex-end">
             {loss ? '-' : ''}${gainDisplay}
@@ -71,16 +95,17 @@ class PositionListItem extends Component<Props, State> {
               <span>{gainPercentDisplay} %</span>
             </Text>
           </Flex>
-          <Box ml={2}>
+          <ButtonGroup css={{ margin: '-1px -1px -1px 2px' }}>
             <Button
               large
-              intent={Intent.DANGER}
-              icon={IconNames.DOLLAR}
+              intent={Intent.WARNING}
+              text="Stop"
               loading={loading}
-              onClick={this.handleSellOnClick}
-              css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: -1 }}
+              onClick={this.handleStopLossOnClick}
+              css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
             />
-          </Box>
+            <Button large intent={Intent.DANGER} text="Sell" loading={loading} onClick={this.handleSellOnClick} />
+          </ButtonGroup>
         </Flex>
       </Card>
     );

@@ -1,9 +1,10 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
+  plugins: ['react', 'relay', '@typescript-eslint'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    // "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
     'plugin:react/recommended',
     'prettier/@typescript-eslint',
     "plugin:relay/recommended",
@@ -25,7 +26,6 @@ module.exports = {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
-  plugins: ['react', 'relay', '@typescript-eslint'],
   // ignorePatterns: ['node_modules/', 'server/', 'relay/'],
   rules: {},
   settings: {

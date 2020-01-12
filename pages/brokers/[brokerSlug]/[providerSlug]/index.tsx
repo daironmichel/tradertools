@@ -290,7 +290,7 @@ class Index extends React.Component<Props, State> {
                 css={{ '> *': { marginBottom: 15 } }}
               >
                 <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
-                <form onSubmit={this.handleBuyOnSubmit}>
+                <form onSubmit={this.handleBuyOnSubmit} css={{ width: '100%' }}>
                   <ControlGroup css={{ width: '100%' }}>
                     <InputGroup
                       placeholder="SYMBOL"

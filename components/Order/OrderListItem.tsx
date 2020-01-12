@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, ReactNode } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { OrderListItem_order as Order } from '../../__generated__/OrderListItem_order.graphql';
@@ -6,6 +6,35 @@ import { Button, Intent, Card, Text, Colors, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import CancelOrderMutation from '../../mutations/Order/CancelOrderMutation';
 import toaster from '../toaster';
+import styled from '@emotion/styled';
+import At from 'components/generic/At';
+
+type OrderStatus = 'EXECUTED' | 'CANCELED' | 'OPEN' | 'REJECTED' | 'PARTIAL' | 'INDIVIDUAL_FILLS';
+
+const Small = styled.small`
+  display: block;
+  margin: 0;
+  font-size: 10px;
+  line-height: 11px;
+`;
+
+const OrderPrice = (props: {
+  status: OrderStatus;
+  limitPrice: string;
+  stopPrice: string;
+  stopLimitPrice: string;
+  executionPrice: string;
+}): JSX.Element | null => {
+  const { stopPrice = '0', stopLimitPrice = '0', executionPrice = '0', limitPrice = '0', status } = props;
+  if (['EXECUTED', 'PARTIAL', 'INDIVIDUAL_FILLS'].includes(status)) return <span>{executionPrice}</span>;
+  if (stopPrice === '0' && stopLimitPrice === '0') return <span>{limitPrice}</span>;
+  return (
+    <div css={{ margin: 0 }}>
+      <Small>{stopPrice !== '0' ? stopPrice : stopLimitPrice} stop</Small>
+      <Small>{limitPrice} limit</Small>
+    </div>
+  );
+};
 
 interface Props {
   order: Order;
@@ -25,7 +54,7 @@ class OrderListItem extends Component<Props, State> {
     };
   }
 
-  cancelAllowed = (status: string): boolean => {
+  cancelAllowed = (status: OrderStatus): boolean => {
     return ['OPEN', 'INDIVIDUAL_FILLS', 'PARTIAL'].includes(status);
   };
 
@@ -53,17 +82,32 @@ class OrderListItem extends Component<Props, State> {
     const { order } = this.props;
     const { loading } = this.state;
     const actionColor = order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
-    const priceToShow = order.status === 'EXECUTED' ? order.executionPrice : order.limitPrice;
-    const cancelDisabled = !this.cancelAllowed(order.status);
+    const priceToShow = (
+      <OrderPrice
+        status={order.status as OrderStatus}
+        limitPrice={(order.limitPrice as string) || ''}
+        stopPrice={(order.stopPrice as string) || ''}
+        stopLimitPrice={(order.stopLimitPrice as string) || ''}
+        executionPrice={(order.executionPrice as string) || ''}
+      />
+    );
+    const cancelDisabled = !this.cancelAllowed(order.status as OrderStatus);
     return (
-      <Card css={{ padding: 0 }}>
+      <Card css={{ padding: 0, opacity: order.status === 'CANCELED' ? 0.5 : 1 }}>
         <Flex alignItems="center">
           <Box flex="1" m={2}>
             {order.symbol}
           </Box>
           <Flex m={2} justifyContent="flex-end">
             <Text>
-              <span css={{ color: actionColor }}>{order.action}</span> {order.quantity}@{priceToShow}
+              <span css={{ color: actionColor }}>{order.action}</span>{' '}
+              <div css={{ display: 'inline-block' }}>
+                <Flex alignItems="center">
+                  <span>{order.quantity}</span>
+                  <At />
+                  {priceToShow}
+                </Flex>
+              </div>
             </Text>
           </Flex>
           <Box m={2}>
@@ -95,6 +139,8 @@ export default createFragmentContainer(OrderListItem, {
       symbol
       quantity
       limitPrice
+      stopPrice
+      stopLimitPrice
       executionPrice
       status
       action
