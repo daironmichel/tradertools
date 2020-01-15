@@ -9,7 +9,7 @@ import toaster from '../toaster';
 import styled from '@emotion/styled';
 import At from 'components/generic/At';
 
-type OrderStatus = 'EXECUTED' | 'CANCELED' | 'OPEN' | 'REJECTED' | 'PARTIAL' | 'INDIVIDUAL_FILLS';
+type OrderStatus = 'EXECUTED' | 'CANCELLED' | 'OPEN' | 'REJECTED' | 'PARTIAL' | 'INDIVIDUAL_FILLS';
 
 const Small = styled.small`
   display: block;
@@ -93,7 +93,7 @@ class OrderListItem extends Component<Props, State> {
     );
     const cancelDisabled = !this.cancelAllowed(order.status as OrderStatus);
     return (
-      <Card css={{ padding: 0, opacity: order.status === 'CANCELED' ? 0.5 : 1 }}>
+      <Card css={{ padding: 0, opacity: order.status === 'CANCELLED' ? 0.5 : 1 }}>
         <Flex alignItems="center">
           <Box flex="1" m={2}>
             {order.symbol}
