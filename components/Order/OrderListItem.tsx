@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from 'react';
+import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { OrderListItem_order as Order } from '../../__generated__/OrderListItem_order.graphql';
@@ -93,8 +93,8 @@ class OrderListItem extends Component<Props, State> {
     );
     const cancelDisabled = !this.cancelAllowed(order.status as OrderStatus);
     return (
-      <Card css={{ padding: 0, opacity: order.status === 'CANCELLED' ? 0.5 : 1 }}>
-        <Flex alignItems="center">
+      <Card css={{ padding: 0 }}>
+        <Flex alignItems="center" css={{ opacity: order.status === 'CANCELLED' ? 0.5 : 1 }}>
           <Box flex="1" m={2}>
             {order.symbol}
           </Box>
