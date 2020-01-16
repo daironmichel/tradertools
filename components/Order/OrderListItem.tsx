@@ -6,17 +6,10 @@ import { Button, Intent, Card, Text, Colors, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import CancelOrderMutation from '../../mutations/Order/CancelOrderMutation';
 import toaster from '../toaster';
-import styled from '@emotion/styled';
 import At from 'components/generic/At';
+import Small from 'components/generic/Small';
 
 type OrderStatus = 'EXECUTED' | 'CANCELLED' | 'OPEN' | 'REJECTED' | 'PARTIAL' | 'INDIVIDUAL_FILLS';
-
-const Small = styled.small`
-  display: block;
-  margin: 0;
-  font-size: 10px;
-  line-height: 11px;
-`;
 
 const OrderPrice = (props: {
   status: OrderStatus;

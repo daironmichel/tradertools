@@ -2,12 +2,24 @@ import React, { Component } from 'react';
 import { Flex, Box } from 'rebass';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { PositionListItem_position as Position } from 'gen/PositionListItem_position.graphql';
-import { Button, Intent, Card, Text, Colors, Icon, ButtonGroup } from '@blueprintjs/core';
+import {
+  Button,
+  Intent,
+  Card,
+  Text,
+  Colors,
+  Icon,
+  ButtonGroup,
+  Popover,
+  Menu,
+  Position as MenuPosition,
+} from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from 'mutations/Order/SellStockMutation';
 import PlaceStopLossMutation from 'mutations/Order/PlaceStopLossMutation';
 import toaster from '../toaster';
 import At from 'components/generic/At';
+import Small from 'components/generic/Small';
 
 interface Props {
   position: Position;
@@ -86,25 +98,31 @@ class PositionListItem extends Component<Props, State> {
             <At />
             {position.pricePaid}
           </Flex>
-          <Flex m={2} justifyContent="flex-end">
-            {loss ? '-' : ''}${gainDisplay}
-          </Flex>
-          <Flex m={2} justifyContent="flex-end">
-            <Text css={{ color: loss ? Colors.RED3 : Colors.GREEN3 }}>
-              <Icon icon={loss ? IconNames.ARROW_DOWN : IconNames.ARROW_UP} iconSize={12} css={{ paddingBottom: 2 }} />{' '}
+          <Flex m={2} justifyContent="center" flexDirection="column" alignItems="flex-end" minWidth={56}>
+            <Small css={{ color: loss ? Colors.RED3 : Colors.GREEN3 }}>
+              <Icon icon={loss ? IconNames.ARROW_DOWN : IconNames.ARROW_UP} iconSize={8} css={{ paddingBottom: 2 }} />{' '}
               <span>{gainPercentDisplay} %</span>
-            </Text>
+            </Small>
+            <Small>{loss ? `($${gainDisplay})` : `$${gainDisplay}`}</Small>
           </Flex>
-          <ButtonGroup css={{ margin: '-1px -1px -1px 2px' }}>
-            <Button
-              large
-              intent={Intent.WARNING}
-              text="Stop"
-              loading={loading}
-              onClick={this.handleStopLossOnClick}
-              css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-            />
+          <ButtonGroup
+            css={{
+              margin: '-1px -1px -1px 2px',
+              '> *:first-child': { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 },
+            }}
+          >
             <Button large intent={Intent.DANGER} text="Sell" loading={loading} onClick={this.handleSellOnClick} />
+            <Popover
+              position={MenuPosition.TOP_LEFT}
+              content={
+                <Menu>
+                  <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Loss" onClick={this.handleStopLossOnClick} />
+                  <Menu.Item icon={IconNames.TAXI} text="Auto Pilot" />
+                </Menu>
+              }
+            >
+              <Button large intent={Intent.DANGER} icon={IconNames.CARET_DOWN} disabled={loading} />
+            </Popover>
           </ButtonGroup>
         </Flex>
       </Card>
