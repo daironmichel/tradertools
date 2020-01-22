@@ -20,10 +20,13 @@ const OrderPrice = (props: {
 }): JSX.Element | null => {
   const { stopPrice = '0', stopLimitPrice = '0', executionPrice = '0', limitPrice = '0', status } = props;
   if (['EXECUTED', 'PARTIAL', 'INDIVIDUAL_FILLS'].includes(status)) return <span>{executionPrice}</span>;
-  if (stopPrice === '0' && stopLimitPrice === '0') return <span>{limitPrice}</span>;
+  const noStopPrice = !stopPrice || stopPrice === '0';
+  const noStopLimitPrice = !stopLimitPrice || stopLimitPrice === '0';
+  if (noStopPrice && noStopLimitPrice) return <span>{limitPrice}</span>;
   return (
     <div css={{ margin: 0 }}>
-      <Small>{stopPrice !== '0' ? stopPrice : stopLimitPrice} stop</Small>
+      {noStopLimitPrice && <Small>{stopPrice} stop</Small>}
+      {noStopPrice && <Small>{stopLimitPrice} slimit</Small>}
       <Small>{limitPrice} limit</Small>
     </div>
   );
@@ -74,7 +77,8 @@ class OrderListItem extends Component<Props, State> {
   render(): JSX.Element {
     const { order } = this.props;
     const { loading } = this.state;
-    const actionColor = order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
+    let actionColor = order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
+    if (order.status === 'CANCELLED') actionColor = Colors.DARK_GRAY1;
     const priceToShow = (
       <OrderPrice
         status={order.status as OrderStatus}
@@ -91,9 +95,11 @@ class OrderListItem extends Component<Props, State> {
           <Box flex="1" m={2}>
             {order.symbol}
           </Box>
-          <Flex m={2} justifyContent="flex-end">
+          <Box m={2}>
+            <span css={{ color: actionColor }}>{order.action}</span>{' '}
+          </Box>
+          <Flex m={2} justifyContent="flex-end" minWidth={64}>
             <Text>
-              <span css={{ color: actionColor }}>{order.action}</span>{' '}
               <div css={{ display: 'inline-block' }}>
                 <Flex alignItems="center">
                   <span>{order.quantity}</span>

@@ -6,7 +6,6 @@ import {
   Button,
   Intent,
   Card,
-  Text,
   Colors,
   Icon,
   ButtonGroup,
@@ -98,7 +97,7 @@ class PositionListItem extends Component<Props, State> {
             <At />
             {position.pricePaid}
           </Flex>
-          <Flex m={2} justifyContent="center" flexDirection="column" alignItems="flex-end" minWidth={56}>
+          <Flex m={2} justifyContent="center" flexDirection="column" alignItems="flex-end" minWidth={64}>
             <Small css={{ color: loss ? Colors.RED3 : Colors.GREEN3 }}>
               <Icon icon={loss ? IconNames.ARROW_DOWN : IconNames.ARROW_UP} iconSize={8} css={{ paddingBottom: 2 }} />{' '}
               <span>{gainPercentDisplay} %</span>

@@ -137,7 +137,7 @@ class Index extends React.Component<Props, State> {
     // if callback is configured redirect to authorizeUrl
     // else open authorizeUrl in new window and redirect to verification page
     if (callbackEnabled) {
-      Router.push(authorizeUrl);
+      window.location.assign(authorizeUrl);
     } else {
       window.open(authorizeUrl);
       Router.push('/verify');
