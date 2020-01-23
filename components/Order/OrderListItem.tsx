@@ -98,7 +98,7 @@ class OrderListItem extends Component<Props, State> {
           <Box m={2}>
             <span css={{ color: actionColor }}>{order.action}</span>{' '}
           </Box>
-          <Flex m={2} justifyContent="flex-end" minWidth={64}>
+          <Flex m={2} justifyContent="flex-end" minWidth={80}>
             <Text>
               <div css={{ display: 'inline-block' }}>
                 <Flex alignItems="center">
