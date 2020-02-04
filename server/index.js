@@ -136,10 +136,20 @@ app.prepare().then(async () => {
           throw e;
         }
 
-        const { redirect, error } = responseData || {};
+        const { accessToken, brokerSlug, providerSlug, error } = responseData || {};
         if (error) throw Boom.badData(error);
-        else if (!redirect) throw Boom.internal('Unable to redirect');
-        return h.redirect(redirect);
+        if (!accessToken) {
+          console.warn('Unable to authenticate. Redirecting to login.');
+          return h.redirect('/login');
+        }
+
+        request.cookieAuth.set({ accessToken });
+
+        if (!brokerSlug || !providerSlug) {
+          console.warn(`Unable to redirect. Broker: ${brokerSlug}, Provider: ${providerSlug}. Redirecting to home.`);
+          return h.redirect('/');
+        }
+        return h.redirect(`/brokers/${brokerSlug}/${providerSlug}/`);
       },
     },
   });
