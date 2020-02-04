@@ -2,8 +2,6 @@ import React from 'react';
 import Themed from '../components/Themed';
 import Head from 'next/head';
 import { Flex } from 'rebass';
-import { NonIdealState } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
 import { NextPageContext } from 'next';
 import ErrorState from '../components/generic/ErrorState';
 
@@ -22,7 +20,7 @@ function ErrorPage(props: Props): JSX.Element {
   return (
     <Themed>
       <Head>
-        <title>Login</title>
+        <title>Error</title>
       </Head>
       <Flex justifyContent="center" alignItems="center" height="100vh">
         <ErrorState statusCode={statusCode} title={title} description={description} />

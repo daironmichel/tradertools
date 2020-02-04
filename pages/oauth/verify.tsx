@@ -5,12 +5,12 @@ import { withRouter } from 'next/router';
 import { Flex, Box } from 'rebass';
 import { Button, Card, InputGroup, Icon, Classes, Intent } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import AuthorizeConnectionMutation from '../mutations/Provider/AuthorizeConnectionMutation';
-import { AuthorizeConnectionMutationResponse } from '../__generated__/AuthorizeConnectionMutation.graphql';
+import AuthorizeConnectionMutation from '../../mutations/Provider/AuthorizeConnectionMutation';
+import { AuthorizeConnectionMutationResponse } from '../../__generated__/AuthorizeConnectionMutation.graphql';
 import { WithRouterProps } from 'next/dist/client/with-router';
 import { ParsedUrlQuery, parse } from 'querystring';
-import Themed from '../components/Themed';
-import toaster from '../components/toaster';
+import Themed from '../../components/Themed';
+import toaster from '../../components/toaster';
 
 interface State {
   code: string;

@@ -133,14 +133,14 @@ class Index extends React.Component<Props, State> {
     }
 
     // save provider id in local storage
-    window.localStorage.setItem('providerId', serviceProvider.databaseId.toString());
+    // window.localStorage.setItem('providerId', serviceProvider.databaseId.toString());
     // if callback is configured redirect to authorizeUrl
     // else open authorizeUrl in new window and redirect to verification page
     if (callbackEnabled) {
       window.location.assign(authorizeUrl);
     } else {
       window.open(authorizeUrl);
-      Router.push('/verify');
+      Router.push('/oauth/verify');
     }
   };
 

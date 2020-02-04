@@ -2,6 +2,7 @@ const dev = process.env.NODE_ENV !== 'production';
 const next = require('next');
 const Hapi = require('@hapi/hapi');
 const H2o2 = require('@hapi/h2o2');
+const Boom = require('@hapi/boom');
 const CookieAuth = require('@hapi/cookie');
 const { nextHandlerWrapper } = require('./next-wrapper');
 const BackboneAPI = require('../api/backbone-api');
@@ -66,8 +67,8 @@ app.prepare().then(async () => {
     method: 'GET',
     path: '/login',
     options: {
-      auth: false /* use next to handle static files */,
-      handler: nextHandlerWrapper(app),
+      auth: false,
+      handler: nextHandlerWrapper(app) /* use next to handle static files */,
     },
   });
 
@@ -77,9 +78,9 @@ app.prepare().then(async () => {
     options: {
       auth: false,
       handler: async (request, h) => {
-        const { username, password } = request.payload;
+        const { username, password, next } = request.payload;
         if (!username || !password) {
-          return h.redirect('/login'); // "missing username or pass"
+          return h.redirect(`/login${next ? '?next=' + next : ''}`); // "missing username or pass"
         }
 
         let accessToken = null;
@@ -95,7 +96,7 @@ app.prepare().then(async () => {
         }
 
         request.cookieAuth.set({ accessToken });
-        return h.redirect(request.query.next || '/');
+        return h.redirect(next || '/');
       },
     },
   });
@@ -116,6 +117,30 @@ app.prepare().then(async () => {
       // TODO: revoke access token to etrade if present
 
       return h.redirect('/login');
+    },
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/verify',
+    options: {
+      auth: false,
+      handler: async (request, h) => {
+        // const { sid: session } = request.state;
+        const { oauth_token: oauthToken, oauth_verifier: oauthVerifier } = request.query;
+        let responseData = null;
+        try {
+          responseData = await backboneApi.verify(oauthToken, oauthVerifier);
+        } catch (e) {
+          console.error(e);
+          throw e;
+        }
+
+        const { redirect, error } = responseData || {};
+        if (error) throw Boom.badData(error);
+        else if (!redirect) throw Boom.internal('Unable to redirect');
+        return h.redirect(redirect);
+      },
     },
   });
 

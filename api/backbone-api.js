@@ -32,6 +32,12 @@ class BackboneAPI {
     return res.data;
   }
 
+  async verify(oauthToken, oauthVerifier) {
+    const body = { oauthToken, oauthVerifier };
+    const res = await this.axios.post('oauth1/verify/', body);
+    return res.data;
+  }
+
   graphQL(query, variables = {}, headers = {}) {
     // let reqHeaders = R.merge(this.getSessionIdHeaders(), headers);
     const body = { query, variables };

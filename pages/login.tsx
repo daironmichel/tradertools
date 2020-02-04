@@ -11,7 +11,13 @@ import { useRouter } from 'next/router';
 
 const Login = (): JSX.Element => {
   const router = useRouter();
-  const action = router.asPath;
+  let next = null;
+  if (router.asPath.includes('?')) {
+    const queryString = router.asPath.substr(router.asPath.indexOf('?'));
+    const urlParams = new URLSearchParams(queryString);
+    next = urlParams.get('next');
+  }
+  console.log(next);
   return (
     <Themed>
       <Head>
@@ -28,7 +34,8 @@ const Login = (): JSX.Element => {
             <Flex justifyContent="center" alignItems="center" mb={40} mt={-80}>
               <Icon icon={IconNames.LOCK} iconSize={164} className={Classes.TEXT_DISABLED} />
             </Flex>
-            <form action={action} method="POST">
+            <form action="/login" method="POST">
+              {next && <input type="hidden" name="next" value={next} />}
               <InputGroup
                 leftIcon="user"
                 id="username"
