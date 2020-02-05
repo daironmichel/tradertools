@@ -15,7 +15,8 @@ import {
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from 'mutations/Order/SellStockMutation';
-import PlaceStopLossMutation from 'mutations/Order/PlaceStopLossMutation';
+import StopLossMutation from 'mutations/Order/StopLossMutation';
+import StopProfitMutation from 'mutations/Order/StopProfitMutation';
 import toaster from '../toaster';
 import At from 'components/generic/At';
 import Small from 'components/generic/Small';
@@ -60,21 +61,41 @@ class PositionListItem extends Component<Props, State> {
 
   handleStopLossOnClick = (): void => {
     const { position, providerId } = this.props;
-    this.placeStopLoss(providerId, position.symbol);
+    this.stopLoss(providerId, position.symbol);
   };
 
-  placeStopLoss = (providerId: string, symbol: string): void => {
+  stopLoss = (providerId: string, symbol: string): void => {
     this.setState({ loading: true });
-    const sell = new PlaceStopLossMutation();
-    sell.commit({ providerId, symbol }, this.placeStopLossCompleted, this.placeStopLossError);
+    const sell = new StopLossMutation();
+    sell.commit({ providerId, symbol }, this.stopLossCompleted, this.stopLossError);
   };
 
-  placeStopLossCompleted = (): void => {
+  stopLossCompleted = (): void => {
     this.setState({ loading: false });
     toaster.showSuccess('Sell order placed.');
   };
 
-  placeStopLossError = (): void => {
+  stopLossError = (): void => {
+    this.setState({ loading: false });
+  };
+
+  handleStopProfitOnClick = (): void => {
+    const { position, providerId } = this.props;
+    this.stopProfit(providerId, position.symbol);
+  };
+
+  stopProfit = (providerId: string, symbol: string): void => {
+    this.setState({ loading: true });
+    const sell = new StopProfitMutation();
+    sell.commit({ providerId, symbol }, this.stopProfitCompleted, this.stopProfitError);
+  };
+
+  stopProfitCompleted = (): void => {
+    this.setState({ loading: false });
+    toaster.showSuccess('Sell order placed.');
+  };
+
+  stopProfitError = (): void => {
     this.setState({ loading: false });
   };
 
@@ -116,6 +137,7 @@ class PositionListItem extends Component<Props, State> {
               content={
                 <Menu>
                   <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Loss" onClick={this.handleStopLossOnClick} />
+                  <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Profit" onClick={this.handleStopProfitOnClick} />
                   <Menu.Item icon={IconNames.TAXI} text="Auto Pilot" />
                 </Menu>
               }

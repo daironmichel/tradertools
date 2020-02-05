@@ -1,35 +1,35 @@
 /* tslint:disable */
-/* @relayHash 6b9aa8579037d653061eb52fb6917ea2 */
+/* @relayHash e74278057fad871f2dfd2b8e3c1513d8 */
 
 import { ConcreteRequest } from "relay-runtime";
-export type PlaceStopLossError = "ACCOUNT_NOT_PROVIDED" | "%future added value";
-export type PlaceStopLossInput = {
+export type StopLossError = "ACCOUNT_NOT_PROVIDED" | "NOT_ALLOWED_ON_AUTOPILOT" | "%future added value";
+export type StopLossInput = {
     readonly providerId: string;
     readonly symbol: string;
     readonly accountId?: string | null;
     readonly clientMutationId?: string | null;
 };
-export type PlaceStopLossMutationVariables = {
-    input: PlaceStopLossInput;
+export type StopLossMutationVariables = {
+    input: StopLossInput;
 };
-export type PlaceStopLossMutationResponse = {
-    readonly placeStopLoss: {
-        readonly error: PlaceStopLossError | null;
+export type StopLossMutationResponse = {
+    readonly stopLoss: {
+        readonly error: StopLossError | null;
         readonly errorMessage: string | null;
     };
 };
-export type PlaceStopLossMutation = {
-    readonly response: PlaceStopLossMutationResponse;
-    readonly variables: PlaceStopLossMutationVariables;
+export type StopLossMutation = {
+    readonly response: StopLossMutationResponse;
+    readonly variables: StopLossMutationVariables;
 };
 
 
 
 /*
-mutation PlaceStopLossMutation(
-  $input: PlaceStopLossInput!
+mutation StopLossMutation(
+  $input: StopLossInput!
 ) {
-  placeStopLoss(input: $input) {
+  stopLoss(input: $input) {
     error
     errorMessage
   }
@@ -41,7 +41,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "input",
-    "type": "PlaceStopLossInput!",
+    "type": "StopLossInput!",
     "defaultValue": null
   }
 ],
@@ -49,7 +49,7 @@ v1 = [
   {
     "kind": "LinkedField",
     "alias": null,
-    "name": "placeStopLoss",
+    "name": "stopLoss",
     "storageKey": null,
     "args": [
       {
@@ -58,7 +58,7 @@ v1 = [
         "variableName": "input"
       }
     ],
-    "concreteType": "PlaceStopLossPayload",
+    "concreteType": "StopLossPayload",
     "plural": false,
     "selections": [
       {
@@ -82,7 +82,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "PlaceStopLossMutation",
+    "name": "StopLossMutation",
     "type": "Mutation",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -90,18 +90,18 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "PlaceStopLossMutation",
+    "name": "StopLossMutation",
     "argumentDefinitions": (v0/*: any*/),
     "selections": (v1/*: any*/)
   },
   "params": {
     "operationKind": "mutation",
-    "name": "PlaceStopLossMutation",
+    "name": "StopLossMutation",
     "id": null,
-    "text": "mutation PlaceStopLossMutation(\n  $input: PlaceStopLossInput!\n) {\n  placeStopLoss(input: $input) {\n    error\n    errorMessage\n  }\n}\n",
+    "text": "mutation StopLossMutation(\n  $input: StopLossInput!\n) {\n  stopLoss(input: $input) {\n    error\n    errorMessage\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '6106706d0f654dea666a3f6270997e98';
+(node as any).hash = '981c51004ce54b00ed8945e33c792ff3';
 export default node;

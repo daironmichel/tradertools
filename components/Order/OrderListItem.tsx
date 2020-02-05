@@ -91,7 +91,7 @@ class OrderListItem extends Component<Props, State> {
     const cancelDisabled = !this.cancelAllowed(order.status as OrderStatus);
     return (
       <Card css={{ padding: 0 }}>
-        <Flex alignItems="center" css={{ opacity: order.status === 'CANCELLED' ? 0.5 : 1 }}>
+        <Flex alignItems="center" css={{ opacity: order.status === 'CANCELLED' ? 0.4 : 1 }}>
           <Box flex="1" m={2}>
             {order.symbol}
           </Box>

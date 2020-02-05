@@ -1,8 +1,8 @@
 /* tslint:disable */
-/* @relayHash a05b41b3d4e6eec18e39fca7435bbba0 */
+/* @relayHash e935db1827521f1783c99e3c1ed69f61 */
 
 import { ConcreteRequest } from "relay-runtime";
-export type AuthorizeConnectionError = "INCOMPATIBLE_STATE" | "PROVIDER_NOT_FOUND" | "%future added value";
+export type AuthorizeConnectionError = "INCOMPATIBLE_STATE" | "MISSING_REQUIRED_FIELD" | "PROVIDER_NOT_FOUND" | "%future added value";
 export type SyncAccountsInput = {
     readonly providerId: string;
     readonly clientMutationId?: string | null;
