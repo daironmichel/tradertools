@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed Feb 05 2020 07:37:14 GMT-0500 (Eastern Standard Time)
+# timestamp: Thu Feb 06 2020 07:24:24 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -302,7 +302,9 @@ type OrderType {
   orderId: ID!
   symbol: String!
   priceType: String!
-  quantity: Int!
+  pendingQuantity: Int!
+  orderedQuantity: Int!
+  filledQuantity: Int!
   limitPrice: Decimal!
   stopPrice: Decimal
   stopLimitPrice: Decimal

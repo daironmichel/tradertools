@@ -11,6 +11,21 @@ import Small from 'components/generic/Small';
 
 type OrderStatus = 'EXECUTED' | 'CANCELLED' | 'OPEN' | 'REJECTED' | 'PARTIAL' | 'INDIVIDUAL_FILLS';
 
+const OrderQuantity = (props: { filledQuantity: number; orderedQuantity: number }): JSX.Element | null => {
+  const { orderedQuantity, filledQuantity } = props;
+  const pendingQuantity = orderedQuantity - filledQuantity;
+
+  if (filledQuantity > 0 && filledQuantity < orderedQuantity) {
+    return (
+      <div css={{ margin: 0, textAlign: 'right' }}>
+        <Small>pending {pendingQuantity}</Small>
+        <Small>filled {filledQuantity}</Small>
+      </div>
+    );
+  }
+  return <span>{orderedQuantity}</span>;
+};
+
 const OrderPrice = (props: {
   status: OrderStatus;
   limitPrice: string;
@@ -77,41 +92,49 @@ class OrderListItem extends Component<Props, State> {
   render(): JSX.Element {
     const { order } = this.props;
     const { loading } = this.state;
-    let actionColor = order.action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
-    if (order.status === 'CANCELLED') actionColor = Colors.DARK_GRAY1;
-    const priceToShow = (
-      <OrderPrice
-        status={order.status as OrderStatus}
-        limitPrice={(order.limitPrice as string) || ''}
-        stopPrice={(order.stopPrice as string) || ''}
-        stopLimitPrice={(order.stopLimitPrice as string) || ''}
-        executionPrice={(order.executionPrice as string) || ''}
-      />
-    );
-    const cancelDisabled = !this.cancelAllowed(order.status as OrderStatus);
+    const {
+      status,
+      symbol,
+      action,
+      limitPrice,
+      stopPrice,
+      stopLimitPrice,
+      executionPrice,
+      filledQuantity,
+      orderedQuantity,
+    } = order;
+    const cancelDisabled = !this.cancelAllowed(status as OrderStatus);
+    let actionColor = action.startsWith('BUY') ? Colors.GREEN3 : Colors.RED3;
+    if (status === 'CANCELLED') actionColor = Colors.DARK_GRAY1;
     return (
-      <Card css={{ padding: 0 }}>
-        <Flex alignItems="center" css={{ opacity: order.status === 'CANCELLED' ? 0.4 : 1 }}>
+      <Card css={{ padding: 0, backgroundColor: status === 'EXECUTED' ? '#d5f5e8' : undefined }}>
+        <Flex alignItems="center" css={{ opacity: status === 'CANCELLED' ? 0.3 : 1 }}>
           <Box flex="1" m={2}>
-            {order.symbol}
+            {symbol}
           </Box>
           <Box m={2}>
-            <span css={{ color: actionColor }}>{order.action}</span>{' '}
+            <span css={{ color: actionColor }}>{action}</span>{' '}
           </Box>
           <Flex m={2} justifyContent="flex-end" minWidth={80}>
             <Text>
               <div css={{ display: 'inline-block' }}>
                 <Flex alignItems="center">
-                  <span>{order.quantity}</span>
+                  <OrderQuantity orderedQuantity={orderedQuantity} filledQuantity={filledQuantity} />
                   <At />
-                  {priceToShow}
+                  <OrderPrice
+                    status={status as OrderStatus}
+                    limitPrice={(limitPrice as string) || ''}
+                    stopPrice={(stopPrice as string) || ''}
+                    stopLimitPrice={(stopLimitPrice as string) || ''}
+                    executionPrice={(executionPrice as string) || ''}
+                  />
                 </Flex>
               </div>
             </Text>
           </Flex>
           <Box m={2}>
-            <Tooltip content={order.status}>
-              <span>{order.status.substring(0, 2)}</span>
+            <Tooltip content={status}>
+              <span>{status.substring(0, 2)}</span>
             </Tooltip>
           </Box>
           <Box ml={2}>
@@ -136,7 +159,8 @@ export default createFragmentContainer(OrderListItem, {
     fragment OrderListItem_order on OrderType {
       orderId
       symbol
-      quantity
+      filledQuantity
+      orderedQuantity
       limitPrice
       stopPrice
       stopLimitPrice

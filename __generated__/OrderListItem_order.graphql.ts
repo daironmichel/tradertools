@@ -5,7 +5,8 @@ import { FragmentRefs } from "relay-runtime";
 export type OrderListItem_order = {
     readonly orderId: string;
     readonly symbol: string;
-    readonly quantity: number;
+    readonly filledQuantity: number;
+    readonly orderedQuantity: number;
     readonly limitPrice: unknown;
     readonly stopPrice: unknown | null;
     readonly stopLimitPrice: unknown | null;
@@ -46,7 +47,14 @@ const node: ReaderFragment = {
     {
       "kind": "ScalarField",
       "alias": null,
-      "name": "quantity",
+      "name": "filledQuantity",
+      "args": null,
+      "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "orderedQuantity",
       "args": null,
       "storageKey": null
     },
@@ -94,5 +102,5 @@ const node: ReaderFragment = {
     }
   ]
 };
-(node as any).hash = '0373dce9c6ee3f37417c676eb987532a';
+(node as any).hash = '1354cab53806c781f8cb14e057b5ef99';
 export default node;

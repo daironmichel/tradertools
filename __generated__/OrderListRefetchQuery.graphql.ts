@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 8e0fe9d224dbb69300878046ae9a50e0 */
+/* @relayHash 8adacacbe75a1021d610f4280eeb6913 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -32,7 +32,8 @@ query OrderListRefetchQuery(
 fragment OrderListItem_order on OrderType {
   orderId
   symbol
-  quantity
+  filledQuantity
+  orderedQuantity
   limitPrice
   stopPrice
   stopLimitPrice
@@ -142,7 +143,14 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
-                "name": "quantity",
+                "name": "filledQuantity",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "orderedQuantity",
                 "args": null,
                 "storageKey": null
               },
@@ -198,7 +206,7 @@ return {
     "operationKind": "query",
     "name": "OrderListRefetchQuery",
     "id": null,
-    "text": "query OrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  quantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
+    "text": "query OrderListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...OrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  filledQuantity\n  orderedQuantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n",
     "metadata": {}
   }
 };
