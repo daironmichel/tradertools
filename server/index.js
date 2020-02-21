@@ -122,6 +122,17 @@ app.prepare().then(async () => {
 
   server.route({
     method: 'GET',
+    path: '/oauth/redirect',
+    handler: async (request, h) => {
+      const { to } = request.query;
+      if (!to) throw Boom.badData('Missing URL param: to');
+
+      return h.redirect(to);
+    },
+  });
+
+  server.route({
+    method: 'GET',
     path: '/verify',
     options: {
       auth: false,
