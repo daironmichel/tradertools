@@ -9,6 +9,7 @@ import PositionAndOrderList from './PositionAndOrderList';
 
 interface RendererProps {
   variables: PositionAndOrderListRendererQueryVariables;
+  selectedStrategyId?: number;
   autoRefetch?: number;
 }
 
@@ -31,6 +32,7 @@ class PositionAndOrderListRenderer extends Component<RendererProps & PositionAnd
         viewer={this.props.viewer}
         providerId={this.props.variables.providerId}
         autoRefetch={this.props.autoRefetch}
+        selectedStrategyId={this.props.selectedStrategyId}
       />
     );
   }

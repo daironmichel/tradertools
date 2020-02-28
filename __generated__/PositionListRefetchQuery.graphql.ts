@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash e6cbb35f0c2345f72ba3fd5637c20992 */
+/* @relayHash 9368f2f4c038f168f5e3701e6a1ba988 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -35,6 +35,12 @@ fragment PositionListItem_position on PositionType {
   pricePaid
   totalGain
   totalGainPct
+  autopilot {
+    status
+    state
+    errorMessage
+    id
+  }
 }
 
 fragment PositionList_viewer_15bWwS on ViewerType {
@@ -155,6 +161,45 @@ return {
                 "name": "totalGainPct",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "autopilot",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "AutoPilotTaskNode",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "status",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "state",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "errorMessage",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "id",
+                    "args": null,
+                    "storageKey": null
+                  }
+                ]
               }
             ]
           }
@@ -166,7 +211,7 @@ return {
     "operationKind": "query",
     "name": "PositionListRefetchQuery",
     "id": null,
-    "text": "query PositionListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
+    "text": "query PositionListRefetchQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionList_viewer_15bWwS\n  }\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n  autopilot {\n    status\n    state\n    errorMessage\n    id\n  }\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };

@@ -340,6 +340,7 @@ class Index extends React.Component<Props, State> {
                 </form>
                 <PositionAndOrderListRenderer
                   autoRefetch={settings?.refreshRate || 0}
+                  selectedStrategyId={selectedStrategy?.databaseId}
                   variables={{
                     providerId: serviceProvider.databaseId.toString(),
                   }}

@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Thu Feb 06 2020 07:24:24 GMT-0500 (Eastern Standard Time)
+# timestamp: Thu Feb 27 2020 07:37:48 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -107,7 +107,7 @@ enum AutoPilotONError {
   PROVIDER_REQUIRED
   ACCOUNT_REQUIRED
   STRATEGY_REQUIRED
-  NO_POSITION_FOR_SYMBOL
+  ALREADY_EXISTS
 }
 
 input AutoPilotONInput {
@@ -134,6 +134,9 @@ enum AutoPilotTaskModifier {
 
   """Minimize Loss"""
   A_2
+
+  """Minimize Loss, Maximize Profit"""
+  A_3
 }
 
 type AutoPilotTaskNode implements Node & DatabaseId {
@@ -149,8 +152,12 @@ type AutoPilotTaskNode implements Node & DatabaseId {
   symbol: String!
   quantity: Int!
   entryPrice: Float!
+  isOtc: Boolean!
+  errorMessage: String!
+  trackingOrderId: String
   basePrice: Float!
-  refPrice: Float!
+  profitRefPrice: Float!
+  lossRefPrice: Float!
   refTime: DateTime!
   databaseId: Int!
 }
@@ -170,31 +177,19 @@ enum AutoPilotTaskSignal {
   A_3
 }
 
-"""An enumeration."""
 enum AutoPilotTaskState {
-  """Buying Mode"""
-  A_0
-
-  """Watching Mode"""
-  A_1
-
-  """Selling Mode"""
-  A_2
+  BUYING
+  WATCHING
+  SELLING
+  ERROR
 }
 
-"""An enumeration."""
 enum AutoPilotTaskStatus {
-  """Created"""
-  A_0
-
-  """Queued"""
-  A_1
-
-  """Running"""
-  A_2
-
-  """Done"""
-  A_3
+  READY
+  QUEUED
+  RUNNING
+  DONE
+  PAUSED
 }
 
 type BrokerNode implements Node & DatabaseId {
@@ -288,8 +283,8 @@ type Mutation {
   stopProfit(input: StopProfitInput!): StopProfitPayload!
   cancelOrder(input: CancelOrderInput!): CancelOrderPayload!
   saveSettings(input: SaveSettingsInput!): SaveSettingsPayload!
-  autopilotOn(input: AutoPilotONInput!): AutoPilotONPayload!
-  autopilotOff(input: AutoPilotOFFInput!): AutoPilotOFFPayload!
+  autoPilotOn(input: AutoPilotONInput!): AutoPilotONPayload!
+  autoPilotOff(input: AutoPilotOFFInput!): AutoPilotOFFPayload!
 }
 
 """An object with an ID"""
@@ -357,6 +352,7 @@ type ProviderSessionNode implements Node & DatabaseId {
   accessTokenSecret: String!
   created: DateTime!
   refreshed: DateTime!
+  provider: ServiceProviderNode!
   databaseId: Int!
 }
 
@@ -472,12 +468,28 @@ enum SessionStatus {
   CLOSED
 }
 
+"""An enumeration."""
+enum SettingsDefaultAutopilotModifier {
+  """Follow Strategy"""
+  A_0
+
+  """Maximize Profit"""
+  A_1
+
+  """Minimize Loss"""
+  A_2
+
+  """Minimize Loss, Maximize Profit"""
+  A_3
+}
+
 type SettingsNode implements Node & DatabaseId {
   """The ID of the object."""
   id: ID!
   refreshRate: Int!
   defaultBroker: BrokerNode
   defaultStrategy: TradingStrategyNode
+  defaultAutopilotModifier: SettingsDefaultAutopilotModifier!
   databaseId: Int!
 }
 

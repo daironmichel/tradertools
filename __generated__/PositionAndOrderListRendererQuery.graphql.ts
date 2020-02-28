@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 32f749f4c19f77bd00a435e4ee78864f */
+/* @relayHash 98e3fd6416704e9c54b8c511054509fc */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -59,6 +59,12 @@ fragment PositionListItem_position on PositionType {
   pricePaid
   totalGain
   totalGainPct
+  autopilot {
+    status
+    state
+    errorMessage
+    id
+  }
 }
 
 fragment PositionList_viewer_15bWwS on ViewerType {
@@ -99,6 +105,13 @@ v2 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "symbol",
+  "args": null,
+  "storageKey": null
+},
+v3 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "status",
   "args": null,
   "storageKey": null
 };
@@ -180,6 +193,39 @@ return {
                 "name": "totalGainPct",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "autopilot",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "AutoPilotTaskNode",
+                "plural": false,
+                "selections": [
+                  (v3/*: any*/),
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "state",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "errorMessage",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "id",
+                    "args": null,
+                    "storageKey": null
+                  }
+                ]
               }
             ]
           },
@@ -242,13 +288,7 @@ return {
                 "args": null,
                 "storageKey": null
               },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "status",
-                "args": null,
-                "storageKey": null
-              },
+              (v3/*: any*/),
               {
                 "kind": "ScalarField",
                 "alias": null,
@@ -266,7 +306,7 @@ return {
     "operationKind": "query",
     "name": "PositionAndOrderListRendererQuery",
     "id": null,
-    "text": "query PositionAndOrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionAndOrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  filledQuantity\n  orderedQuantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionAndOrderList_viewer_15bWwS on ViewerType {\n  ...PositionList_viewer_15bWwS\n  ...OrderList_viewer_15bWwS\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
+    "text": "query PositionAndOrderListRendererQuery(\n  $providerId: ID!\n  $accountId: ID\n) {\n  viewer {\n    ...PositionAndOrderList_viewer_15bWwS\n  }\n}\n\nfragment OrderListItem_order on OrderType {\n  orderId\n  symbol\n  filledQuantity\n  orderedQuantity\n  limitPrice\n  stopPrice\n  stopLimitPrice\n  executionPrice\n  status\n  action\n}\n\nfragment OrderList_viewer_15bWwS on ViewerType {\n  orders(providerId: $providerId, accountId: $accountId) {\n    ...OrderListItem_order\n  }\n}\n\nfragment PositionAndOrderList_viewer_15bWwS on ViewerType {\n  ...PositionList_viewer_15bWwS\n  ...OrderList_viewer_15bWwS\n}\n\nfragment PositionListItem_position on PositionType {\n  symbol\n  quantity\n  pricePaid\n  totalGain\n  totalGainPct\n  autopilot {\n    status\n    state\n    errorMessage\n    id\n  }\n}\n\nfragment PositionList_viewer_15bWwS on ViewerType {\n  positions(providerId: $providerId, accountId: $accountId) {\n    ...PositionListItem_position\n  }\n}\n",
     "metadata": {}
   }
 };

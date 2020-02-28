@@ -10,6 +10,7 @@ interface Props {
   relay: RelayRefetchProp;
   viewer: PositionAndOrderList_viewer;
   providerId: string;
+  selectedStrategyId?: number;
   autoRefetch?: number;
 }
 
@@ -55,14 +56,19 @@ class PositionAndOrderList extends Component<Props, State> {
   };
 
   render(): JSX.Element {
-    const { viewer, providerId } = this.props;
+    const { viewer, providerId, selectedStrategyId } = this.props;
     const { refetchError } = this.state;
 
     return refetchError ? (
       <ErrorState title="Error fetching positions" description={refetchError.message} />
     ) : (
       <>
-        <PositionList viewer={viewer} providerId={providerId} autoRefetch={false} />
+        <PositionList
+          viewer={viewer}
+          providerId={providerId}
+          autoRefetch={false}
+          selectedStrategyId={selectedStrategyId}
+        />
         <OrderList viewer={viewer} providerId={providerId} autoRefetch={false} />
       </>
     );

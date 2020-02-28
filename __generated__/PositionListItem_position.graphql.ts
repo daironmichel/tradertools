@@ -2,12 +2,19 @@
 
 import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
+export type AutoPilotTaskState = "BUYING" | "ERROR" | "SELLING" | "WATCHING" | "%future added value";
+export type AutoPilotTaskStatus = "DONE" | "PAUSED" | "QUEUED" | "READY" | "RUNNING" | "%future added value";
 export type PositionListItem_position = {
     readonly symbol: string;
     readonly quantity: number;
     readonly pricePaid: unknown;
     readonly totalGain: unknown;
     readonly totalGainPct: unknown;
+    readonly autopilot: {
+        readonly status: AutoPilotTaskStatus;
+        readonly state: AutoPilotTaskState;
+        readonly errorMessage: string;
+    } | null;
     readonly " $refType": "PositionListItem_position";
 };
 export type PositionListItem_position$data = PositionListItem_position;
@@ -59,8 +66,40 @@ const node: ReaderFragment = {
       "name": "totalGainPct",
       "args": null,
       "storageKey": null
+    },
+    {
+      "kind": "LinkedField",
+      "alias": null,
+      "name": "autopilot",
+      "storageKey": null,
+      "args": null,
+      "concreteType": "AutoPilotTaskNode",
+      "plural": false,
+      "selections": [
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "status",
+          "args": null,
+          "storageKey": null
+        },
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "state",
+          "args": null,
+          "storageKey": null
+        },
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "errorMessage",
+          "args": null,
+          "storageKey": null
+        }
+      ]
     }
   ]
 };
-(node as any).hash = 'e252cb16c64bffd05de44e42a6d950a5';
+(node as any).hash = '8332f5ebb46c0e4c1c2dafb0c9d41a62';
 export default node;

@@ -12,18 +12,21 @@ import {
   Popover,
   Menu,
   Position as MenuPosition,
+  Tooltip,
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from 'mutations/Order/SellStockMutation';
 import StopLossMutation from 'mutations/Order/StopLossMutation';
-import StopProfitMutation from 'mutations/Order/StopProfitMutation';
 import toaster from '../toaster';
 import At from 'components/generic/At';
 import Small from 'components/generic/Small';
+import AutoPilotONMutation from 'mutations/Position/AutoPilotON';
+import AutoPilotOFFMutation from 'mutations/Position/AutoPilotOFF';
 
 interface Props {
   position: Position;
   providerId: string;
+  selectedStrategyId?: number;
 }
 
 interface State {
@@ -79,39 +82,78 @@ class PositionListItem extends Component<Props, State> {
     this.setState({ loading: false });
   };
 
-  handleStopProfitOnClick = (): void => {
-    const { position, providerId } = this.props;
-    this.stopProfit(providerId, position.symbol);
+  handleAutoPilotOnClick = (): void => {
+    const { position, providerId, selectedStrategyId } = this.props;
+    if (!selectedStrategyId) return;
+    this.autoPilotON(providerId, selectedStrategyId.toString(), position.symbol);
   };
 
-  stopProfit = (providerId: string, symbol: string): void => {
+  autoPilotON = (providerId: string, strategyId: string, symbol: string): void => {
     this.setState({ loading: true });
-    const sell = new StopProfitMutation();
-    sell.commit({ providerId, symbol }, this.stopProfitCompleted, this.stopProfitError);
+    const apON = new AutoPilotONMutation();
+    apON.commit({ providerId, strategyId, symbol }, this.autoPilotONCompleted, this.autoPilotONError);
   };
 
-  stopProfitCompleted = (): void => {
+  autoPilotONCompleted = (): void => {
     this.setState({ loading: false });
-    toaster.showSuccess('Sell order placed.');
+    toaster.showSuccess('Auto Pilot Engaged.');
   };
 
-  stopProfitError = (): void => {
+  autoPilotONError = (): void => {
+    this.setState({ loading: false });
+  };
+
+  handleAutoPilotOffClick = (): void => {
+    const { position } = this.props;
+    this.autoPilotOFF(position.symbol);
+  };
+
+  autoPilotOFF = (symbol: string): void => {
+    this.setState({ loading: true });
+    const apOFF = new AutoPilotOFFMutation();
+    apOFF.commit({ symbol }, this.autoPilotONCompleted, this.autoPilotONError);
+  };
+
+  autoPilotOFFCompleted = (): void => {
+    this.setState({ loading: false });
+    toaster.showSuccess('Auto Pilot Disengaged.');
+  };
+
+  autoPilotOFFError = (): void => {
     this.setState({ loading: false });
   };
 
   render(): JSX.Element {
-    const { position } = this.props;
+    const { position, selectedStrategyId } = this.props;
     const { loading } = this.state;
     const totalGain = position.totalGain as string;
     const totalGainPct = position.totalGainPct as string;
     const loss = parseFloat(totalGain) < 0;
     const gainDisplay = totalGain.replace('-', '');
     const gainPercentDisplay = totalGainPct.replace('-', '');
+    const autopilot = position.autopilot;
     return (
       <Card css={{ padding: 0 }}>
         <Flex alignItems="center">
           <Box flex="1" m={2}>
-            {position.symbol}
+            <Flex justifyContent="center">
+              <Box>{position.symbol}</Box>
+
+              {autopilot && (
+                <Box css={{ '> *': { marginLeft: 5 } }}>
+                  {autopilot.status === 'READY' && <Icon icon={IconNames.TAXI} />}
+                  {autopilot.status === 'RUNNING' && <Icon icon={IconNames.TAXI} intent={Intent.SUCCESS} />}
+                  {autopilot.status === 'PAUSED' && (
+                    <>
+                      <Icon icon={IconNames.TAXI} />
+                      <Tooltip content={autopilot.errorMessage} intent={Intent.WARNING}>
+                        <Icon icon={IconNames.WARNING_SIGN} intent={Intent.WARNING} />
+                      </Tooltip>
+                    </>
+                  )}
+                </Box>
+              )}
+            </Flex>
           </Box>
           <Flex m={2} justifyContent="flex-end">
             {position.quantity}
@@ -137,8 +179,19 @@ class PositionListItem extends Component<Props, State> {
               content={
                 <Menu>
                   <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Loss" onClick={this.handleStopLossOnClick} />
-                  <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Profit" onClick={this.handleStopProfitOnClick} />
-                  <Menu.Item icon={IconNames.TAXI} text="Auto Pilot" />
+                  <Menu.Divider />
+                  <Menu.Item
+                    icon={<Icon icon={IconNames.POWER} intent={Intent.SUCCESS} />}
+                    text="Auto Pilot ON"
+                    disabled={!selectedStrategyId}
+                    onClick={this.handleAutoPilotOnClick}
+                  />
+                  <Menu.Item
+                    icon={<Icon icon={IconNames.POWER} intent={Intent.DANGER} />}
+                    text="Auto Pilot OFF"
+                    disabled={!autopilot}
+                    onClick={this.handleAutoPilotOffClick}
+                  />
                 </Menu>
               }
             >
@@ -159,6 +212,11 @@ export default createFragmentContainer(PositionListItem, {
       pricePaid
       totalGain
       totalGainPct
+      autopilot {
+        status
+        state
+        errorMessage
+      }
     }
   `,
 });

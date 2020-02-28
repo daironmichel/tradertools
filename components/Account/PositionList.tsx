@@ -12,6 +12,7 @@ interface Props {
   relay: RelayRefetchProp;
   viewer: PositionList_viewer;
   providerId: string;
+  selectedStrategyId?: number;
   autoRefetch?: boolean;
 }
 
@@ -57,7 +58,7 @@ class PositionList extends Component<Props, State> {
   };
 
   render(): JSX.Element {
-    const { viewer, providerId } = this.props;
+    const { viewer, providerId, selectedStrategyId } = this.props;
     const { refetchError } = this.state;
 
     return (
@@ -71,7 +72,12 @@ class PositionList extends Component<Props, State> {
           <Box css={{ '> div': { marginBottom: 4 } }}>
             {viewer.positions.length > 0 ? (
               viewer.positions.map((position, idx) => (
-                <PositionListItem key={idx} position={position} providerId={providerId} />
+                <PositionListItem
+                  key={idx}
+                  position={position}
+                  providerId={providerId}
+                  selectedStrategyId={selectedStrategyId}
+                />
               ))
             ) : (
               <Callout icon={IconNames.INBOX}>No positions to show at this moment...</Callout>
