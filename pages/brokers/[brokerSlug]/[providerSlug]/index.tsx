@@ -12,8 +12,11 @@ import {
   Menu,
   MenuItem,
   Position,
+  Classes,
+  Callout,
+  Colors,
 } from '@blueprintjs/core';
-import { Flex } from 'rebass';
+import { Flex, Box } from 'rebass';
 import Layout from '../../../../components/Layout';
 import { ProviderSlugQueryResponse } from '../../../../__generated__/ProviderSlugQuery.graphql';
 import { IconNames } from '@blueprintjs/icons';
@@ -27,6 +30,7 @@ import BuyStockMutation from '../../../../mutations/Order/BuyStockMutation';
 import ErrorState from '../../../../components/generic/ErrorState';
 import PositionAndOrderListRenderer from '../../../../components/Account/PositionAndOrderListRenderer';
 import toaster from '../../../../components/toaster';
+import numeral from 'numeral';
 
 type TradingStrategy = ProviderSlugQueryResponse['viewer']['tradingStrategies'][0];
 
@@ -37,6 +41,7 @@ interface State {
   selectedStrategy: TradingStrategy | null;
   symbol: string;
   connectError: PayloadError | Error | null;
+  syncAccountsNeeded: boolean;
 }
 
 class Index extends React.Component<Props, State> {
@@ -71,7 +76,15 @@ class Index extends React.Component<Props, State> {
             databaseId
             name
             sessionStatus
+            accountKey
           }
+        }
+        accounts {
+          accountKey
+          name
+          netCash
+          cashAvailableForInvestment
+          cashBuyingPower
         }
       }
     }
@@ -90,6 +103,7 @@ class Index extends React.Component<Props, State> {
       selectedStrategy: defaultStrategy || null,
       symbol: '',
       connectError: null,
+      syncAccountsNeeded: true,
     };
   }
 
@@ -180,7 +194,7 @@ class Index extends React.Component<Props, State> {
   };
 
   syncAccountsCompleted = (): void => {
-    this.setState({ loading: false });
+    this.setState({ loading: false, syncAccountsNeeded: false });
     toaster.showSuccess('Accounts synched.');
   };
 
@@ -229,7 +243,7 @@ class Index extends React.Component<Props, State> {
   };
 
   buyCompleted = (): void => {
-    this.setState({ loading: false });
+    this.setState({ loading: false, syncAccountsNeeded: true });
     toaster.showSuccess('Buy order placed.');
   };
 
@@ -239,15 +253,26 @@ class Index extends React.Component<Props, State> {
 
   render(): JSX.Element {
     const { viewer } = this.props;
-    const { broker, tradingStrategies, settings } = viewer;
+    const { broker, tradingStrategies, settings, accounts } = viewer;
     const { serviceProvider } = broker || {};
     const { sessionStatus = 'CLOSED' } = serviceProvider || {};
 
-    const { selectedStrategy, symbol, loading, connectError } = this.state;
+    const { selectedStrategy, symbol, loading, connectError, syncAccountsNeeded } = this.state;
 
     if (!broker || !serviceProvider) {
       return <Error title="Not Found" description="There's nothing to see here." />;
     }
+
+    const defaultAccount = accounts.find(a => a.accountKey === serviceProvider.accountKey);
+
+    if (!defaultAccount) {
+      return <Error title="Not Found" description="Default account not configured." />;
+    }
+
+    const { netCash, cashAvailableForInvestment } = defaultAccount;
+    const exposurePercent = selectedStrategy?.exposurePercent || 0;
+    const exposureAmount = netCash * (exposurePercent / 100);
+    const funded = exposureAmount < cashAvailableForInvestment;
 
     return (
       <Layout>
@@ -290,7 +315,40 @@ class Index extends React.Component<Props, State> {
                 p={3}
                 css={{ '> *': { marginBottom: 15 } }}
               >
-                <Button large fill text="Sync Accounts" onClick={this.handleSyncOnClick} disabled={loading} />
+                <Callout intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE}>
+                  <Box>
+                    Accont Value: <span className={Classes.MONOSPACE_TEXT}>{numeral(netCash).format('0,0.00')}</span>
+                  </Box>
+                  <Box>
+                    Buying Power:{' '}
+                    <span className={Classes.MONOSPACE_TEXT}>
+                      {numeral(cashAvailableForInvestment).format('0,0.00')}
+                    </span>
+                  </Box>
+                  <Box>
+                    Exposure:{' '}
+                    <span className={Classes.MONOSPACE_TEXT} css={{ color: funded ? Colors.GREEN3 : Colors.RED3 }}>
+                      {numeral(exposureAmount).format('0,0.00')}
+                    </span>
+                  </Box>
+                  <Button
+                    large
+                    fill
+                    intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE}
+                    text={
+                      <Box>
+                        <div>Sync Accounts</div>
+                        {syncAccountsNeeded && (
+                          <div className={Classes.TEXT_MUTED}>
+                            <small>needed</small>
+                          </div>
+                        )}
+                      </Box>
+                    }
+                    onClick={this.handleSyncOnClick}
+                    disabled={loading}
+                  />
+                </Callout>
                 <form onSubmit={this.handleBuyOnSubmit} css={{ width: '100%' }}>
                   <ControlGroup css={{ width: '100%' }}>
                     <InputGroup

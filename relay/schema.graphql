@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Thu Feb 27 2020 07:37:48 GMT-0500 (Eastern Standard Time)
+# timestamp: Tue Mar 03 2020 07:16:56 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -42,6 +42,8 @@ type AccountNode implements Node & DatabaseId {
   accountMode: AccountAccountMode!
   accountStatus: AccountAccountStatus!
   pdtStatus: String!
+  netCash: Float!
+  cashAvailableForInvestment: Float!
   cashBalance: Float!
   cashBuyingPower: Float!
   marginBuyingPower: Float!
@@ -206,6 +208,7 @@ type BrokerNode implements Node & DatabaseId {
 
 enum BuyStockError {
   ACCOUNT_NOT_PROVIDED
+  INSUFFICIENT_FUNDS
 }
 
 input BuyStockInput {
