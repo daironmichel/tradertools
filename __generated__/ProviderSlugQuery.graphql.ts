@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash d7374423a27dcfdb8fcded2a7a00e898 */
+/* @relayHash 3a8f578f39fc33e95578bdf22681b604 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -43,7 +43,7 @@ export type ProviderSlugQueryResponse = {
         readonly accounts: ReadonlyArray<{
             readonly accountKey: string;
             readonly name: string;
-            readonly netCash: number;
+            readonly totalAccountValue: number;
             readonly cashAvailableForInvestment: number;
             readonly cashBuyingPower: number;
         }>;
@@ -97,7 +97,7 @@ query ProviderSlugQuery(
     accounts {
       accountKey
       name
-      netCash
+      totalAccountValue
       cashAvailableForInvestment
       cashBuyingPower
       id
@@ -253,7 +253,7 @@ v9 = {
 v10 = {
   "kind": "ScalarField",
   "alias": null,
-  "name": "netCash",
+  "name": "totalAccountValue",
   "args": null,
   "storageKey": null
 },
@@ -379,10 +379,10 @@ return {
     "operationKind": "query",
     "name": "ProviderSlugQuery",
     "id": null,
-    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n    }\n    accounts {\n      accountKey\n      name\n      netCash\n      cashAvailableForInvestment\n      cashBuyingPower\n      id\n    }\n  }\n}\n",
+    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n    }\n    accounts {\n      accountKey\n      name\n      totalAccountValue\n      cashAvailableForInvestment\n      cashBuyingPower\n      id\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'd8bed22f430aaa91884fa7ea5fc50f32';
+(node as any).hash = '21d3e588ca537ebcb8def04d61610bf8';
 export default node;

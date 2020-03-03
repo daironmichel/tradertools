@@ -82,7 +82,7 @@ class Index extends React.Component<Props, State> {
         accounts {
           accountKey
           name
-          netCash
+          totalAccountValue
           cashAvailableForInvestment
           cashBuyingPower
         }
@@ -269,9 +269,9 @@ class Index extends React.Component<Props, State> {
       return <Error title="Not Found" description="Default account not configured." />;
     }
 
-    const { netCash, cashAvailableForInvestment } = defaultAccount;
+    const { totalAccountValue, cashAvailableForInvestment } = defaultAccount;
     const exposurePercent = selectedStrategy?.exposurePercent || 0;
-    const exposureAmount = netCash * (exposurePercent / 100);
+    const exposureAmount = totalAccountValue * (exposurePercent / 100);
     const funded = exposureAmount < cashAvailableForInvestment;
 
     return (
@@ -317,7 +317,8 @@ class Index extends React.Component<Props, State> {
               >
                 <Callout intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE}>
                   <Box>
-                    Accont Value: <span className={Classes.MONOSPACE_TEXT}>{numeral(netCash).format('0,0.00')}</span>
+                    Accont Value:{' '}
+                    <span className={Classes.MONOSPACE_TEXT}>{numeral(totalAccountValue).format('0,0.00')}</span>
                   </Box>
                   <Box>
                     Buying Power:{' '}
@@ -334,7 +335,6 @@ class Index extends React.Component<Props, State> {
                   <Button
                     large
                     fill
-                    intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE}
                     text={
                       <Box>
                         <div>Sync Accounts</div>

@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Tue Mar 03 2020 07:16:56 GMT-0500 (Eastern Standard Time)
+# timestamp: Tue Mar 03 2020 09:14:16 GMT-0500 (Eastern Standard Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -42,6 +42,8 @@ type AccountNode implements Node & DatabaseId {
   accountMode: AccountAccountMode!
   accountStatus: AccountAccountStatus!
   pdtStatus: String!
+  totalAccountValue: Float!
+  accountBalance: Float!
   netCash: Float!
   cashAvailableForInvestment: Float!
   cashBalance: Float!
