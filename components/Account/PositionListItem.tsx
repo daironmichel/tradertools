@@ -22,6 +22,8 @@ import At from 'components/generic/At';
 import Small from 'components/generic/Small';
 import AutoPilotONMutation from 'mutations/Position/AutoPilotON';
 import AutoPilotOFFMutation from 'mutations/Position/AutoPilotOFF';
+import { AutoPilotONMutationResponse } from 'gen/AutoPilotONMutation.graphql';
+import { AutoPilotOFFMutationResponse } from 'gen/AutoPilotOFFMutation.graphql';
 
 interface Props {
   position: Position;
@@ -94,9 +96,11 @@ class PositionListItem extends Component<Props, State> {
     apON.commit({ providerId, strategyId, symbol }, this.autoPilotONCompleted, this.autoPilotONError);
   };
 
-  autoPilotONCompleted = (): void => {
+  autoPilotONCompleted = (response: AutoPilotONMutationResponse): void => {
     this.setState({ loading: false });
-    toaster.showSuccess('Auto Pilot Engaged.');
+    if (!response.autoPilotOn.error) {
+      toaster.showSuccess('Auto Pilot Engaged.');
+    }
   };
 
   autoPilotONError = (): void => {
@@ -111,12 +115,14 @@ class PositionListItem extends Component<Props, State> {
   autoPilotOFF = (symbol: string): void => {
     this.setState({ loading: true });
     const apOFF = new AutoPilotOFFMutation();
-    apOFF.commit({ symbol }, this.autoPilotONCompleted, this.autoPilotONError);
+    apOFF.commit({ symbol }, this.autoPilotOFFCompleted, this.autoPilotOFFError);
   };
 
-  autoPilotOFFCompleted = (): void => {
+  autoPilotOFFCompleted = (response: AutoPilotOFFMutationResponse): void => {
     this.setState({ loading: false });
-    toaster.showSuccess('Auto Pilot Disengaged.');
+    if (!response.autoPilotOff.error) {
+      toaster.showSuccess('Auto Pilot Disengaged.');
+    }
   };
 
   autoPilotOFFError = (): void => {
