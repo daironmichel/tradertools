@@ -78,13 +78,18 @@ class Index extends React.Component<Props, State> {
             sessionStatus
             accountKey
           }
-        }
-        accounts {
-          accountKey
-          name
-          totalAccountValue
-          cashAvailableForInvestment
-          cashBuyingPower
+          accounts {
+            edges {
+              node {
+                id
+                accountKey
+                name
+                totalAccountValue
+                cashAvailableForInvestment
+                cashBuyingPower
+              }
+            }
+          }
         }
       }
     }
@@ -253,9 +258,10 @@ class Index extends React.Component<Props, State> {
 
   render(): JSX.Element {
     const { viewer } = this.props;
-    const { broker, tradingStrategies, settings, accounts } = viewer;
-    const { serviceProvider } = broker || {};
+    const { broker, tradingStrategies, settings } = viewer;
+    const { serviceProvider, accounts } = broker || {};
     const { sessionStatus = 'CLOSED' } = serviceProvider || {};
+    const accountEdges = accounts?.edges || [];
 
     const { selectedStrategy, symbol, loading, connectError, syncAccountsNeeded } = this.state;
 
@@ -263,13 +269,13 @@ class Index extends React.Component<Props, State> {
       return <Error title="Not Found" description="There's nothing to see here." />;
     }
 
-    const defaultAccount = accounts.find(a => a.accountKey === serviceProvider.accountKey);
+    const defaultAccount = accountEdges.find(a => a.node.accountKey === serviceProvider.accountKey);
 
     if (!defaultAccount) {
       return <Error title="Not Found" description="Default account not configured." />;
     }
 
-    const { totalAccountValue, cashAvailableForInvestment } = defaultAccount;
+    const { totalAccountValue, cashAvailableForInvestment } = defaultAccount.node;
     const exposurePercent = selectedStrategy?.exposurePercent || 0;
     const exposureAmount = totalAccountValue * (exposurePercent / 100);
     const funded = exposureAmount < cashAvailableForInvestment;
@@ -315,7 +321,7 @@ class Index extends React.Component<Props, State> {
                 p={3}
                 css={{ '> *': { marginBottom: 15 } }}
               >
-                <Callout intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE}>
+                <Callout intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE} css={{ marginTop: 0 }}>
                   <Box>
                     Accont Value:{' '}
                     <span className={Classes.MONOSPACE_TEXT}>{numeral(totalAccountValue).format('0,0.00')}</span>

@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 3a8f578f39fc33e95578bdf22681b604 */
+/* @relayHash 425912f78f594b7b02b5ad9f6adb86c6 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -39,14 +39,19 @@ export type ProviderSlugQueryResponse = {
                 readonly sessionStatus: SessionStatus;
                 readonly accountKey: string;
             } | null;
+            readonly accounts: {
+                readonly edges: ReadonlyArray<{
+                    readonly node: {
+                        readonly id: string;
+                        readonly accountKey: string;
+                        readonly name: string;
+                        readonly totalAccountValue: number;
+                        readonly cashAvailableForInvestment: number;
+                        readonly cashBuyingPower: number;
+                    };
+                }>;
+            };
         } | null;
-        readonly accounts: ReadonlyArray<{
-            readonly accountKey: string;
-            readonly name: string;
-            readonly totalAccountValue: number;
-            readonly cashAvailableForInvestment: number;
-            readonly cashBuyingPower: number;
-        }>;
     };
 };
 export type ProviderSlugQuery = {
@@ -93,14 +98,18 @@ query ProviderSlugQuery(
         sessionStatus
         accountKey
       }
-    }
-    accounts {
-      accountKey
-      name
-      totalAccountValue
-      cashAvailableForInvestment
-      cashBuyingPower
-      id
+      accounts {
+        edges {
+          node {
+            id
+            accountKey
+            name
+            totalAccountValue
+            cashAvailableForInvestment
+            cashBuyingPower
+          }
+        }
+      }
     }
   }
 }
@@ -247,29 +256,65 @@ v9 = {
         },
         (v8/*: any*/)
       ]
+    },
+    {
+      "kind": "LinkedField",
+      "alias": null,
+      "name": "accounts",
+      "storageKey": null,
+      "args": null,
+      "concreteType": "AccountConnection",
+      "plural": false,
+      "selections": [
+        {
+          "kind": "LinkedField",
+          "alias": null,
+          "name": "edges",
+          "storageKey": null,
+          "args": null,
+          "concreteType": "AccountEdge",
+          "plural": true,
+          "selections": [
+            {
+              "kind": "LinkedField",
+              "alias": null,
+              "name": "node",
+              "storageKey": null,
+              "args": null,
+              "concreteType": "AccountNode",
+              "plural": false,
+              "selections": [
+                (v2/*: any*/),
+                (v8/*: any*/),
+                (v4/*: any*/),
+                {
+                  "kind": "ScalarField",
+                  "alias": null,
+                  "name": "totalAccountValue",
+                  "args": null,
+                  "storageKey": null
+                },
+                {
+                  "kind": "ScalarField",
+                  "alias": null,
+                  "name": "cashAvailableForInvestment",
+                  "args": null,
+                  "storageKey": null
+                },
+                {
+                  "kind": "ScalarField",
+                  "alias": null,
+                  "name": "cashBuyingPower",
+                  "args": null,
+                  "storageKey": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
-},
-v10 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "totalAccountValue",
-  "args": null,
-  "storageKey": null
-},
-v11 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "cashAvailableForInvestment",
-  "args": null,
-  "storageKey": null
-},
-v12 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "cashBuyingPower",
-  "args": null,
-  "storageKey": null
 };
 return {
   "kind": "Request",
@@ -303,23 +348,7 @@ return {
             ]
           },
           (v7/*: any*/),
-          (v9/*: any*/),
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "accounts",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "AccountNode",
-            "plural": true,
-            "selections": [
-              (v8/*: any*/),
-              (v4/*: any*/),
-              (v10/*: any*/),
-              (v11/*: any*/),
-              (v12/*: any*/)
-            ]
-          }
+          (v9/*: any*/)
         ]
       }
     ]
@@ -353,24 +382,7 @@ return {
             ]
           },
           (v7/*: any*/),
-          (v9/*: any*/),
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "accounts",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "AccountNode",
-            "plural": true,
-            "selections": [
-              (v8/*: any*/),
-              (v4/*: any*/),
-              (v10/*: any*/),
-              (v11/*: any*/),
-              (v12/*: any*/),
-              (v2/*: any*/)
-            ]
-          }
+          (v9/*: any*/)
         ]
       }
     ]
@@ -379,10 +391,10 @@ return {
     "operationKind": "query",
     "name": "ProviderSlugQuery",
     "id": null,
-    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n    }\n    accounts {\n      accountKey\n      name\n      totalAccountValue\n      cashAvailableForInvestment\n      cashBuyingPower\n      id\n    }\n  }\n}\n",
+    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n            cashBuyingPower\n          }\n        }\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '21d3e588ca537ebcb8def04d61610bf8';
+(node as any).hash = 'b8f410b6b7a3e507f9a1011d4660ac16';
 export default node;

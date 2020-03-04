@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash e935db1827521f1783c99e3c1ed69f61 */
+/* @relayHash b940b4e66d9382bacd4a2c6df59c4939 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type AuthorizeConnectionError = "INCOMPATIBLE_STATE" | "MISSING_REQUIRED_FIELD" | "PROVIDER_NOT_FOUND" | "%future added value";
@@ -20,9 +20,11 @@ export type SyncAccountsMutationResponse = {
                 readonly edges: ReadonlyArray<{
                     readonly node: {
                         readonly id: string;
-                        readonly name: string;
-                        readonly accountId: string;
                         readonly accountKey: string;
+                        readonly name: string;
+                        readonly totalAccountValue: number;
+                        readonly cashAvailableForInvestment: number;
+                        readonly cashBuyingPower: number;
                     };
                 }>;
             };
@@ -49,9 +51,11 @@ mutation SyncAccountsMutation(
         edges {
           node {
             id
-            name
-            accountId
             accountKey
+            name
+            totalAccountValue
+            cashAvailableForInvestment
+            cashBuyingPower
           }
         }
       }
@@ -147,6 +151,13 @@ v2 = [
                       {
                         "kind": "ScalarField",
                         "alias": null,
+                        "name": "accountKey",
+                        "args": null,
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
                         "name": "name",
                         "args": null,
                         "storageKey": null
@@ -154,14 +165,21 @@ v2 = [
                       {
                         "kind": "ScalarField",
                         "alias": null,
-                        "name": "accountId",
+                        "name": "totalAccountValue",
                         "args": null,
                         "storageKey": null
                       },
                       {
                         "kind": "ScalarField",
                         "alias": null,
-                        "name": "accountKey",
+                        "name": "cashAvailableForInvestment",
+                        "args": null,
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "name": "cashBuyingPower",
                         "args": null,
                         "storageKey": null
                       }
@@ -196,10 +214,10 @@ return {
     "operationKind": "mutation",
     "name": "SyncAccountsMutation",
     "id": null,
-    "text": "mutation SyncAccountsMutation(\n  $input: SyncAccountsInput!\n) {\n  syncAccounts(input: $input) {\n    error\n    errorMessage\n    broker {\n      id\n      accounts {\n        edges {\n          node {\n            id\n            name\n            accountId\n            accountKey\n          }\n        }\n      }\n    }\n  }\n}\n",
+    "text": "mutation SyncAccountsMutation(\n  $input: SyncAccountsInput!\n) {\n  syncAccounts(input: $input) {\n    error\n    errorMessage\n    broker {\n      id\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n            cashBuyingPower\n          }\n        }\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '0f522aaa746fa764eb7f797caca6cc4d';
+(node as any).hash = '3b24ea55a206e42ac70e7a18f79ee526';
 export default node;

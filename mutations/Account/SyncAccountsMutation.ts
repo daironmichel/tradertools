@@ -15,9 +15,11 @@ export default class SyncAccountsMutation extends Mutation<SyncAccountsMutationT
             edges {
               node {
                 id
-                name
-                accountId
                 accountKey
+                name
+                totalAccountValue
+                cashAvailableForInvestment
+                cashBuyingPower
               }
             }
           }
