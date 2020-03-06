@@ -86,7 +86,6 @@ class Index extends React.Component<Props, State> {
                 name
                 totalAccountValue
                 cashAvailableForInvestment
-                cashBuyingPower
               }
             }
           }
@@ -322,38 +321,32 @@ class Index extends React.Component<Props, State> {
                 css={{ '> *': { marginBottom: 15 } }}
               >
                 <Callout intent={syncAccountsNeeded ? Intent.WARNING : Intent.NONE} css={{ marginTop: 0 }}>
-                  <Box>
-                    Accont Value:{' '}
-                    <span className={Classes.MONOSPACE_TEXT}>{numeral(totalAccountValue).format('0,0.00')}</span>
-                  </Box>
-                  <Box>
-                    Buying Power:{' '}
-                    <span className={Classes.MONOSPACE_TEXT}>
-                      {numeral(cashAvailableForInvestment).format('0,0.00')}
-                    </span>
-                  </Box>
-                  <Box>
-                    Exposure:{' '}
-                    <span className={Classes.MONOSPACE_TEXT} css={{ color: funded ? Colors.GREEN3 : Colors.RED3 }}>
-                      {numeral(exposureAmount).format('0,0.00')}
-                    </span>
-                  </Box>
-                  <Button
-                    large
-                    fill
-                    text={
+                  <Flex justifyContent="space-between">
+                    <Box>
                       <Box>
-                        <div>Sync Accounts</div>
-                        {syncAccountsNeeded && (
-                          <div className={Classes.TEXT_MUTED}>
-                            <small>needed</small>
-                          </div>
-                        )}
+                        Accont Value: <span>{numeral(totalAccountValue).format('0,0.00')}</span>
                       </Box>
-                    }
-                    onClick={this.handleSyncOnClick}
-                    disabled={loading}
-                  />
+                      <Box>
+                        Buying Power: <span>{numeral(cashAvailableForInvestment).format('0,0.00')}</span>
+                      </Box>
+                      <Box>
+                        Exposure:{' '}
+                        <span css={{ color: funded ? Colors.GREEN3 : Colors.RED3 }}>
+                          {numeral(exposureAmount).format('0,0.00')}
+                        </span>
+                      </Box>
+                    </Box>
+                    {syncAccountsNeeded && (
+                      <Button
+                        large
+                        minimal
+                        intent={Intent.WARNING}
+                        icon={IconNames.REFRESH}
+                        onClick={this.handleSyncOnClick}
+                        disabled={loading}
+                      />
+                    )}
+                  </Flex>
                 </Callout>
                 <form onSubmit={this.handleBuyOnSubmit} css={{ width: '100%' }}>
                   <ControlGroup css={{ width: '100%' }}>

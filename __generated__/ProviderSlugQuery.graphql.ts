@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 425912f78f594b7b02b5ad9f6adb86c6 */
+/* @relayHash 52e19081b02ca22a75dbd381f84a87bd */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -47,7 +47,6 @@ export type ProviderSlugQueryResponse = {
                         readonly name: string;
                         readonly totalAccountValue: number;
                         readonly cashAvailableForInvestment: number;
-                        readonly cashBuyingPower: number;
                     };
                 }>;
             };
@@ -106,7 +105,6 @@ query ProviderSlugQuery(
             name
             totalAccountValue
             cashAvailableForInvestment
-            cashBuyingPower
           }
         }
       }
@@ -300,13 +298,6 @@ v9 = {
                   "name": "cashAvailableForInvestment",
                   "args": null,
                   "storageKey": null
-                },
-                {
-                  "kind": "ScalarField",
-                  "alias": null,
-                  "name": "cashBuyingPower",
-                  "args": null,
-                  "storageKey": null
                 }
               ]
             }
@@ -391,10 +382,10 @@ return {
     "operationKind": "query",
     "name": "ProviderSlugQuery",
     "id": null,
-    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n            cashBuyingPower\n          }\n        }\n      }\n    }\n  }\n}\n",
+    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n          }\n        }\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'b8f410b6b7a3e507f9a1011d4660ac16';
+(node as any).hash = 'ef25b114c574035871a627ccf162daa3';
 export default node;

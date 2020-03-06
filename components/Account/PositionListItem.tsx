@@ -13,6 +13,7 @@ import {
   Menu,
   Position as MenuPosition,
   Tooltip,
+  Classes,
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from 'mutations/Order/SellStockMutation';
@@ -142,16 +143,22 @@ class PositionListItem extends Component<Props, State> {
       <Card css={{ padding: 0 }}>
         <Flex alignItems="center">
           <Box flex="1" m={2}>
-            <Flex justifyContent="center">
+            <Flex alignItems="center">
               <Box>{position.symbol}</Box>
-
               {autopilot && (
                 <Box css={{ '> *': { marginLeft: 5 } }}>
-                  {autopilot.status === 'READY' && <Icon icon={IconNames.TAXI} />}
-                  {autopilot.status === 'RUNNING' && <Icon icon={IconNames.TAXI} intent={Intent.SUCCESS} />}
+                  {autopilot.status === 'READY' && <Icon icon={IconNames.DRIVE_TIME} />}
+                  {autopilot.status === 'RUNNING' && (
+                    <>
+                      <Icon icon={IconNames.TAXI} intent={Intent.SUCCESS} />
+                      {autopilot.state === 'WATCHING' && <Icon icon={IconNames.EYE_OPEN} />}
+                      {autopilot.state === 'BUYING' && <Icon icon={IconNames.ADD} />}
+                      {autopilot.state === 'SELLING' && <Icon icon={IconNames.REMOVE} />}
+                    </>
+                  )}
                   {autopilot.status === 'PAUSED' && (
                     <>
-                      <Icon icon={IconNames.TAXI} />
+                      <Icon icon={IconNames.DRIVE_TIME} className={Classes.TEXT_DISABLED} />
                       <Tooltip content={autopilot.errorMessage} intent={Intent.WARNING}>
                         <Icon icon={IconNames.WARNING_SIGN} intent={Intent.WARNING} />
                       </Tooltip>
