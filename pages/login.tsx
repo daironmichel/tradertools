@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Themed from '../components/Themed';
 import { Flex, Box } from 'rebass';
@@ -11,13 +11,21 @@ import { useRouter } from 'next/router';
 
 const Login = (): JSX.Element => {
   const router = useRouter();
-  let next = null;
-  if (router.asPath.includes('?')) {
-    const queryString = router.asPath.substr(router.asPath.indexOf('?'));
-    const urlParams = new URLSearchParams(queryString);
-    next = urlParams.get('next');
-  }
-  console.log(next);
+  useEffect(() => {
+    const sessionCookie = document.cookie.match(/;*\s*sid\s*=/);
+    if (!sessionCookie) return;
+    let next = null;
+    if (router.asPath.includes('?')) {
+      const queryString = router.asPath.substr(router.asPath.indexOf('?'));
+      const urlParams = new URLSearchParams(queryString);
+      next = urlParams.get('next');
+    }
+
+    if (!next) return;
+
+    router.push(next);
+  }, []);
+
   return (
     <Themed>
       <Head>

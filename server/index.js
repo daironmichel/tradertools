@@ -135,7 +135,7 @@ app.prepare().then(async () => {
     method: 'GET',
     path: '/verify',
     options: {
-      auth: false,
+      auth: { mode: 'optional' },
       handler: async (request, h) => {
         // const { sid: session } = request.state;
         const { oauth_token: oauthToken, oauth_verifier: oauthVerifier } = request.query;
