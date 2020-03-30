@@ -11,18 +11,16 @@ import { useRouter } from 'next/router';
 
 const Login = (): JSX.Element => {
   const router = useRouter();
+  let next: string | null = null;
+  if (router.asPath.includes('?')) {
+    const queryString = router.asPath.substr(router.asPath.indexOf('?'));
+    const urlParams = new URLSearchParams(queryString);
+    next = urlParams.get('next');
+  }
+
   useEffect(() => {
     const sessionCookie = document.cookie.match(/;*\s*sid\s*=/);
-    if (!sessionCookie) return;
-    let next = null;
-    if (router.asPath.includes('?')) {
-      const queryString = router.asPath.substr(router.asPath.indexOf('?'));
-      const urlParams = new URLSearchParams(queryString);
-      next = urlParams.get('next');
-    }
-
-    if (!next) return;
-
+    if (!sessionCookie || !next) return;
     router.push(next);
   }, []);
 
