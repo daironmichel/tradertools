@@ -1,26 +1,50 @@
-import { createServer } from 'http';
-import { parse } from 'url';
 import next from 'next';
+import Hapi from 'hapi';
+import { pathWrapper, defaultHandlerWrapper, nextHandlerWrapper } from './next-wrapper';
 
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
-const handle = app.getRequestHandler();
+const server = new Hapi.Server({
+  port,
+});
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    const parsedUrl = parse(req.url!, true);
-    const { pathname, query } = parsedUrl;
+app.prepare().then(async () => {
+  server.route({
+    method: 'GET',
+    path: '/a',
+    handler: pathWrapper(app, '/a'),
+  });
 
-    if (pathname === '/a') {
-      app.render(req, res, '/a', query);
-    } else if (pathname === '/b') {
-      app.render(req, res, '/b', query);
-    } else {
-      handle(req, res, parsedUrl);
-    }
-  }).listen(port);
+  server.route({
+    method: 'GET',
+    path: '/b',
+    handler: pathWrapper(app, '/b'),
+  });
 
-  // tslint:disable-next-line:no-console
-  console.log(`> Server listening at http://localhost:${port} as ${dev ? 'development' : process.env.NODE_ENV}`);
+  server.route({
+    method: 'GET',
+    path: '/_next/{p*}' /* next specific routes */,
+    handler: nextHandlerWrapper(app),
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/static/{p*}' /* use next to handle static files */,
+    handler: nextHandlerWrapper(app),
+  });
+
+  server.route({
+    method: '*',
+    path: '/{p*}' /* catch all route */,
+    handler: defaultHandlerWrapper(app),
+  });
+
+  try {
+    await server.start();
+    console.log(`> Ready on http://localhost:${port}`);
+  } catch (error) {
+    console.log('Error starting server');
+    console.log(error);
+  }
 });
