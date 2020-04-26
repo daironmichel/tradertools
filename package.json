@@ -5,17 +5,25 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "migrate-make": "knex migrate:make --esm -x ts",
+    "migrate": "knex migrate:latest --esm",
+    "migrate-rollback": "knex migrate:rollback --esm",
+    "migrate-up": "knex migrate:up --esm",
+    "migrate-down": "knex migrate:down --esm"
   },
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
     "cross-env": "^7.0.2",
+    "knex": "^0.21.0",
     "next": "9.3.5",
+    "pg": "^8.0.3",
     "react": "16.13.1",
     "react-dom": "16.13.1"
   },
   "devDependencies": {
     "@types/hapi": "^18.0.3",
+    "@types/knex": "^0.16.1",
     "@types/node": "^13.13.2",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
