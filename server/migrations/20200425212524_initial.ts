@@ -4,10 +4,10 @@ export async function up(knex: Knex): Promise<any> {
   return knex.schema
     .createTable('user', function (table) {
       table.increments('id');
-      table.string('username', 255).notNullable();
-      table.string('password', 255).notNullable();
-      table.string('first_name', 255).notNullable();
-      table.string('last_name', 255).notNullable();
+      table.string('username', 150).notNullable();
+      table.string('password', 128).notNullable();
+      table.string('first_name', 50).notNullable();
+      table.string('last_name', 150).notNullable();
     })
     .createTable('broker', function (table) {
       table.increments('id');
@@ -15,7 +15,10 @@ export async function up(knex: Knex): Promise<any> {
       table.string('slug', 255).notNullable();
       table.integer('user_id').unsigned().notNullable().references('user.id').onDelete('CASCADE').index();
 
-      table.unique(['user_id', 'slug']);
+      table
+        .unique(['user_id', 'slug'])
+        .index(['slug'])
+        .index([knex.raw('slug varchar_pattern_ops')]);
     });
 }
 
