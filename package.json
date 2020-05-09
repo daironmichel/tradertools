@@ -10,7 +10,8 @@
     "migrate": "knex migrate:latest --esm",
     "migrate-rollback": "knex migrate:rollback --esm",
     "migrate-up": "knex migrate:up --esm",
-    "migrate-down": "knex migrate:down --esm"
+    "migrate-down": "knex migrate:down --esm",
+    "createuser": "ts-node --project tsconfig.server.json --transpile-only server/commands/createuser.ts"
   },
   "dependencies": {
     "@hapi/hapi": "^19.1.1",

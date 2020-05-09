@@ -2,26 +2,26 @@ import * as Knex from 'knex';
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema
-    .createTable('user', function (table) {
+    .createTable('User', function (table) {
       table.increments('id');
-      table.string('username', 150).notNullable();
-      table.string('password', 128).notNullable();
-      table.string('first_name', 50).notNullable();
-      table.string('last_name', 150).notNullable();
+      table.string('username', 150).notNullable().unique();
+      table.string('password', 198).notNullable();
+      table.string('firstName', 50).notNullable().defaultTo('');
+      table.string('lastName', 150).notNullable().defaultTo('');
     })
-    .createTable('broker', function (table) {
+    .createTable('Broker', function (table) {
       table.increments('id');
       table.string('name', 255).notNullable();
       table.string('slug', 255).notNullable();
-      table.integer('user_id').unsigned().notNullable().references('user.id').onDelete('CASCADE').index();
+      table.integer('userId').unsigned().notNullable().references('User.id').onDelete('CASCADE').index();
 
       table
-        .unique(['user_id', 'slug'])
+        .unique(['userId', 'slug'])
         .index(['slug'])
         .index([knex.raw('slug varchar_pattern_ops')]);
     });
 }
 
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema.dropTable('broker').dropTable('user');
+  return knex.schema.dropTable('Broker').dropTable('User');
 }
