@@ -1,6 +1,6 @@
 import next from 'next';
-import Hapi from 'hapi';
 import { pathWrapper, defaultHandlerWrapper, nextHandlerWrapper } from './next-wrapper';
+const Hapi = require('@hapi/hapi');
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';

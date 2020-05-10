@@ -1,2 +1,2 @@
-release: tsc --project tsconfig.server.json --sourceMap --outDir ./server/build
-web: node server/build/index.js
+release: tsc --project tsconfig.server.json --sourceMap --outDir ./build
+web: node build/server/index.js
