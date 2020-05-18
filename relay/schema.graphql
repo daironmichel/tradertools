@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed Mar 04 2020 06:18:23 GMT-0500 (Eastern Standard Time)
+# timestamp: Mon May 18 2020 07:58:26 GMT-0400 (Eastern Daylight Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -112,6 +112,7 @@ enum AutoPilotONError {
   ACCOUNT_REQUIRED
   STRATEGY_REQUIRED
   ALREADY_EXISTS
+  NO_POSITION_FOR_SYMBOL
 }
 
 input AutoPilotONInput {
@@ -119,6 +120,7 @@ input AutoPilotONInput {
   strategyId: ID
   providerId: ID
   accountId: ID
+  modifier: AutoPilotTaskModifier
   clientMutationId: String
 }
 
@@ -128,19 +130,11 @@ type AutoPilotONPayload {
   clientMutationId: String
 }
 
-"""An enumeration."""
 enum AutoPilotTaskModifier {
-  """Follow Strategy"""
-  A_0
-
-  """Maximize Profit"""
-  A_1
-
-  """Minimize Loss"""
-  A_2
-
-  """Minimize Loss, Maximize Profit"""
-  A_3
+  FOLLOW_STRATEGY
+  MAXIMIZE_PROFIT
+  MINIMIZE_LOSS
+  MIN_LOSS_MAX_PROFIT
 }
 
 type AutoPilotTaskNode implements Node & DatabaseId {
@@ -150,12 +144,15 @@ type AutoPilotTaskNode implements Node & DatabaseId {
   signal: AutoPilotTaskSignal!
   state: AutoPilotTaskState!
   modifier: AutoPilotTaskModifier!
+  trackingData: JSONString!
   strategy: TradingStrategyNode!
   provider: ServiceProviderNode!
   account: AccountNode!
+  discordWebhook: String
   symbol: String!
   quantity: Int!
   entryPrice: Float!
+  exitPrice: Float!
   isOtc: Boolean!
   errorMessage: String!
   trackingOrderId: String
@@ -218,6 +215,7 @@ input BuyStockInput {
   strategyId: ID!
   symbol: String!
   price: Decimal
+  quantity: Int
   accountId: ID
   autopilot: Boolean
   clientMutationId: String
@@ -277,6 +275,14 @@ scalar DateTime
 
 """The `Decimal` scalar type represents a python Decimal."""
 scalar Decimal
+
+"""
+Allows use of a JSON String for input / output from the GraphQL schema.
+
+Use of this type is *not recommended* as you lose the benefits of having a defined, static
+schema (one of the key benefits of GraphQL).
+"""
+scalar JSONString
 
 type Mutation {
   connectProvider(input: ConnectProviderInput!): ConnectProviderPayload!
@@ -369,7 +375,9 @@ type Query {
 
 type QuoteType {
   volume: Int
-  lastTrade: Decimal
+  last: Decimal
+  bid: Decimal
+  ask: Decimal
   lastTradeDirection: Decimal
   marketCap: Decimal
   sharesOutstanding: Int
@@ -406,6 +414,8 @@ enum SellStockError {
 input SellStockInput {
   providerId: ID!
   symbol: String!
+  price: Decimal
+  quantity: Int
   accountId: ID
   clientMutationId: String
 }
@@ -495,6 +505,7 @@ type SettingsNode implements Node & DatabaseId {
   defaultBroker: BrokerNode
   defaultStrategy: TradingStrategyNode
   defaultAutopilotModifier: SettingsDefaultAutopilotModifier!
+  discordWebhook: String
   databaseId: Int!
 }
 
@@ -555,6 +566,7 @@ type TradingStrategyNode implements Node & DatabaseId {
   exposurePercent: Float!
   profitPercent: Float!
   lossPercent: Float!
+  pullbackPercent: Float!
   feePerTrade: Float!
   priceMargin: Float!
   databaseId: Int!

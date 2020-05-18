@@ -12,9 +12,9 @@ import {
   Menu,
   MenuItem,
   Position,
-  Classes,
   Callout,
   Colors,
+  NumericInput,
 } from '@blueprintjs/core';
 import { Flex, Box } from 'rebass';
 import Layout from '../../../../components/Layout';
@@ -31,6 +31,7 @@ import ErrorState from '../../../../components/generic/ErrorState';
 import PositionAndOrderListRenderer from '../../../../components/Account/PositionAndOrderListRenderer';
 import toaster from '../../../../components/toaster';
 import numeral from 'numeral';
+import { privateEncrypt } from 'crypto';
 
 type TradingStrategy = ProviderSlugQueryResponse['viewer']['tradingStrategies'][0];
 
@@ -40,6 +41,7 @@ interface State {
   strategies: ReadonlyArray<TradingStrategy>;
   selectedStrategy: TradingStrategy | null;
   symbol: string;
+  price: number;
   connectError: PayloadError | Error | null;
   syncAccountsNeeded: boolean;
 }
@@ -106,6 +108,7 @@ class Index extends React.Component<Props, State> {
       strategies: tradingStrategies,
       selectedStrategy: defaultStrategy || null,
       symbol: '',
+      price: 0,
       connectError: null,
       syncAccountsNeeded: true,
     };
@@ -176,6 +179,10 @@ class Index extends React.Component<Props, State> {
     this.setState({ symbol: event.currentTarget.value.toUpperCase() });
   };
 
+  handlePriceChange = (valueAsNumber: number): void => {
+    this.setState({ price: valueAsNumber });
+  };
+
   handleSyncOnClick = (): void => {
     if (this.state.loading) return;
 
@@ -217,7 +224,7 @@ class Index extends React.Component<Props, State> {
     const { viewer } = this.props;
     const { broker } = viewer;
     const { serviceProvider } = broker || {};
-    const { selectedStrategy, symbol } = this.state;
+    const { selectedStrategy, symbol, price } = this.state;
 
     if (!serviceProvider) {
       console.warn('No service provider supplied');
@@ -229,10 +236,10 @@ class Index extends React.Component<Props, State> {
       return;
     }
 
-    this.buy(serviceProvider.databaseId, selectedStrategy.databaseId, symbol);
+    this.buy(serviceProvider.databaseId, selectedStrategy.databaseId, symbol, price);
   };
 
-  buy = (providerId: number, strategyId: number, symbol: string): void => {
+  buy = (providerId: number, strategyId: number, symbol: string, price = 0): void => {
     this.setState({ loading: true });
     const buy = new BuyStockMutation();
     buy.commit(
@@ -240,6 +247,7 @@ class Index extends React.Component<Props, State> {
         providerId: providerId.toString(),
         strategyId: strategyId.toString(),
         symbol: symbol,
+        price: price,
       },
       this.buyCompleted,
       this.buyError,
@@ -262,7 +270,7 @@ class Index extends React.Component<Props, State> {
     const { sessionStatus = 'CLOSED' } = serviceProvider || {};
     const accountEdges = accounts?.edges || [];
 
-    const { selectedStrategy, symbol, loading, connectError, syncAccountsNeeded } = this.state;
+    const { selectedStrategy, symbol, price, loading, connectError, syncAccountsNeeded } = this.state;
 
     if (!broker || !serviceProvider) {
       return <Error title="Not Found" description="There's nothing to see here." />;
@@ -385,6 +393,7 @@ class Index extends React.Component<Props, State> {
                         </Popover>
                       }
                     />
+                    <NumericInput placeholder="Price" value={price} fill large onValueChange={this.handlePriceChange} />
                     <Button
                       type="submit"
                       large

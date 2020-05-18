@@ -1,13 +1,15 @@
 /* tslint:disable */
-/* @relayHash 4cfa0e6d88d42cb8513e5a300ffa705f */
+/* @relayHash 3a7d9039b93ff9cba2c1be0c71061f19 */
 
 import { ConcreteRequest } from "relay-runtime";
-export type AutoPilotONError = "ACCOUNT_REQUIRED" | "ALREADY_EXISTS" | "PROVIDER_REQUIRED" | "STRATEGY_REQUIRED" | "%future added value";
+export type AutoPilotONError = "ACCOUNT_REQUIRED" | "ALREADY_EXISTS" | "NO_POSITION_FOR_SYMBOL" | "PROVIDER_REQUIRED" | "STRATEGY_REQUIRED" | "%future added value";
+export type AutoPilotTaskModifier = "FOLLOW_STRATEGY" | "MAXIMIZE_PROFIT" | "MINIMIZE_LOSS" | "MIN_LOSS_MAX_PROFIT" | "%future added value";
 export type AutoPilotONInput = {
     readonly symbol: string;
     readonly strategyId?: string | null;
     readonly providerId?: string | null;
     readonly accountId?: string | null;
+    readonly modifier?: AutoPilotTaskModifier | null;
     readonly clientMutationId?: string | null;
 };
 export type AutoPilotONMutationVariables = {
