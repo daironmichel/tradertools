@@ -17,14 +17,17 @@ const Login = (): JSX.Element => {
     const urlParams = new URLSearchParams(queryString);
     next = urlParams.get('next');
   }
-  const sessionCookie = document.cookie.match(/;*\s*sid\s*=/);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const sessionCookie = document.cookie.match(/;*\s*sid\s*=/);
     console.log('cookies:', document.cookie);
     console.log('next:', next);
     if (!sessionCookie || !next) return;
     router.push(next);
-  }, [sessionCookie, next]);
+  }, [next]);
+
+  if (typeof document === 'undefined') return <div>Loading...</div>;
 
   return (
     <Themed>
