@@ -180,7 +180,7 @@ class Index extends React.Component<Props, State> {
   };
 
   handlePriceChange = (valueAsNumber: number): void => {
-    this.setState({ price: valueAsNumber });
+    this.setState({ price: isNaN(valueAsNumber) ? 0 : valueAsNumber });
   };
 
   handleSyncOnClick = (): void => {

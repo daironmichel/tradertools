@@ -14,6 +14,9 @@ import {
   Position as MenuPosition,
   Tooltip,
   Classes,
+  Dialog,
+  FormGroup,
+  NumericInput,
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import SellStockMutation from 'mutations/Order/SellStockMutation';
@@ -34,6 +37,9 @@ interface Props {
 
 interface State {
   loading: boolean;
+  sellDialogOpen: boolean;
+  sellPrice: number;
+  sellQuantity: number;
 }
 
 class PositionListItem extends Component<Props, State> {
@@ -42,18 +48,44 @@ class PositionListItem extends Component<Props, State> {
 
     this.state = {
       loading: false,
+      sellDialogOpen: false,
+      sellPrice: 0,
+      sellQuantity: 0,
     };
   }
+
+  handleSellAtOnClick = (): void => {
+    this.setState({ sellDialogOpen: true });
+  };
+
+  handleSellDialogCancelOnClick = (): void => {
+    this.setState({ sellPrice: 0, sellQuantity: 0, sellDialogOpen: false });
+  };
+
+  handleSellPriceChange = (valueAsNumber: number): void => {
+    this.setState({ sellPrice: isNaN(valueAsNumber) ? 0 : valueAsNumber });
+  };
+
+  handleSellQuantityChange = (valueAsNumber: number): void => {
+    this.setState({ sellQuantity: isNaN(valueAsNumber) ? 0 : valueAsNumber });
+  };
+
+  handleSellDialogSubmitOnClick = (): void => {
+    const { position, providerId } = this.props;
+    const { sellPrice, sellQuantity } = this.state;
+    this.sellStock(providerId, position.symbol, sellPrice, sellQuantity);
+    this.setState({ sellPrice: 0, sellQuantity: 0, sellDialogOpen: false });
+  };
 
   handleSellOnClick = (): void => {
     const { position, providerId } = this.props;
     this.sellStock(providerId, position.symbol);
   };
 
-  sellStock = (providerId: string, symbol: string): void => {
+  sellStock = (providerId: string, symbol: string, price = 0, quantity = 0): void => {
     this.setState({ loading: true });
     const sell = new SellStockMutation();
-    sell.commit({ providerId, symbol }, this.sellStockCompleted, this.sellStockError);
+    sell.commit({ providerId, symbol, price, quantity }, this.sellStockCompleted, this.sellStockError);
   };
 
   sellStockCompleted = (): void => {
@@ -132,7 +164,7 @@ class PositionListItem extends Component<Props, State> {
 
   render(): JSX.Element {
     const { position, selectedStrategyId } = this.props;
-    const { loading } = this.state;
+    const { loading, sellDialogOpen } = this.state;
     const totalGain = position.totalGain as string;
     const totalGainPct = position.totalGainPct as string;
     const loss = parseFloat(totalGain) < 0;
@@ -191,6 +223,7 @@ class PositionListItem extends Component<Props, State> {
               position={MenuPosition.TOP_LEFT}
               content={
                 <Menu>
+                  <Menu.Item icon={IconNames.DOLLAR} text="Sell At..." onClick={this.handleSellAtOnClick} />
                   <Menu.Item icon={IconNames.BAN_CIRCLE} text="Stop Loss" onClick={this.handleStopLossOnClick} />
                   <Menu.Divider />
                   <Menu.Item
@@ -212,6 +245,25 @@ class PositionListItem extends Component<Props, State> {
             </Popover>
           </ButtonGroup>
         </Flex>
+        <Dialog title="Sell Options" isOpen={sellDialogOpen} css={{ maxWidth: '98vw' }}>
+          <Box width="100%" p={3}>
+            <FormGroup>
+              <NumericInput fill large onValueChange={this.handleSellPriceChange} placeholder="Price" />
+            </FormGroup>
+            <FormGroup>
+              <NumericInput fill large onValueChange={this.handleSellQuantityChange} placeholder="Quantity" />
+            </FormGroup>
+            <Button
+              text="Sell"
+              fill
+              large
+              intent={Intent.PRIMARY}
+              onClick={this.handleSellDialogSubmitOnClick}
+              css={{ margin: '30px 0 10px' }}
+            />
+            <Button text="Cancel" fill large onClick={this.handleSellDialogCancelOnClick} />
+          </Box>
+        </Dialog>
       </Card>
     );
   }
