@@ -255,7 +255,7 @@ class Index extends React.Component<Props, State> {
   };
 
   buyCompleted = (): void => {
-    this.setState({ loading: false, syncAccountsNeeded: true });
+    this.setState({ loading: false, syncAccountsNeeded: true, price: 0 });
     toaster.showSuccess('Buy order placed.');
   };
 
@@ -393,7 +393,14 @@ class Index extends React.Component<Props, State> {
                         </Popover>
                       }
                     />
-                    <NumericInput placeholder="Price" value={price} fill large onValueChange={this.handlePriceChange} />
+                    <NumericInput
+                      placeholder="Price"
+                      value={price}
+                      fill
+                      large
+                      disabled={loading || !symbol}
+                      onValueChange={this.handlePriceChange}
+                    />
                     <Button
                       type="submit"
                       large
