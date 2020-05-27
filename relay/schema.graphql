@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Mon May 18 2020 07:58:26 GMT-0400 (Eastern Daylight Time)
+# timestamp: Wed May 27 2020 08:05:55 GMT-0400 (Eastern Daylight Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -214,6 +214,7 @@ input BuyStockInput {
   providerId: ID!
   strategyId: ID!
   symbol: String!
+  margin: Decimal
   price: Decimal
   quantity: Int
   accountId: ID
@@ -414,6 +415,7 @@ enum SellStockError {
 input SellStockInput {
   providerId: ID!
   symbol: String!
+  margin: Decimal
   price: Decimal
   quantity: Int
   accountId: ID

@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 98de239c57ceca45aab00c2349569d79 */
+/* @relayHash 2163b046495def7e3cc61235eb611bf4 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type BuyStockError = "ACCOUNT_NOT_PROVIDED" | "INSUFFICIENT_FUNDS" | "%future added value";
@@ -7,6 +7,7 @@ export type BuyStockInput = {
     readonly providerId: string;
     readonly strategyId: string;
     readonly symbol: string;
+    readonly margin?: unknown | null;
     readonly price?: unknown | null;
     readonly quantity?: number | null;
     readonly accountId?: string | null;

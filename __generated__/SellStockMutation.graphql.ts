@@ -1,11 +1,12 @@
 /* tslint:disable */
-/* @relayHash 810819161110f48f37e3c25386f0755e */
+/* @relayHash a8a5b710c357f83abd00f6e9e8947297 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SellStockError = "ACCOUNT_NOT_PROVIDED" | "%future added value";
 export type SellStockInput = {
     readonly providerId: string;
     readonly symbol: string;
+    readonly margin?: unknown | null;
     readonly price?: unknown | null;
     readonly quantity?: number | null;
     readonly accountId?: string | null;

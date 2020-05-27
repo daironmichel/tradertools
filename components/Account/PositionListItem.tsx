@@ -38,6 +38,7 @@ interface Props {
 interface State {
   loading: boolean;
   sellDialogOpen: boolean;
+  sellMargin: number;
   sellPrice: number;
   sellQuantity: number;
 }
@@ -49,6 +50,7 @@ class PositionListItem extends Component<Props, State> {
     this.state = {
       loading: false,
       sellDialogOpen: false,
+      sellMargin: 0,
       sellPrice: 0,
       sellQuantity: 0,
     };
@@ -62,6 +64,10 @@ class PositionListItem extends Component<Props, State> {
     this.setState({ sellPrice: 0, sellQuantity: 0, sellDialogOpen: false });
   };
 
+  handleSellMarginChange = (valueAsNumber: number): void => {
+    this.setState({ sellMargin: isNaN(valueAsNumber) ? 0 : valueAsNumber });
+  };
+
   handleSellPriceChange = (valueAsNumber: number): void => {
     this.setState({ sellPrice: isNaN(valueAsNumber) ? 0 : valueAsNumber });
   };
@@ -72,9 +78,9 @@ class PositionListItem extends Component<Props, State> {
 
   handleSellDialogSubmitOnClick = (): void => {
     const { position, providerId } = this.props;
-    const { sellPrice, sellQuantity } = this.state;
-    this.sellStock(providerId, position.symbol, sellPrice, sellQuantity);
-    this.setState({ sellPrice: 0, sellQuantity: 0, sellDialogOpen: false });
+    const { sellMargin, sellPrice, sellQuantity } = this.state;
+    this.sellStock(providerId, position.symbol, sellMargin, sellPrice, sellQuantity);
+    this.setState({ sellMargin: 0, sellPrice: 0, sellQuantity: 0, sellDialogOpen: false });
   };
 
   handleSellOnClick = (): void => {
@@ -82,10 +88,10 @@ class PositionListItem extends Component<Props, State> {
     this.sellStock(providerId, position.symbol);
   };
 
-  sellStock = (providerId: string, symbol: string, price = 0, quantity = 0): void => {
+  sellStock = (providerId: string, symbol: string, margin = 0, price = 0, quantity = 0): void => {
     this.setState({ loading: true });
     const sell = new SellStockMutation();
-    sell.commit({ providerId, symbol, price, quantity }, this.sellStockCompleted, this.sellStockError);
+    sell.commit({ providerId, symbol, margin, price, quantity }, this.sellStockCompleted, this.sellStockError);
   };
 
   sellStockCompleted = (): void => {
@@ -247,6 +253,18 @@ class PositionListItem extends Component<Props, State> {
         </Flex>
         <Dialog title="Sell Options" isOpen={sellDialogOpen} css={{ maxWidth: '98vw' }}>
           <Box width="100%" p={3}>
+            <FormGroup>
+              <NumericInput
+                fill
+                large
+                onValueChange={this.handleSellMarginChange}
+                placeholder="Margin"
+                min={0.01}
+                stepSize={0.01}
+                minorStepSize={0.001}
+                majorStepSize={0.1}
+              />
+            </FormGroup>
             <FormGroup>
               <NumericInput fill large onValueChange={this.handleSellPriceChange} placeholder="Price" />
             </FormGroup>

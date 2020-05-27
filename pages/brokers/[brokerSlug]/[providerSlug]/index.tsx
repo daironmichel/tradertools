@@ -31,7 +31,6 @@ import ErrorState from '../../../../components/generic/ErrorState';
 import PositionAndOrderListRenderer from '../../../../components/Account/PositionAndOrderListRenderer';
 import toaster from '../../../../components/toaster';
 import numeral from 'numeral';
-import { privateEncrypt } from 'crypto';
 
 type TradingStrategy = ProviderSlugQueryResponse['viewer']['tradingStrategies'][0];
 
