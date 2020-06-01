@@ -1,12 +1,8 @@
 import { gql, IResolverObject, IResolvers } from 'apollo-server-hapi';
-import type { Loaders } from '../db/loaders';
-import { IUser } from '../db/tables';
+import { MaybeUserRecord } from '../db';
+import { Context, IntIdArg } from './common';
 
-type Context = {
-  loaders: Loaders;
-};
-
-export default gql`
+export const typeDefinitions = gql`
   type Query {
     user(id: Int!): User
   }
@@ -18,18 +14,12 @@ export default gql`
   }
 `;
 
-type NumericIdArgs = {
-  id: number;
-};
-
-type QueryUserArgs = {} & NumericIdArgs;
-
 const Query: IResolverObject<{}, Context> = {
-  user: async (_source, args: QueryUserArgs, context: Context, _info): Promise<IUser | undefined> => {
+  user: async (_query, args: IntIdArg, context: Context, _info): Promise<MaybeUserRecord> => {
     return await context.loaders.user.load(args.id);
   },
 };
 
-export const resolvers: IResolvers<{}, Context> = {
+export const typeResolvers: IResolvers<{}, Context> = {
   Query,
 };

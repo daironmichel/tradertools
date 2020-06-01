@@ -1,18 +1,19 @@
-import db from './db';
+import db, { MaybeUserRecord, User, UserRecord } from './db';
 import DataLoader from 'dataloader';
-import { IUser } from './tables';
 
-const userLoader = new DataLoader((ids: readonly number[]) =>
-  db<IUser>('User')
-    .whereIn('id', ids)
-    .select(['id', 'username', 'firstName', 'lastName'])
-    .then((rows) => ids.map((id) => rows.find((x) => x.id === id)))
-);
-
-const loaders = {
-  user: userLoader,
+export type Loaders = {
+  user: DataLoader<number, MaybeUserRecord>;
 };
 
-export type Loaders = typeof loaders;
+function userLoader(ids: readonly number[]) {
+  return db<User>('User')
+    .whereIn('id', ids)
+    .select(['id', 'username', 'firstName', 'lastName'])
+    .then((rows: UserRecord[]) => ids.map((id) => rows.find((x) => x.id === id)));
+}
 
-export default loaders;
+export function getLoaders(): Loaders {
+  return {
+    user: new DataLoader(userLoader),
+  };
+}

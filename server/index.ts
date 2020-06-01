@@ -3,24 +3,25 @@ import next from 'next';
 import Hapi from '@hapi/hapi';
 import { pathWrapper, defaultHandlerWrapper, nextHandlerWrapper } from './next-wrapper';
 import { ApolloServer } from 'apollo-server-hapi';
-import loaders from './db/loaders';
-import typeDefs, { resolvers } from './graphql/types';
+import { typeDefinitions, typeResolvers, Context } from './graphql';
+import { getLoaders } from './db';
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 
 const apolloServer = new ApolloServer({
-  typeDefs,
-  resolvers: resolvers,
+  typeDefs: [typeDefinitions],
+  resolvers: [typeResolvers],
   // schema,
   debug: dev,
-  context: async () => {
+  context: async (): Promise<Context> => {
     // async ({ request, h }) => {
+    // we can get credentials from request and set current user here
     return {
-      loaders,
+      loaders: getLoaders(),
+      user: undefined,
     };
   },
-  playground: true,
 });
 
 const hapiServer = new Hapi.Server({
