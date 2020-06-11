@@ -1,5 +1,5 @@
 # source: http://localhost:5000/api/gql/
-# timestamp: Wed May 27 2020 08:05:55 GMT-0400 (Eastern Daylight Time)
+# timestamp: Thu Jun 11 2020 08:28:37 GMT-0400 (Eastern Daylight Time)
 
 """An enumeration."""
 enum AccountAccountMode {
@@ -52,7 +52,9 @@ type AccountNode implements Node & DatabaseId {
   lastUpdated: DateTime!
   broker: BrokerNode!
   provider: ServiceProviderNode!
+  bufferCash: BufferCashNode
   databaseId: Int!
+  realValue: Float!
 }
 
 type AccountNodeConnection {
@@ -203,6 +205,14 @@ type BrokerNode implements Node & DatabaseId {
   serviceProviders(before: String, after: String, first: Int, last: Int): ServiceProviderConnection!
   databaseId: Int!
   serviceProvider(databaseId: ID, slug: String): ServiceProviderNode
+}
+
+type BufferCashNode implements Node & DatabaseId {
+  """The ID of the object."""
+  id: ID!
+  amount: Float!
+  account: AccountNode!
+  databaseId: Int!
 }
 
 enum BuyStockError {

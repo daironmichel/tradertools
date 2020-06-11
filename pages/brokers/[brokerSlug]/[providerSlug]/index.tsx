@@ -15,6 +15,7 @@ import {
   Callout,
   Colors,
   NumericInput,
+  Classes,
 } from '@blueprintjs/core';
 import { Flex, Box } from 'rebass';
 import Layout from '../../../../components/Layout';
@@ -87,6 +88,10 @@ class Index extends React.Component<Props, State> {
                 name
                 totalAccountValue
                 cashAvailableForInvestment
+                realValue
+                bufferCash {
+                  amount
+                }
               }
             }
           }
@@ -281,10 +286,11 @@ class Index extends React.Component<Props, State> {
       return <Error title="Not Found" description="Default account not configured." />;
     }
 
-    const { totalAccountValue, cashAvailableForInvestment } = defaultAccount.node;
+    const { totalAccountValue, cashAvailableForInvestment, realValue, bufferCash } = defaultAccount.node;
     const exposurePercent = selectedStrategy?.exposurePercent || 0;
-    const exposureAmount = totalAccountValue * (exposurePercent / 100);
-    const funded = exposureAmount < cashAvailableForInvestment;
+    const exposureAmount = realValue * (exposurePercent / 100);
+    const realBuyingPower = cashAvailableForInvestment - (bufferCash?.amount || 0);
+    const funded = exposureAmount < realBuyingPower;
 
     return (
       <Layout>
@@ -331,10 +337,16 @@ class Index extends React.Component<Props, State> {
                   <Flex justifyContent="space-between">
                     <Box>
                       <Box>
-                        Accont Value: <span>{numeral(totalAccountValue).format('0,0.00')}</span>
+                        Accont Value: <span>{numeral(realValue).format('0,0.00')}</span>{' '}
+                        <small className={Classes.TEXT_MUTED}>
+                          = {totalAccountValue} - {bufferCash?.amount || 0}
+                        </small>
                       </Box>
                       <Box>
-                        Buying Power: <span>{numeral(cashAvailableForInvestment).format('0,0.00')}</span>
+                        Buying Power: <span>{numeral(realBuyingPower).format('0,0.00')}</span>{' '}
+                        <small className={Classes.TEXT_MUTED}>
+                          = {cashAvailableForInvestment} - {bufferCash?.amount || 0}
+                        </small>
                       </Box>
                       <Box>
                         Exposure:{' '}

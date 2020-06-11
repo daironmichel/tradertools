@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* @relayHash 52e19081b02ca22a75dbd381f84a87bd */
+/* @relayHash db38b64ab4f40183a20d4502b1be1e6c */
 
 import { ConcreteRequest } from "relay-runtime";
 export type SessionStatus = "CLOSED" | "CONNECTED" | "EXPIRED" | "INACTIVE" | "REQUESTING" | "%future added value";
@@ -47,6 +47,10 @@ export type ProviderSlugQueryResponse = {
                         readonly name: string;
                         readonly totalAccountValue: number;
                         readonly cashAvailableForInvestment: number;
+                        readonly realValue: number;
+                        readonly bufferCash: {
+                            readonly amount: number;
+                        } | null;
                     };
                 }>;
             };
@@ -105,6 +109,11 @@ query ProviderSlugQuery(
             name
             totalAccountValue
             cashAvailableForInvestment
+            realValue
+            bufferCash {
+              amount
+              id
+            }
           }
         }
       }
@@ -202,110 +211,75 @@ v7 = {
   "plural": true,
   "selections": (v5/*: any*/)
 },
-v8 = {
+v8 = [
+  {
+    "kind": "Variable",
+    "name": "slug",
+    "variableName": "brokerSlug"
+  }
+],
+v9 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "accountKey",
   "args": null,
   "storageKey": null
 },
-v9 = {
+v10 = {
   "kind": "LinkedField",
   "alias": null,
-  "name": "broker",
+  "name": "serviceProvider",
   "storageKey": null,
   "args": [
     {
       "kind": "Variable",
       "name": "slug",
-      "variableName": "brokerSlug"
+      "variableName": "providerSlug"
     }
   ],
-  "concreteType": "BrokerNode",
+  "concreteType": "ServiceProviderNode",
   "plural": false,
   "selections": [
     (v2/*: any*/),
     (v3/*: any*/),
     (v4/*: any*/),
     {
-      "kind": "LinkedField",
+      "kind": "ScalarField",
       "alias": null,
-      "name": "serviceProvider",
-      "storageKey": null,
-      "args": [
-        {
-          "kind": "Variable",
-          "name": "slug",
-          "variableName": "providerSlug"
-        }
-      ],
-      "concreteType": "ServiceProviderNode",
-      "plural": false,
-      "selections": [
-        (v2/*: any*/),
-        (v3/*: any*/),
-        (v4/*: any*/),
-        {
-          "kind": "ScalarField",
-          "alias": null,
-          "name": "sessionStatus",
-          "args": null,
-          "storageKey": null
-        },
-        (v8/*: any*/)
-      ]
-    },
-    {
-      "kind": "LinkedField",
-      "alias": null,
-      "name": "accounts",
-      "storageKey": null,
+      "name": "sessionStatus",
       "args": null,
-      "concreteType": "AccountConnection",
-      "plural": false,
-      "selections": [
-        {
-          "kind": "LinkedField",
-          "alias": null,
-          "name": "edges",
-          "storageKey": null,
-          "args": null,
-          "concreteType": "AccountEdge",
-          "plural": true,
-          "selections": [
-            {
-              "kind": "LinkedField",
-              "alias": null,
-              "name": "node",
-              "storageKey": null,
-              "args": null,
-              "concreteType": "AccountNode",
-              "plural": false,
-              "selections": [
-                (v2/*: any*/),
-                (v8/*: any*/),
-                (v4/*: any*/),
-                {
-                  "kind": "ScalarField",
-                  "alias": null,
-                  "name": "totalAccountValue",
-                  "args": null,
-                  "storageKey": null
-                },
-                {
-                  "kind": "ScalarField",
-                  "alias": null,
-                  "name": "cashAvailableForInvestment",
-                  "args": null,
-                  "storageKey": null
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
+      "storageKey": null
+    },
+    (v9/*: any*/)
   ]
+},
+v11 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "totalAccountValue",
+  "args": null,
+  "storageKey": null
+},
+v12 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "cashAvailableForInvestment",
+  "args": null,
+  "storageKey": null
+},
+v13 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "realValue",
+  "args": null,
+  "storageKey": null
+},
+v14 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "amount",
+  "args": null,
+  "storageKey": null
 };
 return {
   "kind": "Request",
@@ -339,7 +313,72 @@ return {
             ]
           },
           (v7/*: any*/),
-          (v9/*: any*/)
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "broker",
+            "storageKey": null,
+            "args": (v8/*: any*/),
+            "concreteType": "BrokerNode",
+            "plural": false,
+            "selections": [
+              (v2/*: any*/),
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v10/*: any*/),
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "accounts",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "AccountConnection",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "LinkedField",
+                    "alias": null,
+                    "name": "edges",
+                    "storageKey": null,
+                    "args": null,
+                    "concreteType": "AccountEdge",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "kind": "LinkedField",
+                        "alias": null,
+                        "name": "node",
+                        "storageKey": null,
+                        "args": null,
+                        "concreteType": "AccountNode",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v9/*: any*/),
+                          (v4/*: any*/),
+                          (v11/*: any*/),
+                          (v12/*: any*/),
+                          (v13/*: any*/),
+                          {
+                            "kind": "LinkedField",
+                            "alias": null,
+                            "name": "bufferCash",
+                            "storageKey": null,
+                            "args": null,
+                            "concreteType": "BufferCashNode",
+                            "plural": false,
+                            "selections": [
+                              (v14/*: any*/)
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         ]
       }
     ]
@@ -373,7 +412,73 @@ return {
             ]
           },
           (v7/*: any*/),
-          (v9/*: any*/)
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "broker",
+            "storageKey": null,
+            "args": (v8/*: any*/),
+            "concreteType": "BrokerNode",
+            "plural": false,
+            "selections": [
+              (v2/*: any*/),
+              (v3/*: any*/),
+              (v4/*: any*/),
+              (v10/*: any*/),
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "accounts",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "AccountConnection",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "LinkedField",
+                    "alias": null,
+                    "name": "edges",
+                    "storageKey": null,
+                    "args": null,
+                    "concreteType": "AccountEdge",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "kind": "LinkedField",
+                        "alias": null,
+                        "name": "node",
+                        "storageKey": null,
+                        "args": null,
+                        "concreteType": "AccountNode",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v9/*: any*/),
+                          (v4/*: any*/),
+                          (v11/*: any*/),
+                          (v12/*: any*/),
+                          (v13/*: any*/),
+                          {
+                            "kind": "LinkedField",
+                            "alias": null,
+                            "name": "bufferCash",
+                            "storageKey": null,
+                            "args": null,
+                            "concreteType": "BufferCashNode",
+                            "plural": false,
+                            "selections": [
+                              (v14/*: any*/),
+                              (v2/*: any*/)
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         ]
       }
     ]
@@ -382,10 +487,10 @@ return {
     "operationKind": "query",
     "name": "ProviderSlugQuery",
     "id": null,
-    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n          }\n        }\n      }\n    }\n  }\n}\n",
+    "text": "query ProviderSlugQuery(\n  $brokerSlug: String!\n  $providerSlug: String!\n) {\n  viewer {\n    settings {\n      refreshRate\n      defaultStrategy {\n        id\n        databaseId\n        name\n        exposurePercent\n        profitPercent\n        lossPercent\n      }\n      id\n    }\n    tradingStrategies {\n      id\n      databaseId\n      name\n      exposurePercent\n      profitPercent\n      lossPercent\n    }\n    broker(slug: $brokerSlug) {\n      id\n      databaseId\n      name\n      serviceProvider(slug: $providerSlug) {\n        id\n        databaseId\n        name\n        sessionStatus\n        accountKey\n      }\n      accounts {\n        edges {\n          node {\n            id\n            accountKey\n            name\n            totalAccountValue\n            cashAvailableForInvestment\n            realValue\n            bufferCash {\n              amount\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'ef25b114c574035871a627ccf162daa3';
+(node as any).hash = '74b69cf12f940277c7bb00daf5f670a3';
 export default node;
