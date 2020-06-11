@@ -290,7 +290,7 @@ class Index extends React.Component<Props, State> {
     const exposurePercent = selectedStrategy?.exposurePercent || 0;
     const exposureAmount = realValue * (exposurePercent / 100);
     const realBuyingPower = cashAvailableForInvestment - (bufferCash?.amount || 0);
-    const funded = exposureAmount < realBuyingPower;
+    const funded = exposureAmount < cashAvailableForInvestment;
 
     return (
       <Layout>
@@ -343,9 +343,9 @@ class Index extends React.Component<Props, State> {
                         </small>
                       </Box>
                       <Box>
-                        Buying Power: <span>{numeral(realBuyingPower).format('0,0.00')}</span>{' '}
+                        Buying Power: <span>{numeral(cashAvailableForInvestment).format('0,0.00')}</span>{' '}
                         <small className={Classes.TEXT_MUTED}>
-                          = {cashAvailableForInvestment} - {bufferCash?.amount || 0}
+                          = {realBuyingPower} + {bufferCash?.amount || 0}
                         </small>
                       </Box>
                       <Box>
