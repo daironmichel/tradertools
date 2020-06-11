@@ -287,9 +287,11 @@ class Index extends React.Component<Props, State> {
     }
 
     const { totalAccountValue, cashAvailableForInvestment, realValue, bufferCash } = defaultAccount.node;
+    const currency = '0,0.00';
     const exposurePercent = selectedStrategy?.exposurePercent || 0;
     const exposureAmount = realValue * (exposurePercent / 100);
-    const realBuyingPower = cashAvailableForInvestment - (bufferCash?.amount || 0);
+    const buffer = bufferCash?.amount || 0;
+    const realBuyingPower = cashAvailableForInvestment - buffer;
     const funded = exposureAmount < cashAvailableForInvestment;
 
     return (
@@ -337,21 +339,21 @@ class Index extends React.Component<Props, State> {
                   <Flex justifyContent="space-between">
                     <Box>
                       <Box>
-                        Accont Value: <span>{numeral(realValue).format('0,0.00')}</span>{' '}
+                        Accont Value: <span>{numeral(realValue).format(currency)}</span>{' '}
                         <small className={Classes.TEXT_MUTED}>
-                          = {totalAccountValue} - {bufferCash?.amount || 0}
+                          = {numeral(totalAccountValue).format(currency)} - {numeral(buffer).format(currency)}
                         </small>
                       </Box>
                       <Box>
-                        Buying Power: <span>{numeral(cashAvailableForInvestment).format('0,0.00')}</span>{' '}
+                        Buying Power: <span>{numeral(cashAvailableForInvestment).format(currency)}</span>{' '}
                         <small className={Classes.TEXT_MUTED}>
-                          = {realBuyingPower} + {bufferCash?.amount || 0}
+                          = {numeral(realBuyingPower).format(currency)} + {numeral(buffer).format(currency)}
                         </small>
                       </Box>
                       <Box>
                         Exposure:{' '}
                         <span css={{ color: funded ? Colors.GREEN3 : Colors.RED3 }}>
-                          {numeral(exposureAmount).format('0,0.00')}
+                          {numeral(exposureAmount).format(currency)}
                         </span>
                       </Box>
                     </Box>
