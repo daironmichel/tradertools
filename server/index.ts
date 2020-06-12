@@ -1,7 +1,7 @@
 import next from 'next';
 // import Hapi from 'hapi';
 import Hapi from '@hapi/hapi';
-import { pathWrapper, defaultHandlerWrapper, nextHandlerWrapper } from './next-wrapper';
+import { nextPathHandler, nextDefaultHandler, nextRouteHandler } from './next-wrapper';
 import { ApolloServer } from 'apollo-server-hapi';
 import { typeDefinitions, typeResolvers, Context } from './graphql';
 import { getLoaders } from './db';
@@ -28,40 +28,40 @@ const hapiServer = new Hapi.Server({
   port,
 });
 
-const nextServer = next({ dev });
+const nextApp = next({ dev });
 
-nextServer.prepare().then(async () => {
+nextApp.prepare().then(async () => {
   await apolloServer.applyMiddleware({ app: hapiServer, path: '/api/graphql' });
   await apolloServer.installSubscriptionHandlers(hapiServer.listener);
 
   hapiServer.route({
     method: 'GET',
     path: '/a',
-    handler: pathWrapper(nextServer, '/a'),
+    handler: nextPathHandler(nextApp, '/a'),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/b',
-    handler: pathWrapper(nextServer, '/b'),
+    handler: nextPathHandler(nextApp, '/b'),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/_next/{p*}' /* next specific routes */,
-    handler: nextHandlerWrapper(nextServer),
+    handler: nextRouteHandler(nextApp),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/static/{p*}' /* use next to handle static files */,
-    handler: nextHandlerWrapper(nextServer),
+    handler: nextRouteHandler(nextApp),
   });
 
   hapiServer.route({
     method: '*',
     path: '/{p*}' /* catch all route */,
-    handler: defaultHandlerWrapper(nextServer),
+    handler: nextDefaultHandler(nextApp),
   });
 
   try {
