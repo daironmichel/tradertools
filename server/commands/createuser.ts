@@ -1,6 +1,7 @@
 import readline from 'readline';
-import db from '../db';
+import db from '../db/db';
 import { hashPassword } from '../utils';
+import { Transaction } from 'knex';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -43,7 +44,7 @@ async function main() {
 
   let userId = null;
 
-  await db.transaction(async (trx) => {
+  await db.transaction(async (trx: Transaction) => {
     const res = await trx('User').insert({ username, password, firstName, lastName }, 'id');
     userId = res[0];
   });

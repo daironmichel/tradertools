@@ -12,4 +12,4 @@ export type User = {
 };
 
 export type UserRecord = Partial<User>;
-export type MaybeUserRecord = UserRecord | undefined;
+export type MaybeUserRecord = UserRecord | null | undefined;
