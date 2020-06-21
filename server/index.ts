@@ -2,7 +2,7 @@ import next from 'next';
 // import Hapi from 'hapi';
 import Hapi from '@hapi/hapi';
 import HapiNowAuth from '@now-ims/hapi-now-auth';
-import { pathWrapper, defaultHandlerWrapper, nextHandlerWrapper } from './next-wrapper';
+import { nextPathHandler, nextDefaultHandler, nextRouteHandler } from './next-wrapper';
 import { ApolloServer } from 'apollo-server-hapi';
 import { getLoaders } from './db';
 import {
@@ -37,9 +37,9 @@ const hapiServer = new Hapi.Server({
   port,
 });
 
-const nextServer = next({ dev });
+const nextApp = next({ dev });
 
-nextServer.prepare().then(async () => {
+nextApp.prepare().then(async () => {
   // register hapi-now-auth plugin
   try {
     await hapiServer.register(HapiNowAuth);
@@ -74,31 +74,31 @@ nextServer.prepare().then(async () => {
   hapiServer.route({
     method: 'GET',
     path: '/a',
-    handler: pathWrapper(nextServer, '/a'),
+    handler: nextPathHandler(nextApp, '/a'),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/b',
-    handler: pathWrapper(nextServer, '/b'),
+    handler: nextPathHandler(nextApp, '/b'),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/_next/{p*}' /* next specific routes */,
-    handler: nextHandlerWrapper(nextServer),
+    handler: nextRouteHandler(nextApp),
   });
 
   hapiServer.route({
     method: 'GET',
     path: '/static/{p*}' /* use next to handle static files */,
-    handler: nextHandlerWrapper(nextServer),
+    handler: nextRouteHandler(nextApp),
   });
 
   hapiServer.route({
     method: '*',
     path: '/{p*}' /* catch all route */,
-    handler: defaultHandlerWrapper(nextServer),
+    handler: nextDefaultHandler(nextApp),
   });
 
   try {
