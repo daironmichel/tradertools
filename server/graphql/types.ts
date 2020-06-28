@@ -1,76 +1,79 @@
-import { gql, IResolverObject, IResolvers, MergeInfo } from 'apollo-server-hapi';
 import { MaybeUserRecord } from '../db';
 import { Context } from './common';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
-import { GraphQLResolveInfo } from 'graphql';
-
-export const typeDefinitions = gql`
-  interface Node {
-    id: ID!
-  }
-
-  type UserNode implements Node {
-    id: ID!
-    username: String!
-    firstName: String
-    lastName: String
-  }
-
-  type Query {
-    node(id: ID!): Node
-    user(id: Int!): UserNode
-  }
-`;
+import {
+  GraphQLResolveInfo,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLInterfaceType,
+  GraphQLFieldConfig,
+  GraphQLNonNull,
+  GraphQLInt,
+} from 'graphql';
 
 interface INode {
   id: string | number;
 }
 
-function nodeResolvers(resolvers?: IResolverObject<INode, Context>): IResolverObject<INode, Context> {
-  const nodeFields: IResolverObject<INode, Context> = {
-    __isTypeOf() {
-      return this.name;
-    },
-    id: (
-      source: INode,
-      _args: unknown,
-      _context: Context,
-      info: GraphQLResolveInfo & { mergeInfo: MergeInfo }
-    ): string => {
-      return toGlobalId(info.parentType.name, source.id.toString());
-    },
-  };
-
-  return resolvers ? Object.assign(nodeFields, resolvers) : nodeFields;
-}
-
-type NodeResolverArgs = {
-  id: string;
-};
-
-type UserResolverArgs = {
-  id: number;
-};
-
-const UserNode: IResolverObject<INode, Context> = nodeResolvers();
-
-const Query: IResolverObject<{}, Context> = {
-  node: async (_query, args: NodeResolverArgs, context: Context, _info): Promise<unknown> => {
-    const itemInfo = fromGlobalId(args.id);
-    const itemId = parseInt(itemInfo.id) || 0;
-
-    if (itemInfo.type === 'UserNode') {
-      return await context.loaders.user.load(itemId);
-    }
-    return null;
-  },
-
-  user: async (_query, args: UserResolverArgs, context: Context): Promise<MaybeUserRecord> => {
-    return await context.loaders.user.load(args.id);
+const NodeId: GraphQLFieldConfig<INode, Context> = {
+  type: new GraphQLNonNull(GraphQLID),
+  resolve: async (source: INode, _args: Object, _context: Context, info: GraphQLResolveInfo) => {
+    return toGlobalId(info.parentType.name, source.id.toString());
   },
 };
 
-export const typeResolvers: IResolvers<{}, Context> = {
-  Query,
-  UserNode,
-};
+export const Node = new GraphQLInterfaceType({
+  name: 'Node',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+  },
+});
+
+export const UserNode = new GraphQLObjectType({
+  name: 'UserNode',
+  interfaces: [Node],
+  isTypeOf: () => true,
+  fields: {
+    id: NodeId,
+    username: { type: new GraphQLNonNull(GraphQLString) },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+  },
+});
+
+export const QueryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    node: {
+      type: Node,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: async (_source: Object, args: { [argName: string]: any }, context: Context, _info): Promise<unknown> => {
+        const itemInfo = fromGlobalId(args.id);
+        const itemId = parseInt(itemInfo.id) || 0;
+
+        if (itemInfo.type === 'UserNode') {
+          return await context.loaders.user.load(itemId);
+        }
+        return null;
+      },
+    },
+
+    user: {
+      type: UserNode,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLInt) },
+      },
+      resolve: async (
+        _source: Object,
+        args: { [argName: string]: any },
+        context: Context,
+        _info
+      ): Promise<MaybeUserRecord> => {
+        return await context.loaders.user.load(args.id);
+      },
+    },
+  },
+});
