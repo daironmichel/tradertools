@@ -1,5 +1,5 @@
 import NextApp from 'next';
-import Fastify from 'fastify';
+import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyGQL from 'fastify-gql';
 import { getLoaders } from './db';
 import { Context, schema } from './graphql';
@@ -12,12 +12,14 @@ fastifyServer.register(fastifyGQL, {
   schema: schema,
   path: '/api/graphql',
   graphiql: 'playground',
-  context: async (): Promise<Context> => {
+  context: async (request: FastifyRequest, reply: FastifyReply<unknown>): Promise<Context> => {
     // const { req } = context;
     // const auth = (req as express.Request).auth;
     // const currentUser = auth.isAuthenticated ? auth.credentials.user : undefined;
 
     return {
+      request,
+      reply,
       loaders: getLoaders(),
       user: null, //currentUser,
     };
@@ -49,35 +51,30 @@ fastifyServer.register((fastify, _opts, next) => {
     .prepare()
     .then(async () => {
       if (dev) {
-        fastify.get('/_next/*', (req, reply) => {
-          return handle(req.req, reply.res).then(() => {
-            reply.sent = true;
-          });
+        fastify.get('/_next/*', async (req, reply) => {
+          await handle(req.req, reply.res);
+          reply.sent = true;
         });
       }
 
-      fastify.get('/a', (req, reply) => {
-        return nextApp.render(req.req, reply.res, '/a', req.query).then(() => {
-          reply.sent = true;
-        });
+      fastify.get('/a', async (req, reply) => {
+        await nextApp.render(req.req, reply.res, '/a', req.query);
+        reply.sent = true;
       });
 
-      fastify.get('/b', (req, reply) => {
-        return nextApp.render(req.req, reply.res, '/b', req.query).then(() => {
-          reply.sent = true;
-        });
+      fastify.get('/b', async (req, reply) => {
+        await nextApp.render(req.req, reply.res, '/b', req.query);
+        reply.sent = true;
       });
 
-      fastify.all('/*', (req, reply) => {
-        return handle(req.req, reply.res).then(() => {
-          reply.sent = true;
-        });
+      fastify.all('/*', async (req, reply) => {
+        await handle(req.req, reply.res);
+        reply.sent = true;
       });
 
-      fastify.setNotFoundHandler((request, reply) => {
-        return nextApp.render404(request.req, reply.res).then(() => {
-          reply.sent = true;
-        });
+      fastify.setNotFoundHandler(async (request, reply) => {
+        await nextApp.render404(request.req, reply.res);
+        reply.sent = true;
       });
 
       next();

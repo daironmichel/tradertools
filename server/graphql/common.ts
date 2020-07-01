@@ -1,6 +1,9 @@
 import { Loaders, MaybeUserRecord } from '../db';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 export type Context = {
+  request: FastifyRequest,
+  reply: FastifyReply<unknown>,
   loaders: Loaders;
   user: MaybeUserRecord;
 };
