@@ -93,7 +93,7 @@ export const PrivateMutation: GraphQLFieldConfig<Object, Context> = {
   }),
   resolve: (_source, _args, context: Context) => {
     context.reply.status(401); // unauthorized;
-    throw 'Not Authorized';
+    return null;
   },
 };
 
