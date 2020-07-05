@@ -1,4 +1,4 @@
-const basicConfig = {
+const baseConfig = {
   client: 'pg',
   connection: process.env.DATABASE_URL,
   migrations: {
@@ -12,18 +12,12 @@ const basicConfig = {
 
 const config = {
   development: {
-    ...basicConfig,
-    connection: {
-      user: 'tradertools',
-      password: 'zaqwsx12',
-      database: 'tradertools',
-      host: 'localhost',
-      port: 5433,
-    },
+    ...baseConfig,
+    debug: process.env.DATABASE_DEBUG === 'true',
   },
 
   production: {
-    ...basicConfig,
+    ...baseConfig,
     pool: {
       min: 2,
       max: 10,

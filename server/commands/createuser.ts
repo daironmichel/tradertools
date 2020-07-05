@@ -1,6 +1,6 @@
 import readline from 'readline';
 import db from '../db/db';
-import { hashPassword } from '../utils';
+import { hashPassword } from '../auth';
 import { Transaction } from 'knex';
 
 const rl = readline.createInterface({

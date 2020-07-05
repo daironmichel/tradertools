@@ -1,47 +1,38 @@
 import NextApp from 'next';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyGQL from 'fastify-gql';
+import fastifyCookie from 'fastify-cookie';
+import 'dotenv/config';
 import { getLoaders } from './db';
 import { Context, schema } from './graphql';
+import { getAccessToken, MaybeRefreshTokenPayload, verifyAccessHeader, verifyRefreshCookie } from './auth';
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 
 const fastifyServer = Fastify();
+
+fastifyServer.register(fastifyCookie, {
+  secret: process.env.COOKIE_SECRET_KEY,
+});
+
 fastifyServer.register(fastifyGQL, {
   schema: schema,
   path: '/api/graphql',
   graphiql: 'playground',
   context: async (request: FastifyRequest, reply: FastifyReply<unknown>): Promise<Context> => {
-    // const { req } = context;
-    // const auth = (req as express.Request).auth;
-    // const currentUser = auth.isAuthenticated ? auth.credentials.user : undefined;
+    const payload = await verifyAccessHeader(request);
+    const { userId } = payload || {};
+    const user = typeof userId === 'number' ? { id: userId } : undefined;
 
     return {
       request,
       reply,
+      user,
       loaders: getLoaders(),
-      user: null, //currentUser,
     };
   },
 });
-
-// const apolloServer = new ApolloServer({
-//   typeDefs: [typeDefinitions, mutationDefinitions],
-//   resolvers: [typeResolvers, mutationResolvers],
-//   // schema,
-//   debug: dev,
-//   context: async (_context: ExpressContext): Promise<Context> => {
-//     // const { req } = context;
-//     // const auth = (req as express.Request).auth;
-//     // const currentUser = auth.isAuthenticated ? auth.credentials.user : undefined;
-//
-//     return {
-//       loaders: getLoaders(),
-//       user: null, //currentUser,
-//     };
-//   },
-// });
 
 fastifyServer.register((fastify, _opts, next) => {
   const nextApp = NextApp({ dev });
@@ -56,6 +47,17 @@ fastifyServer.register((fastify, _opts, next) => {
           reply.sent = true;
         });
       }
+
+      fastify.get('/token', async (req, reply) => {
+        const payload: MaybeRefreshTokenPayload = await verifyRefreshCookie(req, reply);
+        if (!payload) {
+          reply.status(401);
+          reply.header('WWW-Authenticate', 'https://trader.dleyva.com/login');
+        } else {
+          const token = await getAccessToken({ id: payload.userId });
+          reply.send({ token });
+        }
+      });
 
       fastify.get('/a', async (req, reply) => {
         await nextApp.render(req.req, reply.res, '/a', req.query);
