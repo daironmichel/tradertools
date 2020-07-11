@@ -1,7 +1,6 @@
 import { Context } from './common';
-import { MaybeUserRecord, UserRecord } from '../db';
-import db, { User } from '../db/db';
-import { getAccessToken, compare, getRefreshToken, hashPassword } from '../auth';
+import { UserRecord } from '../db';
+import { hashPassword, login, logout, register } from '../auth';
 import {
   GraphQLObjectType,
   GraphQLString,
@@ -66,7 +65,7 @@ const RegisterMutation: GraphQLFieldConfig<Object, Context, IRegisterArgs> = {
 
     // TODO: validate password
 
-    const record: UserRecord = {
+    const userData: UserRecord = {
       username,
       firstName,
       lastName,
@@ -74,31 +73,12 @@ const RegisterMutation: GraphQLFieldConfig<Object, Context, IRegisterArgs> = {
       tokenVersion: 0,
     };
 
-    let user: MaybeUserRecord = null;
-    try {
-      const result: UserRecord[] = await db<User>('User')
-        .insert(record)
-        .returning(['id', 'username', 'firstName', 'lastName', 'tokenVersion']);
-      user = result[0];
-    } catch (e) {
-      if (e.message.toLowerCase().includes('violates unique constraint')) {
-        return { error: 'username taken.' };
-      } else console.error(e);
-    }
+    const { accessInfo, error } = await register(userData, context.reply);
 
-    if (!user) return { error: 'Unable to register new user.' };
+    if (error) return { error };
+    if (!accessInfo) return { error: 'Unable to register user.' };
 
-    const accessToken = await getAccessToken(user);
-    const refreshToken = await getRefreshToken(user);
-
-    context.reply.setCookie('jid', refreshToken, {
-      httpOnly: true,
-      signed: process.env.NODE_ENV === 'production',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
-    delete user['password'];
-    return { user, accessToken, refreshToken };
+    return accessInfo;
   },
 };
 
@@ -151,27 +131,60 @@ const LoginMutation: GraphQLFieldConfig<Object, Context, ILoginArgs> = {
     if (context.user) return { error: "You're already logged in" };
 
     const { username, password } = args.input;
-    const user: MaybeUserRecord = await db<User>('User').where({ username: username }).select().first();
-
-    if (!user) return { error: 'Incorrect username or password' };
-
-    const { password: storedPass = '' } = user;
-    const valid = await compare(password, storedPass);
-    if (!valid) return { error: 'Incorrect username or password' };
-
-    const accessToken = await getAccessToken(user);
-    const refreshToken = await getRefreshToken(user);
-
-    context.reply.setCookie('jid', refreshToken, {
-      httpOnly: true,
-      signed: process.env.NODE_ENV === 'production',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
-    delete user['password'];
-    return { user, accessToken, refreshToken };
+    const accessInfo = await login(username, password, context.reply);
+    if (!accessInfo) return { error: 'Incorrect username or password' };
+    return accessInfo;
   },
 };
+
+// ----------------------------------------------------------------------------
+//
+//  LogoutMutation
+//
+// ----------------------------------------------------------------------------
+
+interface ILogoutArgs {
+  // input: {
+  //   foo: string;
+  // };
+}
+
+interface ILogoutPayload {
+  error?: string;
+}
+
+export const LogoutArgs: GraphQLFieldConfigArgumentMap = {
+  input: {
+    type: new GraphQLInputObjectType({
+      name: 'LogoutInput',
+      fields: () => ({
+        foo: { type: new GraphQLNonNull(GraphQLString) },
+      }),
+    }),
+  },
+};
+
+export const LogoutPayload = new GraphQLObjectType({
+  name: 'LogoutPayload',
+  fields: () => ({
+    error: { type: GraphQLString },
+  }),
+});
+
+const LogoutMutation: GraphQLFieldConfig<Object, Context, ILogoutArgs> = {
+  args: LogoutArgs,
+  type: LogoutPayload,
+  resolve: async (_source, _args, context): Promise<ILogoutPayload> => {
+    logout(context.reply);
+    return {};
+  },
+};
+
+// ----------------------------------------------------------------------------
+//
+//  Public Mutations
+//
+// ----------------------------------------------------------------------------
 
 export const PublicMutation: GraphQLFieldConfig<Object, Context> = {
   type: new GraphQLObjectType({
@@ -186,11 +199,17 @@ export const PublicMutation: GraphQLFieldConfig<Object, Context> = {
   },
 };
 
+// ----------------------------------------------------------------------------
+//
+//  Private Mutations
+//
+// ----------------------------------------------------------------------------
+
 export const PrivateMutation: GraphQLFieldConfig<Object, Context> = {
   type: new GraphQLObjectType({
     name: 'PrivateMutation',
     fields: (): any => ({
-      todo: { type: GraphQLString },
+      logout: LogoutMutation,
     }),
   }),
   resolve: (_source, _args, context: Context) => {
@@ -203,6 +222,12 @@ export const PrivateMutation: GraphQLFieldConfig<Object, Context> = {
     return {};
   },
 };
+
+// ----------------------------------------------------------------------------
+//
+//  Root Mutations
+//
+// ----------------------------------------------------------------------------
 
 export const MutationType = new GraphQLObjectType({
   name: 'Mutation',

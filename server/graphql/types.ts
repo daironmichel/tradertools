@@ -71,8 +71,8 @@ export const UserNodeField: GraphQLFieldConfig<unknown, Context> = {
 export const ViewerType = new GraphQLObjectType({
   name: 'ViewerType',
   fields: () => ({
-    foo: { type: new GraphQLNonNull(GraphQLString) },
-    bar: { type: GraphQLString },
+    foo: { type: new GraphQLNonNull(GraphQLString), resolve: () => 'fuz' },
+    bar: { type: GraphQLString, resolve: () => 'bis' },
   }),
 });
 

@@ -5,7 +5,14 @@ import fastifyCookie from 'fastify-cookie';
 import 'dotenv/config';
 import { getLoaders } from './db';
 import { Context, schema } from './graphql';
-import { getAccessToken, MaybeRefreshTokenPayload, verifyAccessHeader, verifyRefreshCookie } from './auth';
+import {
+  getAccessToken,
+  getRefreshToken,
+  MaybeRefreshTokenPayload,
+  sendRefreshToken,
+  verifyAccessHeader,
+  verifyRefreshCookie,
+} from './auth';
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -53,8 +60,11 @@ fastifyServer.register((fastify, _opts, next) => {
         if (!payload) {
           reply.status(401);
           reply.header('WWW-Authenticate', 'https://trader.dleyva.com/login');
+          reply.send();
         } else {
           const token = await getAccessToken({ id: payload.userId });
+          const refreshToken = await getRefreshToken({ id: payload.userId, tokenVersion: payload.tokenVersion });
+          sendRefreshToken(reply, refreshToken);
           reply.send({ token });
         }
       });

@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import config from './config';
-import { UserRecord, User } from './db';
 import jwt from 'jsonwebtoken';
-import { FastifyReply, FastifyRequest } from 'fastify';
 import db from './db/db';
+import { UserRecord, User, MaybeUserRecord } from './db';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 export interface PasswordHashingOptions {
   keylen: number;
@@ -96,7 +96,7 @@ export async function getRefreshToken(user: UserRecord): Promise<string> {
 
     const payload: RefreshTokenPayload = { userId, tokenVersion };
     const secretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-    const expiration = process.env.REFRESH_TOKEN_EXPIRATION || '7m';
+    const expiration = process.env.REFRESH_TOKEN_EXPIRATION || '10m';
 
     if (!secretKey) {
       console.error('REFRESH_TOKEN_SECRET_KEY environment variable is not defined.');
@@ -115,7 +115,7 @@ export type MaybeAccessTokenPayload = AccessTokenPayload | undefined;
 
 export async function verifyAccessHeader(request: FastifyRequest): Promise<MaybeAccessTokenPayload> {
   return new Promise<MaybeAccessTokenPayload>((resolve, reject) => {
-    const authorization = request.headers['Authorization'];
+    const { authorization } = request.headers;
     if (!authorization) {
       resolve();
       return;
@@ -136,26 +136,23 @@ export async function verifyAccessHeader(request: FastifyRequest): Promise<Maybe
     }
 
     jwt.verify(token, secretKey, (error, decoded) => {
-      if (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        resolve();
+        return;
+      } else if (error) {
         console.error(error);
         reject(error);
         return;
       }
 
-      const { payload } = (decoded || {}) as any;
-      if (!payload) {
+      const { userId } = (decoded || {}) as any;
+
+      if (typeof userId !== 'number' || userId <= 0) {
         resolve();
         return;
       }
 
-      const { userId } = payload;
-
-      if (!userId) {
-        resolve();
-        return;
-      }
-
-      resolve(payload);
+      resolve({ userId });
     });
   });
 }
@@ -182,29 +179,25 @@ export async function verifyRefreshCookie(
     }
 
     jwt.verify(token, secretKey, (error, decoded) => {
-      if (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        resolve();
+        return;
+      } else if (error) {
         console.error(error);
         reject(error);
         return;
       }
 
-      const { payload } = (decoded || {}) as any;
-      if (!payload) {
-        console.error('Trying to refresh a token without a payload.');
+      const { userId, tokenVersion } = (decoded || {}) as any;
+
+      if (typeof userId !== 'number' || userId <= 0) {
+        console.error('Trying to refresh a token with invalid userId value in payload.');
         resolve();
         return;
       }
 
-      const { userId, tokenVersion } = payload;
-
-      if (!userId) {
-        console.error('Trying to refresh a token without userId in payload.');
-        resolve();
-        return;
-      }
-
-      if (typeof tokenVersion !== 'number') {
-        console.error('Trying to refresh a token without tokenVersion in payload.');
+      if (typeof tokenVersion !== 'number' || tokenVersion < 0) {
+        console.error('Trying to refresh a token with invalid tokenVersion value in payload.');
         resolve();
         return;
       }
@@ -226,8 +219,89 @@ export async function verifyRefreshCookie(
             return;
           }
 
-          resolve(payload);
+          resolve({ userId, tokenVersion });
         });
     });
   });
+}
+
+export function sendRefreshToken(reply: FastifyReply<unknown>, refreshToken: string) {
+  reply.setCookie('jid', refreshToken, {
+    httpOnly: true,
+    signed: true,
+    path: '/token',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: parseInt(process.env.COOKIE_MAX_AGE || '600'), // 60 * 10 (10 minutes)
+  });
+}
+
+export interface AccessInfo {
+  user: UserRecord;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RegisterResult {
+  accessInfo?: AccessInfo;
+  error?: string;
+}
+
+export async function register(userData: UserRecord, reply?: FastifyReply<unknown>): Promise<RegisterResult> {
+  let user: MaybeUserRecord;
+  try {
+    const result: UserRecord[] = await db<User>('User')
+      .insert(userData)
+      .returning(['id', 'username', 'firstName', 'lastName', 'tokenVersion']);
+    user = result[0];
+  } catch (e) {
+    if (e.message.toLowerCase().includes('violates unique constraint')) {
+      return { error: 'username taken.' };
+    } else console.error(e);
+  }
+
+  if (!user) return { error: 'Unable to register new user.' };
+
+  const accessInfo: AccessInfo = {
+    user: user,
+    accessToken: await getAccessToken(user),
+    refreshToken: await getRefreshToken(user),
+  };
+
+  if (reply) sendRefreshToken(reply, accessInfo.refreshToken);
+
+  delete user['password'];
+  delete user['tokenVersion'];
+
+  return { accessInfo };
+}
+
+export async function login(
+  username: string,
+  password: string,
+  reply?: FastifyReply<unknown>
+): Promise<AccessInfo | undefined> {
+  const user: MaybeUserRecord = await db<User>('User')
+    .where({ username: username })
+    .select(['id', 'username', 'firstName', 'lastName', 'password', 'tokenVersion'])
+    .first();
+
+  if (!user) return;
+
+  const { password: storedPass = '' } = user;
+  const valid = await compare(password, storedPass);
+  if (!valid) return;
+
+  const accessToken = await getAccessToken(user);
+  const refreshToken = await getRefreshToken(user);
+
+  if (reply) sendRefreshToken(reply, refreshToken);
+
+  delete user['password'];
+  delete user['tokenVersion'];
+
+  return { user, accessToken, refreshToken };
+}
+
+export function logout(reply?: FastifyReply<unknown>) {
+  reply?.clearCookie('jid');
 }
