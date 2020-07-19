@@ -2,11 +2,18 @@ const baseConfig = {
   client: 'pg',
   connection: process.env.DATABASE_URL,
   migrations: {
-    directory: './server/migrations',
+    directory: './server/db/migrations',
     tableName: 'knex_migrations',
   },
   seeds: {
-    directory: './server/seeds',
+    directory: './server/db/seeds',
+  },
+  pool: {
+    afterCreate: function (connection: any, callback: any) {
+      connection.query("SET TIME ZONE 'UTC';", function (err: Error) {
+        callback(err, connection);
+      });
+    },
   },
 };
 

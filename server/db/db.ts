@@ -14,3 +14,20 @@ export interface User {
 
 export type UserRecord = Partial<User>;
 export type MaybeUserRecord = UserRecord | null | undefined;
+
+export interface Broker {
+  id: number;
+  name: string;
+  userId: number;
+  oauth1RequestToken: string;
+  oauth1RequestTokenSecret: string;
+  oauth1AccessToken: string;
+  oauth1AccessTokenSecret: string;
+  oauth1RefreshToken: string;
+  oauth1AccessTokenExpiresAt: Date;
+  oauth1RefreshTokenExpiresAt: Date;
+  user?: MaybeUserRecord;
+}
+
+export type BrokerRecord = Partial<Broker>;
+export type MaybeBrokerRecord = BrokerRecord | null | undefined;

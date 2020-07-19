@@ -6,11 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "migrate-make": "env-cmd knex migrate:make --esm -x ts",
-    "migrate": "env-cmd knex migrate:latest --esm",
-    "migrate-rollback": "env-cmd knex migrate:rollback --esm",
-    "migrate-up": "env-cmd knex migrate:up --esm",
-    "migrate-down": "env-cmd knex migrate:down --esm",
+    "db-make": "env-cmd knex migrate:make --esm -x ts",
+    "db-migrate": "env-cmd knex migrate:latest --esm",
+    "db-rollback": "env-cmd knex migrate:rollback --esm",
+    "db-up": "env-cmd knex migrate:up --esm",
+    "db-down": "env-cmd knex migrate:down --esm",
     "createuser": "ts-node --project tsconfig.server.json --transpile-only server/commands/createuser.ts"
   },
   "dependencies": {
