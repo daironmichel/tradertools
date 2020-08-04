@@ -1,4 +1,4 @@
-import { MaybeUserRecord } from '../db';
+import { User } from '../db';
 import { Context } from './common';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import {
@@ -11,6 +11,7 @@ import {
   GraphQLNonNull,
   GraphQLInt,
 } from 'graphql';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 interface INode {
   id: string | number;
@@ -63,7 +64,7 @@ export const UserNodeField: GraphQLFieldConfig<unknown, Context> = {
   args: {
     id: { type: new GraphQLNonNull(GraphQLInt) },
   },
-  resolve: async (_source, args, context): Promise<MaybeUserRecord> => {
+  resolve: async (_source, args, context): Promise<Maybe<User>> => {
     return await context.loaders.user.load(args.id);
   },
 };

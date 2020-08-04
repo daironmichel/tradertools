@@ -1,11 +1,12 @@
-import { Loaders, MaybeUserRecord } from '../db';
+import { Loaders, User } from '../db';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 export type Context = {
-  request: FastifyRequest,
-  reply: FastifyReply<unknown>,
+  request: FastifyRequest;
+  reply: FastifyReply<unknown>;
   loaders: Loaders;
-  user: MaybeUserRecord;
+  user: Maybe<User>;
 };
 
 export type IntIdArg = {
@@ -21,7 +22,7 @@ export type ClientCredentials = {
 };
 
 export type ServerCredentials = {
-  user: MaybeUserRecord;
+  user: Maybe<User>;
 };
 
 export type VerifiedToken = {

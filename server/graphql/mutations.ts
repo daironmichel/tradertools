@@ -1,5 +1,5 @@
 import { Context } from './common';
-import { UserRecord } from '../db';
+import { User } from '../db';
 import { hashPassword, login, logout, register } from '../auth';
 import {
   GraphQLObjectType,
@@ -28,7 +28,7 @@ interface IRegisterArgs {
 
 interface IRegisterPayload {
   error?: string;
-  user?: UserRecord;
+  user?: User;
   accessToken?: string;
   refreshToken?: string;
 }
@@ -65,7 +65,7 @@ const RegisterMutation: GraphQLFieldConfig<Object, Context, IRegisterArgs> = {
 
     // TODO: validate password
 
-    const userData: UserRecord = {
+    const userData: User = {
       username,
       firstName,
       lastName,
@@ -97,7 +97,7 @@ interface ILoginArgs {
 
 interface ILoginPayload {
   error?: string;
-  user?: UserRecord;
+  user?: User;
   accessToken?: string;
   refreshToken?: string;
 }

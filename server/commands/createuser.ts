@@ -1,5 +1,5 @@
 import readline from 'readline';
-import db from '../db/db';
+import db, { User } from '../db/db';
 import { hashPassword } from '../auth';
 import { Transaction } from 'knex';
 
@@ -33,7 +33,7 @@ async function main() {
 
   while (!password) {
     try {
-      password = hashPassword(await ask('password (required): '));
+      password = await hashPassword(await ask('password (required): '));
     } catch (e) {
       console.log(e);
     }
@@ -45,7 +45,7 @@ async function main() {
   let userId = null;
 
   await db.transaction(async (trx: Transaction) => {
-    const res = await trx('User').insert({ username, password, firstName, lastName }, 'id');
+    const res = await trx<User, User[]>('User').insert({ username, password, firstName, lastName }, 'id');
     userId = res[0];
   });
 

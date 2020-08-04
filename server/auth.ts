@@ -2,11 +2,12 @@ import crypto from 'crypto';
 import config from './config';
 import jwt from 'jsonwebtoken';
 import db from './db/db';
-import { UserRecord, User, MaybeUserRecord } from './db';
+import { User } from './db';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 export interface PasswordHashingOptions {
-  keylen: number;
+  keyLength: number;
   iterations: number;
   algorithm: string;
 }
@@ -16,12 +17,12 @@ export async function hashPassword(
   salt?: string,
   options?: PasswordHashingOptions
 ): Promise<string> {
-  const { algorithm, iterations, keylen } = options || config.passwordHasher;
+  const { algorithm, iterations, keyLength } = options || config.passwordHasher;
   const saltValue = salt || crypto.randomBytes(16).toString('hex');
 
   const derivedKeyPromise = new Promise<string>((resolve, reject) => {
     let saltedPassword = [saltValue, rawPassword].join('$');
-    crypto.pbkdf2(saltedPassword, saltValue, iterations, keylen, algorithm, (error, derivedKey) => {
+    crypto.pbkdf2(saltedPassword, saltValue, iterations, keyLength, algorithm, (error, derivedKey) => {
       if (error) reject(error);
       else resolve(derivedKey.toString('hex'));
     });
@@ -29,14 +30,14 @@ export async function hashPassword(
 
   const pwdHash = await derivedKeyPromise;
 
-  return [algorithm, iterations, keylen, saltValue, pwdHash].join('$');
+  return [algorithm, iterations, keyLength, saltValue, pwdHash].join('$');
 }
 
 export async function compare(rawPassword: string, storedPassword: string): Promise<boolean> {
-  const [algorithm, iterations, keylen, saltValue] = storedPassword.split('$');
+  const [algorithm, iterations, keyLength, saltValue] = storedPassword.split('$');
 
   const hashedPassword = await hashPassword(rawPassword, saltValue, {
-    keylen: parseInt(keylen),
+    keyLength: parseInt(keyLength),
     iterations: parseInt(iterations),
     algorithm,
   });
@@ -48,7 +49,7 @@ export interface AccessTokenPayload {
   userId: number;
 }
 
-export async function getAccessToken(user: UserRecord): Promise<string> {
+export async function getAccessToken(user: User): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const { id: userId } = user;
     if (!userId) {
@@ -79,7 +80,7 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
 }
 
-export async function getRefreshToken(user: UserRecord): Promise<string> {
+export async function getRefreshToken(user: User): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const { id: userId, tokenVersion } = user;
     if (!userId) {
@@ -202,7 +203,7 @@ export async function verifyRefreshCookie(
         return;
       }
 
-      db<User>('User')
+      db<User, User[]>('User')
         .where({ id: userId })
         .select(['id', 'tokenVersion'])
         .first()
@@ -236,7 +237,7 @@ export function sendRefreshToken(reply: FastifyReply<unknown>, refreshToken: str
 }
 
 export interface AccessInfo {
-  user: UserRecord;
+  user: User;
   accessToken: string;
   refreshToken: string;
 }
@@ -246,10 +247,10 @@ export interface RegisterResult {
   error?: string;
 }
 
-export async function register(userData: UserRecord, reply?: FastifyReply<unknown>): Promise<RegisterResult> {
-  let user: MaybeUserRecord;
+export async function register(userData: User, reply?: FastifyReply<unknown>): Promise<RegisterResult> {
+  let user: Maybe<User>;
   try {
-    const result: UserRecord[] = await db<User>('User')
+    const result: User[] = await db<User, User[]>('User')
       .insert(userData)
       .returning(['id', 'username', 'firstName', 'lastName', 'tokenVersion']);
     user = result[0];
@@ -280,7 +281,7 @@ export async function login(
   password: string,
   reply?: FastifyReply<unknown>
 ): Promise<AccessInfo | undefined> {
-  const user: MaybeUserRecord = await db<User>('User')
+  const user: Maybe<User> = await db<User, User[]>('User')
     .where({ username: username })
     .select(['id', 'username', 'firstName', 'lastName', 'password', 'tokenVersion'])
     .first();
