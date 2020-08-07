@@ -60,7 +60,7 @@ export async function getAccessToken(user: User): Promise<string> {
 
     const payload: AccessTokenPayload = { userId };
     const secretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
-    const expiration = process.env.ACCESS_TOKEN_EXPIRATION || '15m';
+    const expiration = process.env.ACCESS_TOKEN_EXPIRATION || '10m';
 
     if (!secretKey) {
       console.error('ACCESS_TOKEN_SECRET_KEY environment variable is not defined.');
@@ -97,7 +97,7 @@ export async function getRefreshToken(user: User): Promise<string> {
 
     const payload: RefreshTokenPayload = { userId, tokenVersion };
     const secretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
-    const expiration = process.env.REFRESH_TOKEN_EXPIRATION || '10m';
+    const expiration = process.env.REFRESH_TOKEN_EXPIRATION || '30m';
 
     if (!secretKey) {
       console.error('REFRESH_TOKEN_SECRET_KEY environment variable is not defined.');
@@ -232,7 +232,7 @@ export function sendRefreshToken(reply: FastifyReply<unknown>, refreshToken: str
     signed: true,
     path: '/token',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: parseInt(process.env.COOKIE_MAX_AGE || '600'), // 60 * 10 (10 minutes)
+    maxAge: parseInt(process.env.COOKIE_MAX_AGE || '1800'), // 1800 sec == 30 min
   });
 }
 
