@@ -1,5 +1,5 @@
 import { User } from '../db';
-import { Context } from './common';
+import { Context, createGraphQLEnumValues } from './common';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import {
   GraphQLResolveInfo,
@@ -10,8 +10,10 @@ import {
   GraphQLFieldConfig,
   GraphQLNonNull,
   GraphQLInt,
+  GraphQLEnumType,
 } from 'graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
+import { Broker } from '../providers';
 
 interface INode {
   id: string | number;
@@ -68,6 +70,11 @@ export const UserNodeField: GraphQLFieldConfig<unknown, Context> = {
     return await context.loaders.user.load(args.id);
   },
 };
+
+export const BrokerEnum = new GraphQLEnumType({
+  name: 'BrokerEnum',
+  values: createGraphQLEnumValues(Broker),
+});
 
 export const ViewerType = new GraphQLObjectType({
   name: 'ViewerType',

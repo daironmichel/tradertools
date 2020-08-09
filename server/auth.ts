@@ -140,6 +140,9 @@ export async function verifyAccessHeader(request: FastifyRequest): Promise<Maybe
       if (error instanceof jwt.TokenExpiredError) {
         resolve();
         return;
+      } else if (error instanceof jwt.JsonWebTokenError) {
+        resolve();
+        return;
       } else if (error) {
         console.error(error);
         reject(error);
@@ -162,7 +165,7 @@ export type MaybeRefreshTokenPayload = RefreshTokenPayload | undefined;
 
 export async function verifyRefreshCookie(
   request: FastifyRequest,
-  reply: FastifyReply<unknown>
+  reply: FastifyReply
 ): Promise<MaybeRefreshTokenPayload> {
   return new Promise<MaybeRefreshTokenPayload>((resolve, reject) => {
     const token = reply.unsignCookie(request.cookies.jid);
@@ -226,7 +229,7 @@ export async function verifyRefreshCookie(
   });
 }
 
-export function sendRefreshToken(reply: FastifyReply<unknown>, refreshToken: string) {
+export function sendRefreshToken(reply: FastifyReply, refreshToken: string) {
   reply.setCookie('jid', refreshToken, {
     httpOnly: true,
     signed: true,
@@ -247,7 +250,7 @@ export interface RegisterResult {
   error?: string;
 }
 
-export async function register(userData: User, reply?: FastifyReply<unknown>): Promise<RegisterResult> {
+export async function register(userData: User, reply?: FastifyReply): Promise<RegisterResult> {
   let user: Maybe<User>;
   try {
     const result: User[] = await db<User, User[]>('User')
@@ -276,11 +279,7 @@ export async function register(userData: User, reply?: FastifyReply<unknown>): P
   return { accessInfo };
 }
 
-export async function login(
-  username: string,
-  password: string,
-  reply?: FastifyReply<unknown>
-): Promise<AccessInfo | undefined> {
+export async function login(username: string, password: string, reply?: FastifyReply): Promise<AccessInfo | undefined> {
   const user: Maybe<User> = await db<User, User[]>('User')
     .where({ username: username })
     .select(['id', 'username', 'firstName', 'lastName', 'password', 'tokenVersion'])
@@ -303,6 +302,6 @@ export async function login(
   return { user, accessToken, refreshToken };
 }
 
-export function logout(reply?: FastifyReply<unknown>) {
+export function logout(reply?: FastifyReply) {
   reply?.clearCookie('jid');
 }

@@ -9,7 +9,8 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
 } from 'graphql';
-import { UserNode } from './types';
+import { UserNode, BrokerEnum } from './types';
+import { Broker } from '../providers';
 
 // ----------------------------------------------------------------------------
 //
@@ -182,6 +183,50 @@ const LogoutMutation: GraphQLFieldConfig<Object, Context, ILogoutArgs> = {
 
 // ----------------------------------------------------------------------------
 //
+//  GetAuthorizeURLMutation
+//
+// ----------------------------------------------------------------------------
+
+interface IGetAuthorizeURLArgs {
+  input: {
+    broker: Broker;
+  };
+}
+
+interface IGetAuthorizeURLPayload {
+  error?: string;
+  url?: string;
+}
+
+export const GetAuthorizeURLArgs: GraphQLFieldConfigArgumentMap = {
+  input: {
+    type: new GraphQLInputObjectType({
+      name: 'GetAuthorizeURLInput',
+      fields: () => ({
+        broker: { type: new GraphQLNonNull(BrokerEnum) },
+      }),
+    }),
+  },
+};
+
+export const GetAuthorizeURLPayload = new GraphQLObjectType({
+  name: 'GetAuthorizeURLPayload',
+  fields: () => ({
+    error: { type: GraphQLString },
+    url: { type: GraphQLString },
+  }),
+});
+
+const GetAuthorizeURLMutation: GraphQLFieldConfig<Object, Context, IGetAuthorizeURLArgs> = {
+  args: GetAuthorizeURLArgs,
+  type: GetAuthorizeURLPayload,
+  resolve: async (_source, _args, _context): Promise<IGetAuthorizeURLPayload> => {
+    return { url: 'https://www.test.com' };
+  },
+};
+
+// ----------------------------------------------------------------------------
+//
 //  Public Mutations
 //
 // ----------------------------------------------------------------------------
@@ -210,6 +255,7 @@ export const PrivateMutation: GraphQLFieldConfig<Object, Context> = {
     name: 'PrivateMutation',
     fields: (): any => ({
       logout: LogoutMutation,
+      getAuthorizeURL: GetAuthorizeURLMutation,
     }),
   }),
   resolve: (_source, _args, context: Context) => {

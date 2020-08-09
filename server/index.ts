@@ -13,6 +13,7 @@ import {
   verifyAccessHeader,
   verifyRefreshCookie,
 } from './auth';
+import { ParsedUrlQuery } from 'querystring';
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -27,7 +28,7 @@ fastifyServer.register(fastifyGQL, {
   schema: schema,
   path: '/api/graphql',
   graphiql: 'playground',
-  context: async (request: FastifyRequest, reply: FastifyReply<unknown>): Promise<Context> => {
+  context: async (request: FastifyRequest, reply: FastifyReply): Promise<Context> => {
     const payload = await verifyAccessHeader(request);
     const { userId } = payload || {};
     const user = typeof userId === 'number' ? { id: userId } : undefined;
@@ -50,7 +51,7 @@ fastifyServer.register((fastify, _opts, next) => {
     .then(async () => {
       if (dev) {
         fastify.get('/_next/*', async (req, reply) => {
-          await handle(req.req, reply.res);
+          await handle(req.raw, reply.raw);
           reply.sent = true;
         });
       }
@@ -70,22 +71,22 @@ fastifyServer.register((fastify, _opts, next) => {
       });
 
       fastify.get('/a', async (req, reply) => {
-        await nextApp.render(req.req, reply.res, '/a', req.query);
+        await nextApp.render(req.raw, reply.raw, '/a', req.query as ParsedUrlQuery);
         reply.sent = true;
       });
 
       fastify.get('/b', async (req, reply) => {
-        await nextApp.render(req.req, reply.res, '/b', req.query);
+        await nextApp.render(req.raw, reply.raw, '/b', req.query as ParsedUrlQuery);
         reply.sent = true;
       });
 
       fastify.all('/*', async (req, reply) => {
-        await handle(req.req, reply.res);
+        await handle(req.raw, reply.raw);
         reply.sent = true;
       });
 
       fastify.setNotFoundHandler(async (request, reply) => {
-        await nextApp.render404(request.req, reply.res);
+        await nextApp.render404(request.raw, reply.raw);
         reply.sent = true;
       });
 
