@@ -1,3 +1,6 @@
+import { IBroker } from './common';
+import ETrade from './etrade';
+
 export enum Broker {
   ETrade,
   TDAmeritrade,
@@ -6,6 +9,11 @@ export enum Broker {
 
 export type BrokerName = keyof typeof Broker;
 
-export interface IBroker {
-  getAuthorizeURL: () => string;
+export function getBrokerInstance(broker: Broker): IBroker {
+  switch (broker) {
+    case Broker.ETrade:
+      return new ETrade();
+    default:
+      throw 'Invalid broker';
+  }
 }

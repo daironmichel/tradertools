@@ -10,7 +10,7 @@ import {
   GraphQLFieldConfigArgumentMap,
 } from 'graphql';
 import { UserNode, BrokerEnum } from './types';
-import { Broker } from '../providers';
+import { Broker, getBrokerInstance } from '../providers';
 
 // ----------------------------------------------------------------------------
 //
@@ -36,15 +36,17 @@ interface IRegisterPayload {
 
 export const RegisterArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLInputObjectType({
-      name: 'RegisterInput',
-      fields: () => ({
-        username: { type: new GraphQLNonNull(GraphQLString) },
-        password: { type: new GraphQLNonNull(GraphQLString) },
-        firstName: { type: GraphQLString },
-        lastName: { type: GraphQLString },
-      }),
-    }),
+    type: new GraphQLNonNull(
+      new GraphQLInputObjectType({
+        name: 'RegisterInput',
+        fields: () => ({
+          username: { type: new GraphQLNonNull(GraphQLString) },
+          password: { type: new GraphQLNonNull(GraphQLString) },
+          firstName: { type: GraphQLString },
+          lastName: { type: GraphQLString },
+        }),
+      })
+    ),
   },
 };
 
@@ -105,13 +107,15 @@ interface ILoginPayload {
 
 export const LoginArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLInputObjectType({
-      name: 'LoginInput',
-      fields: () => ({
-        username: { type: new GraphQLNonNull(GraphQLString) },
-        password: { type: new GraphQLNonNull(GraphQLString) },
-      }),
-    }),
+    type: new GraphQLNonNull(
+      new GraphQLInputObjectType({
+        name: 'LoginInput',
+        fields: () => ({
+          username: { type: new GraphQLNonNull(GraphQLString) },
+          password: { type: new GraphQLNonNull(GraphQLString) },
+        }),
+      })
+    ),
   },
 };
 
@@ -200,12 +204,14 @@ interface IGetAuthorizeURLPayload {
 
 export const GetAuthorizeURLArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLInputObjectType({
-      name: 'GetAuthorizeURLInput',
-      fields: () => ({
-        broker: { type: new GraphQLNonNull(BrokerEnum) },
-      }),
-    }),
+    type: new GraphQLNonNull(
+      new GraphQLInputObjectType({
+        name: 'GetAuthorizeURLInput',
+        fields: () => ({
+          broker: { type: new GraphQLNonNull(BrokerEnum) },
+        }),
+      })
+    ),
   },
 };
 
@@ -220,8 +226,10 @@ export const GetAuthorizeURLPayload = new GraphQLObjectType({
 const GetAuthorizeURLMutation: GraphQLFieldConfig<Object, Context, IGetAuthorizeURLArgs> = {
   args: GetAuthorizeURLArgs,
   type: GetAuthorizeURLPayload,
-  resolve: async (_source, _args, _context): Promise<IGetAuthorizeURLPayload> => {
-    return { url: 'https://www.test.com' };
+  resolve: async (_source, args, _context): Promise<IGetAuthorizeURLPayload> => {
+    const broker = getBrokerInstance(args.input.broker);
+    const authorizeURL = await broker.getAuthorizeURL();
+    return { url: authorizeURL };
   },
 };
 
