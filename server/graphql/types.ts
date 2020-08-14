@@ -1,4 +1,3 @@
-import { User } from '../db';
 import { Context, createGraphQLEnumValues } from './common';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import {
@@ -9,10 +8,8 @@ import {
   GraphQLInterfaceType,
   GraphQLFieldConfig,
   GraphQLNonNull,
-  GraphQLInt,
   GraphQLEnumType,
 } from 'graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
 import { Broker } from '../providers';
 
 interface INode {
@@ -38,7 +35,13 @@ export const NodeField: GraphQLFieldConfig<Object, Context> = {
   args: {
     id: { type: new GraphQLNonNull(GraphQLID) },
   },
-  resolve: async (_source: Object, args: { [argName: string]: any }, context: Context, _info): Promise<unknown> => {
+  resolve: async (_source, args, context, _info): Promise<unknown> => {
+    if (!context.user) {
+      context.reply.status(401); // unauthorized;
+      context.reply.header('WWW-Authenticate', 'https://trader.dleyva.com/login');
+      return null;
+    }
+
     const itemInfo = fromGlobalId(args.id);
     const itemId = parseInt(itemInfo.id) || 0;
 
@@ -60,16 +63,6 @@ export const UserNode = new GraphQLObjectType({
     lastName: { type: GraphQLString },
   }),
 });
-
-export const UserNodeField: GraphQLFieldConfig<unknown, Context> = {
-  type: UserNode,
-  args: {
-    id: { type: new GraphQLNonNull(GraphQLInt) },
-  },
-  resolve: async (_source, args, context): Promise<Maybe<User>> => {
-    return await context.loaders.user.load(args.id);
-  },
-};
 
 export const BrokerEnum = new GraphQLEnumType({
   name: 'BrokerEnum',
@@ -102,6 +95,5 @@ export const QueryType = new GraphQLObjectType({
   fields: () => ({
     node: NodeField,
     viewer: ViewerTypeField,
-    user: UserNodeField,
   }),
 });

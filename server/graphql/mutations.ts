@@ -34,19 +34,21 @@ interface IRegisterPayload {
   refreshToken?: string;
 }
 
+export const RegisterInput = new GraphQLNonNull(
+  new GraphQLInputObjectType({
+    name: 'RegisterInput',
+    fields: () => ({
+      username: { type: new GraphQLNonNull(GraphQLString) },
+      password: { type: new GraphQLNonNull(GraphQLString) },
+      firstName: { type: GraphQLString },
+      lastName: { type: GraphQLString },
+    }),
+  })
+);
+
 export const RegisterArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLNonNull(
-      new GraphQLInputObjectType({
-        name: 'RegisterInput',
-        fields: () => ({
-          username: { type: new GraphQLNonNull(GraphQLString) },
-          password: { type: new GraphQLNonNull(GraphQLString) },
-          firstName: { type: GraphQLString },
-          lastName: { type: GraphQLString },
-        }),
-      })
-    ),
+    type: RegisterInput,
   },
 };
 
@@ -105,17 +107,19 @@ interface ILoginPayload {
   refreshToken?: string;
 }
 
+export const LoginInput = new GraphQLNonNull(
+  new GraphQLInputObjectType({
+    name: 'LoginInput',
+    fields: () => ({
+      username: { type: new GraphQLNonNull(GraphQLString) },
+      password: { type: new GraphQLNonNull(GraphQLString) },
+    }),
+  })
+);
+
 export const LoginArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLNonNull(
-      new GraphQLInputObjectType({
-        name: 'LoginInput',
-        fields: () => ({
-          username: { type: new GraphQLNonNull(GraphQLString) },
-          password: { type: new GraphQLNonNull(GraphQLString) },
-        }),
-      })
-    ),
+    type: LoginInput,
   },
 };
 
@@ -158,15 +162,17 @@ interface ILogoutPayload {
   error?: string;
 }
 
+// export const LogoutInput = new GraphQLInputObjectType({
+//   name: 'LogoutInput',
+//   fields: () => ({
+//     foo: { type: new GraphQLNonNull(GraphQLString) },
+//   }),
+// });
+
 export const LogoutArgs: GraphQLFieldConfigArgumentMap = {
-  input: {
-    type: new GraphQLInputObjectType({
-      name: 'LogoutInput',
-      fields: () => ({
-        foo: { type: new GraphQLNonNull(GraphQLString) },
-      }),
-    }),
-  },
+  // input: {
+  //   type: LogoutInput,
+  // },
 };
 
 export const LogoutPayload = new GraphQLObjectType({
@@ -202,16 +208,18 @@ interface IGetAuthorizeURLPayload {
   url?: string;
 }
 
+export const GetAuthorizeURLInput = new GraphQLNonNull(
+  new GraphQLInputObjectType({
+    name: 'GetAuthorizeURLInput',
+    fields: () => ({
+      broker: { type: new GraphQLNonNull(BrokerEnum) },
+    }),
+  })
+);
+
 export const GetAuthorizeURLArgs: GraphQLFieldConfigArgumentMap = {
   input: {
-    type: new GraphQLNonNull(
-      new GraphQLInputObjectType({
-        name: 'GetAuthorizeURLInput',
-        fields: () => ({
-          broker: { type: new GraphQLNonNull(BrokerEnum) },
-        }),
-      })
-    ),
+    type: GetAuthorizeURLInput,
   },
 };
 
@@ -240,13 +248,15 @@ const GetAuthorizeURLMutation: GraphQLFieldConfig<Object, Context, IGetAuthorize
 // ----------------------------------------------------------------------------
 
 export const PublicMutation: GraphQLFieldConfig<Object, Context> = {
-  type: new GraphQLObjectType({
-    name: 'PublicMutation',
-    fields: (): any => ({
-      login: LoginMutation,
-      register: RegisterMutation,
-    }),
-  }),
+  type: new GraphQLNonNull(
+    new GraphQLObjectType({
+      name: 'PublicMutation',
+      fields: (): any => ({
+        login: LoginMutation,
+        register: RegisterMutation,
+      }),
+    })
+  ),
   resolve() {
     return {};
   },
