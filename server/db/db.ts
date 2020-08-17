@@ -1,16 +1,18 @@
 import knex from 'knex';
 import { production, development } from '../../knexfile';
 
-export default process.env.NODE_ENV === 'production' ? knex(production) : knex(development);
+const db = process.env.NODE_ENV === 'production' ? knex(production) : knex(development);
 
 export interface User {
   id: number;
-  firstName: string; // default: ''
-  lastName: string; // default: ''
   username: string;
   password: string;
+  firstName: string; // default: ''
+  lastName: string; // default: ''
   tokenVersion: number; // default: 0
 }
+
+export const Users = <TResult>() => db<User, TResult>('User');
 
 export interface BrokerAuth {
   id: number;
@@ -27,3 +29,7 @@ export interface BrokerAuth {
   // other props
   user?: Partial<User>;
 }
+
+export const BrokerAuths = <TResult>() => db<BrokerAuth, TResult>('BrokerAuth');
+
+export default db;

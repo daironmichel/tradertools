@@ -1,4 +1,4 @@
-import db, { User } from './db';
+import { User, Users } from './db';
 import DataLoader from 'dataloader';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
@@ -9,7 +9,7 @@ export type Loaders = {
 };
 
 function userLoader(ids: readonly number[]) {
-  return db<User>('User')
+  return Users<UserRecord[]>()
     .whereIn('id', ids)
     .select(['id', 'username', 'firstName', 'lastName'])
     .then((rows: UserRecord[]) => ids.map((id) => rows.find((x) => x.id === id)));

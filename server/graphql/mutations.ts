@@ -1,6 +1,6 @@
 import { Context } from './common';
 import { User } from '../db';
-import { hashPassword, login, logout, register } from '../auth';
+import { hashPassword, login, logout, register, SignedInUser } from '../auth';
 import {
   GraphQLObjectType,
   GraphQLString,
@@ -29,7 +29,7 @@ interface IRegisterArgs {
 
 interface IRegisterPayload {
   error?: string;
-  user?: User;
+  user?: SignedInUser;
   accessToken?: string;
   refreshToken?: string;
 }
@@ -102,7 +102,7 @@ interface ILoginArgs {
 
 interface ILoginPayload {
   error?: string;
-  user?: User;
+  user?: SignedInUser;
   accessToken?: string;
   refreshToken?: string;
 }

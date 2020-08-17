@@ -1,8 +1,7 @@
 import crypto from 'crypto';
 import config from './config';
 import jwt from 'jsonwebtoken';
-import db from './db/db';
-import { User } from './db';
+import { User, Users } from './db';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
@@ -49,16 +48,8 @@ export interface AccessTokenPayload {
   userId: number;
 }
 
-export async function getAccessToken(user: Partial<User>): Promise<string> {
+export async function generateAccessToken(payload: AccessTokenPayload): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    const { id: userId } = user;
-    if (!userId) {
-      console.error('User record does not have a valid id.');
-      reject(new Error('Unable to generate access token.'));
-      return;
-    }
-
-    const payload: AccessTokenPayload = { userId };
     const secretKey = process.env.ACCESS_TOKEN_SECRET_KEY;
     const expiration = process.env.ACCESS_TOKEN_EXPIRATION || '10m';
 
@@ -80,22 +71,8 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
 }
 
-export async function getRefreshToken(user: Partial<User>): Promise<string> {
+export async function generateRefreshToken(payload: RefreshTokenPayload): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    const { id: userId, tokenVersion } = user;
-    if (!userId) {
-      console.error('User record does not have a valid id.');
-      reject(new Error('Unable to generate refresh token.'));
-      return;
-    }
-
-    if (typeof tokenVersion !== 'number') {
-      console.error('User record does not have a valid token version.');
-      reject(new Error('Unable to generate refresh token.'));
-      return;
-    }
-
-    const payload: RefreshTokenPayload = { userId, tokenVersion };
     const secretKey = process.env.REFRESH_TOKEN_SECRET_KEY;
     const expiration = process.env.REFRESH_TOKEN_EXPIRATION || '30m';
 
@@ -206,7 +183,7 @@ export async function verifyRefreshCookie(
         return;
       }
 
-      db<User, User[]>('User')
+      Users()
         .where({ id: userId })
         .select(['id', 'tokenVersion'])
         .first()
@@ -239,8 +216,12 @@ export function sendRefreshToken(reply: FastifyReply, refreshToken: string) {
   });
 }
 
+export type SignedInUser = Pick<User, 'id' | 'username' | 'firstName' | 'lastName'>;
+export type UserTokenVersion = Pick<User, 'tokenVersion'>;
+export type UserPassword = Pick<User, 'password'>;
+
 export interface AccessInfo {
-  user: User;
+  user: SignedInUser;
   accessToken: string;
   refreshToken: string;
 }
@@ -251,39 +232,36 @@ export interface RegisterResult {
 }
 
 export async function register(userData: Partial<User>, reply?: FastifyReply): Promise<RegisterResult> {
-  let user: Maybe<User>;
+  let user: Maybe<SignedInUser & UserTokenVersion>;
   try {
-    const result: User[] = await db<User, User[]>('User')
+    const result: (SignedInUser & UserTokenVersion)[] = await Users()
       .insert(userData)
       .returning(['id', 'username', 'firstName', 'lastName', 'tokenVersion']);
     user = result[0];
   } catch (e) {
     if (e.message.toLowerCase().includes('violates unique constraint')) {
       return { error: 'username taken.' };
-    } else console.error(e);
+    } else {
+      console.error(e);
+      return { error: 'Unable to register new user.' };
+    }
   }
-
-  if (!user) return { error: 'Unable to register new user.' };
 
   const accessInfo: AccessInfo = {
     user: user,
-    accessToken: await getAccessToken(user),
-    refreshToken: await getRefreshToken(user),
+    accessToken: await generateAccessToken({ userId: user.id }),
+    refreshToken: await generateRefreshToken({ userId: user.id, tokenVersion: user.tokenVersion }),
   };
 
   if (reply) sendRefreshToken(reply, accessInfo.refreshToken);
 
-  delete user['password'];
   delete user['tokenVersion'];
 
   return { accessInfo };
 }
 
 export async function login(username: string, password: string, reply?: FastifyReply): Promise<AccessInfo | undefined> {
-  const user: Maybe<User> = await db<User, User[]>('User')
-    .where({ username: username })
-    .select(['id', 'username', 'firstName', 'lastName', 'password', 'tokenVersion'])
-    .first();
+  const user: Maybe<User> = await Users().where({ username: username }).select('*').first();
 
   if (!user) return;
 
@@ -291,15 +269,18 @@ export async function login(username: string, password: string, reply?: FastifyR
   const valid = await compare(password, storedPass);
   if (!valid) return;
 
-  const accessToken = await getAccessToken(user);
-  const refreshToken = await getRefreshToken(user);
+  const accessInfo: AccessInfo = {
+    user: user,
+    accessToken: await generateAccessToken({ userId: user.id }),
+    refreshToken: await generateRefreshToken({ userId: user.id, tokenVersion: user.tokenVersion }),
+  };
 
-  if (reply) sendRefreshToken(reply, refreshToken);
+  if (reply) sendRefreshToken(reply, accessInfo.refreshToken);
 
   delete user['password'];
   delete user['tokenVersion'];
 
-  return { user, accessToken, refreshToken };
+  return accessInfo;
 }
 
 export function logout(reply?: FastifyReply) {

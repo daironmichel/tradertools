@@ -6,8 +6,8 @@ import 'dotenv/config';
 import { getLoaders } from './db';
 import { Context, schema } from './graphql';
 import {
-  getAccessToken,
-  getRefreshToken,
+  generateAccessToken,
+  generateRefreshToken,
   MaybeRefreshTokenPayload,
   sendRefreshToken,
   verifyAccessHeader,
@@ -63,8 +63,8 @@ fastifyServer.register((fastify, _opts, next) => {
           reply.header('WWW-Authenticate', 'https://trader.dleyva.com/login');
           reply.send();
         } else {
-          const token = await getAccessToken({ id: payload.userId });
-          const refreshToken = await getRefreshToken({ id: payload.userId, tokenVersion: payload.tokenVersion });
+          const token = await generateAccessToken(payload);
+          const refreshToken = await generateRefreshToken(payload);
           sendRefreshToken(reply, refreshToken);
           reply.send({ token });
         }

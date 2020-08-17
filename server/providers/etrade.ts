@@ -3,6 +3,8 @@ import querystring, { ParsedUrlQuery } from 'querystring';
 import axios, { AxiosRequestConfig } from 'axios';
 import OAuth from 'oauth-1.0a';
 import { IBroker } from './common';
+import { BrokerAuth, BrokerAuths } from '../db';
+import { Broker } from './index';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -48,7 +50,20 @@ class ETrade implements IBroker {
       const tokenResponse = querystring.parse(res.data) as RequestTokenResponse;
 
       if (userId) {
-        // TODO: save tokenResponse to db
+        const authData: Partial<BrokerAuth> = {
+          userId,
+          broker: Broker.ETrade,
+          oauth1RequestToken: tokenResponse.oauth_token,
+          oauth1RequestTokenSecret: tokenResponse.oauth_token_secret,
+        };
+
+        const brokerAuth = BrokerAuths().where({ userId, broker: Broker.ETrade }).select(['id']).first();
+
+        if (brokerAuth) {
+          BrokerAuths().where(brokerAuth).update(authData);
+        } else {
+          BrokerAuths().insert(authData);
+        }
       }
 
       return `${this.authorizeURL}?key=${oauth.consumer.key}&token=${tokenResponse.oauth_token}`;
@@ -58,7 +73,7 @@ class ETrade implements IBroker {
     }
   }
 
-  async authorize(oathVerifier: string, oathToken: string): Promise<boolean> {
+  async authorize(oauthVerifier: string, oauthToken: string): Promise<boolean> {
     // callback example
     // https://trader.dleyva.com/verify?oauth_token=DV%2FZjwwcLSofaNar9HlMvH6Y%2FaLN5waR80OWA3S7Rzg%3D&oauth_verifier=5STD2
   }
