@@ -7,7 +7,7 @@ export type Context = {
   request: FastifyRequest;
   reply: FastifyReply;
   loaders: Loaders;
-  user: Maybe<User>;
+  user: Maybe<Partial<User>>;
 };
 
 export type IntIdArg = {

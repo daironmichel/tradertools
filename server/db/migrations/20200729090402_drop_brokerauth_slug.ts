@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<any> {
     table.dropUnique(['userId', 'slug']).dropIndex('slug').dropIndex('slug varchar_pattern_ops');
 
     table.dropColumns('name', 'slug');
-    table.integer('broker');
+    table.integer('broker').notNullable();
   });
 }
 

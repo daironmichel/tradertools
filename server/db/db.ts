@@ -1,28 +1,29 @@
 import knex from 'knex';
 import { production, development } from '../../knexfile';
-import { Maybe } from 'graphql/jsutils/Maybe';
 
 export default process.env.NODE_ENV === 'production' ? knex(production) : knex(development);
 
 export interface User {
-  id?: number;
-  firstName?: string;
-  lastName?: string;
-  username?: string;
-  password?: string;
-  tokenVersion?: number;
+  id: number;
+  firstName: string; // default: ''
+  lastName: string; // default: ''
+  username: string;
+  password: string;
+  tokenVersion: number; // default: 0
 }
 
 export interface BrokerAuth {
-  id?: number;
-  name?: string;
-  userId?: number;
-  oauth1RequestToken?: string;
-  oauth1RequestTokenSecret?: string;
-  oauth1AccessToken?: string;
-  oauth1AccessTokenSecret?: string;
-  oauth1RefreshToken?: string;
-  oauth1AccessTokenExpiresAt?: Date;
-  oauth1RefreshTokenExpiresAt?: Date;
-  user?: Maybe<User>;
+  id: number;
+  broker: number; // enum server/providers/index.ts:Broker
+  userId: number;
+  oauth1RequestToken: string; // default: ''
+  oauth1RequestTokenSecret: string; // default: ''
+  oauth1AccessToken: string; // default: ''
+  oauth1AccessTokenSecret: string; // default: ''
+  oauth1RefreshToken: string; // default: ''
+  oauth1AccessTokenExpiresAt: Date; // default: current timestamp
+  oauth1RefreshTokenExpiresAt: Date; // default: current timestamp
+
+  // other props
+  user?: Partial<User>;
 }

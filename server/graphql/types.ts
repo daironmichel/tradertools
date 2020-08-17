@@ -11,6 +11,7 @@ import {
   GraphQLEnumType,
 } from 'graphql';
 import { Broker } from '../providers';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 interface INode {
   id: string | number;
@@ -35,7 +36,7 @@ export const NodeField: GraphQLFieldConfig<Object, Context> = {
   args: {
     id: { type: new GraphQLNonNull(GraphQLID) },
   },
-  resolve: async (_source, args, context, _info): Promise<unknown> => {
+  resolve: async (_source, args, context, _info): Promise<Maybe<INode>> => {
     if (!context.user) {
       context.reply.status(401); // unauthorized;
       context.reply.header('WWW-Authenticate', 'https://trader.dleyva.com/login');

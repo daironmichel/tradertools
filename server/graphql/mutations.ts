@@ -70,7 +70,7 @@ const RegisterMutation: GraphQLFieldConfig<Object, Context, IRegisterArgs> = {
 
     // TODO: validate password
 
-    const userData: User = {
+    const userData: Partial<User> = {
       username,
       firstName,
       lastName,

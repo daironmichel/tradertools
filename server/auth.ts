@@ -49,7 +49,7 @@ export interface AccessTokenPayload {
   userId: number;
 }
 
-export async function getAccessToken(user: User): Promise<string> {
+export async function getAccessToken(user: Partial<User>): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const { id: userId } = user;
     if (!userId) {
@@ -80,7 +80,7 @@ export interface RefreshTokenPayload {
   tokenVersion: number;
 }
 
-export async function getRefreshToken(user: User): Promise<string> {
+export async function getRefreshToken(user: Partial<User>): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const { id: userId, tokenVersion } = user;
     if (!userId) {
@@ -250,7 +250,7 @@ export interface RegisterResult {
   error?: string;
 }
 
-export async function register(userData: User, reply?: FastifyReply): Promise<RegisterResult> {
+export async function register(userData: Partial<User>, reply?: FastifyReply): Promise<RegisterResult> {
   let user: Maybe<User>;
   try {
     const result: User[] = await db<User, User[]>('User')

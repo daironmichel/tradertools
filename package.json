@@ -11,6 +11,7 @@
     "db-rollback": "env-cmd knex migrate:rollback --esm",
     "db-up": "env-cmd knex migrate:up --esm",
     "db-down": "env-cmd knex migrate:down --esm",
+    "db-list": "env-cmd knex migrate:list --esm",
     "createuser": "ts-node --project tsconfig.server.json --transpile-only server/commands/createuser.ts"
   },
   "dependencies": {
