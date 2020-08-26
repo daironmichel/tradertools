@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { addHours, endOfDay, endOfToday } from 'date-fns';
 import querystring, { ParsedUrlQuery } from 'querystring';
 import axios, { AxiosRequestConfig } from 'axios';
 import OAuth from 'oauth-1.0a';
@@ -8,21 +9,28 @@ import { Broker } from './index';
 
 const dev = process.env.NODE_ENV !== 'production';
 
-const oauth = new OAuth({
-  consumer: {
-    key: process.env.ETRADE_CONSUMER_KEY || '',
-    secret: process.env.ETRADE_CONSUMER_SECRET || '',
-  },
-  signature_method: 'HMAC-SHA1',
-  hash_function: function (base_string: string, key: string): string {
-    return crypto.createHmac('sha1', key).update(base_string).digest('base64');
-  },
-});
+const getOauth = (token?: OAuth.Token): OAuth => {
+  return new OAuth({
+    consumer: token || {
+      key: process.env.ETRADE_CONSUMER_KEY || '',
+      secret: process.env.ETRADE_CONSUMER_SECRET || '',
+    },
+    signature_method: 'HMAC-SHA1',
+    hash_function: function (base_string: string, key: string): string {
+      return crypto.createHmac('sha1', key).update(base_string).digest('base64');
+    },
+  });
+};
 
-interface RequestTokenResponse extends ParsedUrlQuery {
+interface EtradeRequestToken extends ParsedUrlQuery {
   oauth_token: string;
   oauth_token_secret: string;
   oauth_callback_confirmed: 'true' | 'false';
+}
+
+interface EtradeAccessToken extends ParsedUrlQuery {
+  oauth_token: string;
+  oauth_token_secret: string;
 }
 
 class ETrade implements IBroker {
@@ -32,22 +40,27 @@ class ETrade implements IBroker {
   private readonly refreshTokenURL = 'https://api.etrade.com/oauth/renew_access_token';
   private readonly revokeTokenURL = 'https://api.etrade.com/oauth/revoke_access_token';
   private readonly apiURL = dev ? 'https://apisb.etrade.com/v1' : 'https://api.etrade.com/v1';
+  private readonly axios = axios.create({
+    // baseURL: 'https://some-domain.com/api/',
+    timeout: parseInt(process.env.ETRADE_API_REQUEST_TIMEOUT || '120000'),
+  });
 
   async getAuthorizeURL(userId?: number): Promise<string> {
-    const requestData: OAuth.RequestOptions = {
+    const oauth = getOauth();
+    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
       url: this.requestTokenURL,
       method: 'GET',
       data: { oauth_callback: 'oob' },
     };
 
     const config: AxiosRequestConfig = {
-      timeout: parseInt(process.env.ETRADE_API_REQUEST_TIMEOUT || '120000'),
       headers: oauth.toHeader(oauth.authorize(requestData)),
+      ...requestData,
     };
 
     try {
-      const res = await axios.get(this.requestTokenURL, config);
-      const tokenResponse = querystring.parse(res.data) as RequestTokenResponse;
+      const res = await this.axios.request(config);
+      const tokenResponse = querystring.parse(res.data) as EtradeRequestToken;
 
       if (userId) {
         const authData: Partial<BrokerAuth> = {
@@ -57,12 +70,12 @@ class ETrade implements IBroker {
           oauth1RequestTokenSecret: tokenResponse.oauth_token_secret,
         };
 
-        const brokerAuth = BrokerAuths().where({ userId, broker: Broker.ETrade }).select(['id']).first();
+        const brokerAuth = await BrokerAuths().where({ userId, broker: Broker.ETrade }).select(['id']).first();
 
         if (brokerAuth) {
-          BrokerAuths().where(brokerAuth).update(authData);
+          await BrokerAuths().where(brokerAuth).update(authData);
         } else {
-          BrokerAuths().insert(authData);
+          await BrokerAuths().insert(authData);
         }
       }
 
@@ -73,10 +86,65 @@ class ETrade implements IBroker {
     }
   }
 
-  async authorize(oauthVerifier: string, oauthToken: string): Promise<boolean> {
-    // callback example
-    // https://trader.dleyva.com/verify?oauth_token=DV%2FZjwwcLSofaNar9HlMvH6Y%2FaLN5waR80OWA3S7Rzg%3D&oauth_verifier=5STD2
+  async getAccess(oauthVerifier: string, brokerAuth: BrokerAuth): Promise<boolean> {
+    const token = {
+      key: brokerAuth.oauth1RequestToken,
+      secret: brokerAuth.oauth1RequestTokenSecret,
+    };
+
+    const oauth = getOauth();
+    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
+      method: 'GET',
+      url: this.accessTokenURL,
+      data: { oauth_verifier: oauthVerifier, oauth_token: brokerAuth.oauth1RequestToken },
+    };
+
+    const config: AxiosRequestConfig = {
+      headers: oauth.toHeader(oauth.authorize(requestData, token)),
+      ...requestData,
+    };
+
+    try {
+      const res = await this.axios.request(config);
+      const tokenResponse = querystring.parse(res.data) as EtradeAccessToken;
+
+      const authData: Partial<BrokerAuth> = {
+        oauth1AccessToken: tokenResponse.oauth_token,
+        oauth1AccessTokenSecret: tokenResponse.oauth_token_secret,
+        oauth1AccessTokenExpiresAt: getAccessTokenInactivityExpirationTime(),
+        oauth1RefreshToken: tokenResponse.oauth_token,
+        oauth1RefreshTokenExpiresAt: endOfToday(),
+      };
+
+      await BrokerAuths().where('id', brokerAuth.id).update(authData);
+      Object.assign(brokerAuth, authData);
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   }
+
+  async refreshAccess(brokerAuth: BrokerAuth): Promise<boolean> {
+    return false;
+  }
+
+  async revokeAccess(brokerAuth: BrokerAuth): Promise<boolean> {
+    return false;
+  }
+}
+
+/**
+ * For ETrade access tokens become "inactive" after two hours of inactivity
+ * and "expired" at midnight US Eastern timezone. An "inactive" token can be
+ * reactivated by calling https://api.etrade.com/oauth/renew_access_token
+ */
+export function getAccessTokenInactivityExpirationTime(from: Date = new Date()): Date {
+  const midnight = endOfDay(from);
+  const twoHoursAfter = addHours(from, 2);
+  if (twoHoursAfter > midnight) return midnight;
+  return twoHoursAfter;
 }
 
 export default ETrade;

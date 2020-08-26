@@ -12,7 +12,11 @@ export interface User {
   tokenVersion: number; // default: 0
 }
 
-export const Users = <TResult>() => db<User, TResult>('User');
+export const Users = <TResult = User[]>() => db<User, TResult>('User');
+export function isUser(obj: any): obj is User {
+  const user = obj as User;
+  return user.username !== undefined;
+}
 
 export interface BrokerAuth {
   id: number;
@@ -30,6 +34,10 @@ export interface BrokerAuth {
   user?: Partial<User>;
 }
 
-export const BrokerAuths = <TResult>() => db<BrokerAuth, TResult>('BrokerAuth');
+export const BrokerAuths = <TResult = BrokerAuth[]>() => db<BrokerAuth, TResult>('BrokerAuth');
+export function isBrokerAuth(obj: any): obj is BrokerAuth {
+  const brokerAuth = obj as BrokerAuth;
+  return brokerAuth.broker !== undefined && brokerAuth.oauth1AccessTokenExpiresAt !== undefined;
+}
 
 export default db;

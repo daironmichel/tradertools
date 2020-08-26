@@ -234,9 +234,9 @@ export const GetAuthorizeURLPayload = new GraphQLObjectType({
 const GetAuthorizeURLMutation: GraphQLFieldConfig<Object, Context, IGetAuthorizeURLArgs> = {
   args: GetAuthorizeURLArgs,
   type: GetAuthorizeURLPayload,
-  resolve: async (_source, args, _context): Promise<IGetAuthorizeURLPayload> => {
+  resolve: async (_source, args, context): Promise<IGetAuthorizeURLPayload> => {
     const broker = getBrokerInstance(args.input.broker);
-    const authorizeURL = await broker.getAuthorizeURL();
+    const authorizeURL = await broker.getAuthorizeURL(context.user.id);
     return { url: authorizeURL };
   },
 };

@@ -1,4 +1,4 @@
-import { Context, createGraphQLEnumValues } from './common';
+import { Context, createGraphQLEnumValues, GraphQLTimestamp } from './common';
 import { fromGlobalId, toGlobalId } from 'graphql-relay';
 import {
   GraphQLResolveInfo,
@@ -9,9 +9,12 @@ import {
   GraphQLFieldConfig,
   GraphQLNonNull,
   GraphQLEnumType,
+  GraphQLInt,
+  GraphQLList,
 } from 'graphql';
 import { Broker } from '../providers';
 import { Maybe } from 'graphql/jsutils/Maybe';
+import { isBrokerAuth, isUser } from '../db';
 
 interface INode {
   id: string | number;
@@ -49,6 +52,10 @@ export const NodeField: GraphQLFieldConfig<Object, Context> = {
     if (itemInfo.type === UserNode.name) {
       return await context.loaders.user.load(itemId);
     }
+
+    if (itemInfo.type === BrokerAuthNode.name) {
+      return await context.loaders.brokerAuth.load(itemId);
+    }
     return null;
   },
 };
@@ -56,12 +63,13 @@ export const NodeField: GraphQLFieldConfig<Object, Context> = {
 export const UserNode = new GraphQLObjectType({
   name: 'UserNode',
   interfaces: [Node],
-  isTypeOf: () => true,
+  isTypeOf: isUser,
   fields: () => ({
     id: NodeId,
     username: { type: new GraphQLNonNull(GraphQLString) },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
+    brokerAuths: { type: new GraphQLList(BrokerAuthNode) },
   }),
 });
 
@@ -70,11 +78,23 @@ export const BrokerEnum = new GraphQLEnumType({
   values: createGraphQLEnumValues(Broker),
 });
 
+export const BrokerAuthNode = new GraphQLObjectType({
+  name: 'BrokerAuthNode',
+  interfaces: [Node],
+  isTypeOf: isBrokerAuth,
+  fields: () => ({
+    id: NodeId,
+    userId: { type: new GraphQLNonNull(GraphQLInt) },
+    broker: { type: new GraphQLNonNull(BrokerEnum) },
+    oauth1AccessTokenExpiresAt: { type: new GraphQLNonNull(GraphQLTimestamp) },
+    oauth1RefreshTokenExpiresAt: { type: new GraphQLNonNull(GraphQLTimestamp) },
+  }),
+});
+
 export const ViewerType = new GraphQLObjectType({
   name: 'ViewerType',
   fields: () => ({
     foo: { type: new GraphQLNonNull(GraphQLString), resolve: () => 'fuz' },
-    bar: { type: GraphQLString, resolve: () => 'bis' },
   }),
 });
 

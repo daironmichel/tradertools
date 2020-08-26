@@ -7,8 +7,8 @@ export async function up(knex: Knex): Promise<any> {
     table.string('oauth1AccessToken', 255).notNullable().defaultTo('');
     table.string('oauth1AccessTokenSecret', 255).notNullable().defaultTo('');
     table.string('oauth1RefreshToken', 255).notNullable().defaultTo('');
-    table.dateTime('oauth1AccessTokenExpiresAt').notNullable().defaultTo(knex.fn.now());
-    table.dateTime('oauth1RefreshTokenExpiresAt', { useTz: false }).notNullable().defaultTo(knex.fn.now());
+    table.dateTime('oauth1AccessTokenExpiresAt', { useTz: true }).notNullable().defaultTo(knex.fn.now());
+    table.dateTime('oauth1RefreshTokenExpiresAt', { useTz: true }).notNullable().defaultTo(knex.fn.now());
   });
 }
 

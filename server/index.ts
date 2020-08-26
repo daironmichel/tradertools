@@ -3,7 +3,7 @@ import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyGQL from 'fastify-gql';
 import fastifyCookie from 'fastify-cookie';
 import 'dotenv/config';
-import { getLoaders } from './db';
+import { BrokerAuths, getLoaders } from './db';
 import { Context, schema } from './graphql';
 import {
   generateAccessToken,
@@ -14,6 +14,12 @@ import {
   verifyRefreshCookie,
 } from './auth';
 import { ParsedUrlQuery } from 'querystring';
+import { getBrokerInstance } from './providers';
+
+interface VerifyQuery {
+  oauth_verifier: string;
+  oauth_token: string;
+}
 
 const port = parseInt(process.env.PORT || '3000', 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -68,6 +74,49 @@ fastifyServer.register((fastify, _opts, next) => {
           sendRefreshToken(reply, refreshToken);
           reply.send({ token });
         }
+      });
+
+      fastify.route({
+        method: 'GET',
+        url: '/verify',
+        schema: {
+          querystring: {
+            oauth_verifier: { type: 'string' },
+            oauth_token: { type: 'string' },
+          },
+        },
+        handler: async (req, reply) => {
+          const { oauth_verifier: oauthVerifier = '', oauth_token: oauthToken = '' } = req.query as VerifyQuery;
+
+          if (!oauthVerifier) {
+            reply.status(400);
+            reply.send({ error: 'required url query param missing: oauth_verifier' });
+          }
+
+          if (!oauthToken) {
+            reply.status(400);
+            reply.send({ error: 'required url query param missing: oauth_token' });
+          }
+
+          const brokerAuth = await BrokerAuths().where({ oauth1RequestToken: oauthToken }).select().first();
+
+          if (!brokerAuth) {
+            reply.status(404);
+            reply.send({ error: 'oauth_token not found!' });
+            return;
+          }
+
+          const broker = getBrokerInstance(brokerAuth.broker);
+          const authorized = await broker.getAccess(oauthVerifier, brokerAuth);
+
+          if (!authorized) {
+            reply.status(401);
+            reply.send({ error: 'requesting access to provider failed!' });
+            return;
+          }
+
+          reply.send({ message: 'access granted!' });
+        },
       });
 
       fastify.get('/a', async (req, reply) => {

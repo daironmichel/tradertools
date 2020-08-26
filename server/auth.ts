@@ -234,7 +234,7 @@ export interface RegisterResult {
 export async function register(userData: Partial<User>, reply?: FastifyReply): Promise<RegisterResult> {
   let user: Maybe<SignedInUser & UserTokenVersion>;
   try {
-    const result: (SignedInUser & UserTokenVersion)[] = await Users()
+    const result = await Users()
       .insert(userData)
       .returning(['id', 'username', 'firstName', 'lastName', 'tokenVersion']);
     user = result[0];

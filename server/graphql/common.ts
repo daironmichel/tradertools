@@ -1,7 +1,7 @@
 import { Loaders, User } from '../db';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { Maybe } from 'graphql/jsutils/Maybe';
-import { GraphQLEnumValueConfigMap } from 'graphql';
+import { GraphQLEnumValueConfigMap, GraphQLScalarType } from 'graphql';
 
 export type Context = {
   request: FastifyRequest;
@@ -38,3 +38,8 @@ export function createGraphQLEnumValues(numericEnum: any): GraphQLEnumValueConfi
   props.forEach((prop) => (graphqlFields[prop] = { value: numericEnum[prop] }));
   return graphqlFields;
 }
+
+export const GraphQLTimestamp = new GraphQLScalarType({
+  name: 'Timestamp',
+  serialize: (value: Date) => value.getTime(),
+});
