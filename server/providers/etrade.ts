@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { addHours, endOfDay, endOfToday } from 'date-fns';
+import { addHours, endOfDay, endOfToday, isAfter, isBefore } from 'date-fns';
 import querystring, { ParsedUrlQuery } from 'querystring';
 import axios, { AxiosRequestConfig } from 'axios';
 import OAuth from 'oauth-1.0a';
@@ -45,7 +45,7 @@ class ETrade implements IBroker {
     timeout: parseInt(process.env.ETRADE_API_REQUEST_TIMEOUT || '120000'),
   });
 
-  async getAuthorizeURL(userId?: number): Promise<string> {
+  private authorizeConfig() {
     const oauth = getOauth();
     const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
       url: this.requestTokenURL,
@@ -57,6 +57,11 @@ class ETrade implements IBroker {
       headers: oauth.toHeader(oauth.authorize(requestData)),
       ...requestData,
     };
+    return config;
+  }
+
+  async getAuthorizeURL(userId?: number): Promise<string> {
+    const config = this.authorizeConfig();
 
     try {
       const res = await this.axios.request(config);
@@ -79,14 +84,14 @@ class ETrade implements IBroker {
         }
       }
 
-      return `${this.authorizeURL}?key=${oauth.consumer.key}&token=${tokenResponse.oauth_token}`;
+      return `${this.authorizeURL}?key=${process.env.ETRADE_CONSUMER_KEY || ''}&token=${tokenResponse.oauth_token}`;
     } catch (err) {
       console.error(err);
       return '';
     }
   }
 
-  async getAccess(oauthVerifier: string, brokerAuth: BrokerAuth): Promise<boolean> {
+  private requestAccessConfig(brokerAuth: BrokerAuth, oauthVerifier: string) {
     const token = {
       key: brokerAuth.oauth1RequestToken,
       secret: brokerAuth.oauth1RequestTokenSecret,
@@ -103,21 +108,16 @@ class ETrade implements IBroker {
       headers: oauth.toHeader(oauth.authorize(requestData, token)),
       ...requestData,
     };
+    return config;
+  }
+
+  async getAccess(oauthVerifier: string, brokerAuth: BrokerAuth): Promise<boolean> {
+    const config = this.requestAccessConfig(brokerAuth, oauthVerifier);
 
     try {
       const res = await this.axios.request(config);
       const tokenResponse = querystring.parse(res.data) as EtradeAccessToken;
-
-      const authData: Partial<BrokerAuth> = {
-        oauth1AccessToken: tokenResponse.oauth_token,
-        oauth1AccessTokenSecret: tokenResponse.oauth_token_secret,
-        oauth1AccessTokenExpiresAt: getAccessTokenInactivityExpirationTime(),
-        oauth1RefreshToken: tokenResponse.oauth_token,
-        oauth1RefreshTokenExpiresAt: endOfToday(),
-      };
-
-      await BrokerAuths().where('id', brokerAuth.id).update(authData);
-      Object.assign(brokerAuth, authData);
+      await updateAccess(tokenResponse, brokerAuth);
 
       return true;
     } catch (err) {
@@ -126,12 +126,100 @@ class ETrade implements IBroker {
     }
   }
 
+  private refreshAccessConfig(brokerAuth: BrokerAuth) {
+    const token = {
+      key: brokerAuth.oauth1RefreshToken,
+      secret: brokerAuth.oauth1AccessTokenSecret,
+    };
+
+    const oauth = getOauth();
+    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
+      method: 'GET',
+      url: this.refreshTokenURL,
+      data: { oauth_token: brokerAuth.oauth1RefreshToken },
+    };
+
+    const config: AxiosRequestConfig = {
+      headers: oauth.toHeader(oauth.authorize(requestData, token)),
+      ...requestData,
+    };
+    return config;
+  }
+
   async refreshAccess(brokerAuth: BrokerAuth): Promise<boolean> {
-    return false;
+    const config = this.refreshAccessConfig(brokerAuth);
+
+    try {
+      const res = await this.axios.request(config);
+      const tokenResponse = querystring.parse(res.data) as EtradeAccessToken;
+      await updateAccess(tokenResponse, brokerAuth);
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  private revokeAccessConfig(brokerAuth: BrokerAuth) {
+    const token = {
+      key: brokerAuth.oauth1AccessToken,
+      secret: brokerAuth.oauth1AccessTokenSecret,
+    };
+
+    const oauth = getOauth();
+    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
+      method: 'GET',
+      url: this.revokeTokenURL,
+      data: { oauth_token: brokerAuth.oauth1AccessToken },
+    };
+
+    const config: AxiosRequestConfig = {
+      headers: oauth.toHeader(oauth.authorize(requestData, token)),
+      ...requestData,
+    };
+    return config;
   }
 
   async revokeAccess(brokerAuth: BrokerAuth): Promise<boolean> {
-    return false;
+    const config = this.revokeAccessConfig(brokerAuth);
+
+    try {
+      await this.axios.request(config);
+      await BrokerAuths().where('id', brokerAuth.id).delete();
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async request(config: AxiosRequestConfig, brokerAuth: BrokerAuth): Promise<any> {
+    const now = new Date();
+    const tokenExpired = isAfter(now, brokerAuth.oauth1AccessTokenExpiresAt);
+    if (tokenExpired) {
+      const canRefresh = isBefore(brokerAuth.oauth1AccessTokenExpiresAt, endOfToday());
+      let accessRefreshed = false;
+      if (canRefresh) accessRefreshed = await this.refreshAccess(brokerAuth);
+      else throw new Error('ETrade access token expired.');
+
+      if (!accessRefreshed) throw new Error('Unable to refresh access token.');
+    }
+
+    // TODO: build request config and make request
+    const token = {
+      key: brokerAuth.oauth1AccessToken,
+      secret: brokerAuth.oauth1AccessTokenSecret,
+    };
+
+    const oauth = getOauth();
+    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
+      method: 'GET',
+      url: this.revokeTokenURL,
+      data: { oauth_token: brokerAuth.oauth1AccessToken },
+    };
+
+    const requestConfig: AxiosRequestConfig = {};
   }
 }
 
@@ -145,6 +233,19 @@ export function getAccessTokenInactivityExpirationTime(from: Date = new Date()):
   const twoHoursAfter = addHours(from, 2);
   if (twoHoursAfter > midnight) return midnight;
   return twoHoursAfter;
+}
+
+async function updateAccess(tokenResponse: EtradeAccessToken, brokerAuth: BrokerAuth) {
+  const authData: Partial<BrokerAuth> = {
+    oauth1AccessToken: tokenResponse.oauth_token,
+    oauth1AccessTokenSecret: tokenResponse.oauth_token_secret,
+    oauth1AccessTokenExpiresAt: getAccessTokenInactivityExpirationTime(),
+    oauth1RefreshToken: tokenResponse.oauth_token,
+    oauth1RefreshTokenExpiresAt: endOfToday(),
+  };
+
+  await BrokerAuths().where('id', brokerAuth.id).update(authData);
+  Object.assign(brokerAuth, authData);
 }
 
 export default ETrade;
