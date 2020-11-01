@@ -247,15 +247,15 @@ export async function register(userData: Partial<User>, reply?: FastifyReply): P
     }
   }
 
+  const { tokenVersion, ...signedInfo } = user;
+
   const accessInfo: AccessInfo = {
-    user: user,
+    user: signedInfo,
     accessToken: await generateAccessToken({ userId: user.id }),
     refreshToken: await generateRefreshToken({ userId: user.id, tokenVersion: user.tokenVersion }),
   };
 
   if (reply) sendRefreshToken(reply, accessInfo.refreshToken);
-
-  delete user['tokenVersion'];
 
   return { accessInfo };
 }
@@ -265,20 +265,17 @@ export async function login(username: string, password: string, reply?: FastifyR
 
   if (!user) return;
 
-  const { password: storedPass = '' } = user;
+  const { password: storedPass = '', tokenVersion, ...userInfo } = user;
   const valid = await compare(password, storedPass);
   if (!valid) return;
 
   const accessInfo: AccessInfo = {
-    user: user,
+    user: userInfo,
     accessToken: await generateAccessToken({ userId: user.id }),
-    refreshToken: await generateRefreshToken({ userId: user.id, tokenVersion: user.tokenVersion }),
+    refreshToken: await generateRefreshToken({ userId: user.id, tokenVersion }),
   };
 
   if (reply) sendRefreshToken(reply, accessInfo.refreshToken);
-
-  delete user['password'];
-  delete user['tokenVersion'];
 
   return accessInfo;
 }

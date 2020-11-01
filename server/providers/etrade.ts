@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { addHours, endOfDay, endOfToday, isAfter, isBefore } from 'date-fns';
+import { addHours, endOfDay, endOfToday } from 'date-fns';
 import querystring, { ParsedUrlQuery } from 'querystring';
 import axios, { AxiosRequestConfig } from 'axios';
 import OAuth from 'oauth-1.0a';
@@ -7,7 +7,7 @@ import { IBroker } from './common';
 import { BrokerAuth, BrokerAuths } from '../db';
 import { Broker } from './index';
 
-const dev = process.env.NODE_ENV !== 'production';
+// const dev = process.env.NODE_ENV !== 'production';
 
 const getOauth = (token?: OAuth.Token): OAuth => {
   return new OAuth({
@@ -39,7 +39,7 @@ class ETrade implements IBroker {
   private readonly accessTokenURL = 'https://api.etrade.com/oauth/access_token';
   private readonly refreshTokenURL = 'https://api.etrade.com/oauth/renew_access_token';
   private readonly revokeTokenURL = 'https://api.etrade.com/oauth/revoke_access_token';
-  private readonly apiURL = dev ? 'https://apisb.etrade.com/v1' : 'https://api.etrade.com/v1';
+  // private readonly apiURL = dev ? 'https://apisb.etrade.com/v1' : 'https://api.etrade.com/v1';
   private readonly axios = axios.create({
     // baseURL: 'https://some-domain.com/api/',
     timeout: parseInt(process.env.ETRADE_API_REQUEST_TIMEOUT || '120000'),
@@ -194,33 +194,33 @@ class ETrade implements IBroker {
     }
   }
 
-  async request(config: AxiosRequestConfig, brokerAuth: BrokerAuth): Promise<any> {
-    const now = new Date();
-    const tokenExpired = isAfter(now, brokerAuth.oauth1AccessTokenExpiresAt);
-    if (tokenExpired) {
-      const canRefresh = isBefore(brokerAuth.oauth1AccessTokenExpiresAt, endOfToday());
-      let accessRefreshed = false;
-      if (canRefresh) accessRefreshed = await this.refreshAccess(brokerAuth);
-      else throw new Error('ETrade access token expired.');
+  // async request(config: AxiosRequestConfig, brokerAuth: BrokerAuth): Promise<any> {
+  //   const now = new Date();
+  //   const tokenExpired = isAfter(now, brokerAuth.oauth1AccessTokenExpiresAt);
+  //   if (tokenExpired) {
+  //     const canRefresh = isBefore(brokerAuth.oauth1AccessTokenExpiresAt, endOfToday());
+  //     let accessRefreshed = false;
+  //     if (canRefresh) accessRefreshed = await this.refreshAccess(brokerAuth);
+  //     else throw new Error('ETrade access token expired.');
 
-      if (!accessRefreshed) throw new Error('Unable to refresh access token.');
-    }
+  //     if (!accessRefreshed) throw new Error('Unable to refresh access token.');
+  //   }
 
-    // TODO: build request config and make request
-    const token = {
-      key: brokerAuth.oauth1AccessToken,
-      secret: brokerAuth.oauth1AccessTokenSecret,
-    };
+  //   // TODO: build request config and make request
+  //   const token = {
+  //     key: brokerAuth.oauth1AccessToken,
+  //     secret: brokerAuth.oauth1AccessTokenSecret,
+  //   };
 
-    const oauth = getOauth();
-    const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
-      method: 'GET',
-      url: this.revokeTokenURL,
-      data: { oauth_token: brokerAuth.oauth1AccessToken },
-    };
+  //   const oauth = getOauth();
+  //   const requestData: OAuth.RequestOptions & AxiosRequestConfig = {
+  //     method: 'GET',
+  //     url: this.revokeTokenURL,
+  //     data: { oauth_token: brokerAuth.oauth1AccessToken },
+  //   };
 
-    const requestConfig: AxiosRequestConfig = {};
-  }
+  //   const requestConfig: AxiosRequestConfig = {};
+  // }
 }
 
 /**

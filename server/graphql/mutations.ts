@@ -236,7 +236,7 @@ const GetAuthorizeURLMutation: GraphQLFieldConfig<Object, Context, IGetAuthorize
   type: GetAuthorizeURLPayload,
   resolve: async (_source, args, context): Promise<IGetAuthorizeURLPayload> => {
     const broker = getBrokerInstance(args.input.broker);
-    const authorizeURL = await broker.getAuthorizeURL(context.user.id);
+    const authorizeURL = await broker.getAuthorizeURL(context.user?.id);
     return { url: authorizeURL };
   },
 };
