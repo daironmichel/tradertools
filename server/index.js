@@ -148,7 +148,14 @@ app.prepare().then(async () => {
         }
 
         const { accessToken, brokerSlug, providerSlug, error } = responseData || {};
-        if (error) throw Boom.badData(error);
+        if (error) {
+          if (process.REDIRECT_TO_APP_ON_VERIFY_ERROR && process.APP_URLSCHEME) {
+            h.redirect(`${process.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
+          } else {
+            throw Boom.badData(error);
+          }
+        }
+        
         if (!accessToken) {
           console.warn('Unable to authenticate. Redirecting to login.');
           return h.redirect('/login');
