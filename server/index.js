@@ -143,8 +143,12 @@ app.prepare().then(async () => {
         try {
           responseData = await backboneApi.verify(oauthToken, oauthVerifier);
         } catch (e) {
-          console.error(e);
-          throw e;
+          if (process.REDIRECT_TO_APP_ON_VERIFY_ERROR && process.APP_URLSCHEME) {
+            h.redirect(`${process.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
+          } else {
+            console.error(e);
+            throw e;
+          }
         }
 
         const { accessToken, brokerSlug, providerSlug, error } = responseData || {};
