@@ -152,8 +152,11 @@ app.prepare().then(async () => {
         if (error) {
           console.log("res error:", error);
           if (process.env.REDIRECT_TO_APP_ON_VERIFY_ERROR === "1" && process.env.APP_URLSCHEME) {
-            console.log("toke:", oauthToken);
-            h.redirect(`${process.env.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
+            const urlSafeToken = encodeURIComponent(oauthToken);
+            const urlSafeVerifier = encodeURIComponent(oauthVerifier);
+            const appurl = `${process.env.APP_URLSCHEME}://verify?oauth_token=${urlSafeToken}&oauth_verifier=${urlSafeVerifier}`;
+            console.log("redirecting to app:", appurl);
+            return h.redirect(appurl);
           } else {
             throw Boom.badData(error);
           }
