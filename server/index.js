@@ -144,21 +144,16 @@ app.prepare().then(async () => {
           console.log("calling verify endpoint");
           responseData = await backboneApi.verify(oauthToken, oauthVerifier);
         } catch (e) {
-          console.log("error:", e);
-          if (process.REDIRECT_TO_APP_ON_VERIFY_ERROR === "1" && process.APP_URLSCHEME) {
-            console.log("redirecting to app")
-            h.redirect(`${process.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
-          } else {
-            console.error(e);
-            throw e;
-          }
+          console.error(e);
+          throw e;
         }
 
         const { accessToken, brokerSlug, providerSlug, error } = responseData || {};
         if (error) {
           console.log("res error:", error);
-          if (process.REDIRECT_TO_APP_ON_VERIFY_ERROR === "1" && process.APP_URLSCHEME) {
-            h.redirect(`${process.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
+          if (process.env.REDIRECT_TO_APP_ON_VERIFY_ERROR === "1" && process.env.APP_URLSCHEME) {
+            console.log("toke:", oauthToken);
+            h.redirect(`${process.env.APP_URLSCHEME}://verify?oauth_token=${oauthToken}&oauth_verifier=${oauthVerifier}`);
           } else {
             throw Boom.badData(error);
           }
